@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->enum('turno', ['maniana', 'tarde', 'contraturno']);
+            $table->unsignedTinyInteger('orden');
             $table->time('hora_inicio');
             $table->time('hora_fin');
             $table->unsignedSmallInteger('duracion_minutos');
