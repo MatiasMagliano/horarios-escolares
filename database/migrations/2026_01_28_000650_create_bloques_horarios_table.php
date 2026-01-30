@@ -14,13 +14,14 @@ return new class extends Migration
         Schema::create('bloques_horarios', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->enum('turno', ['maniana', 'tarde', 'contraturno']);
+            $table->enum('turno', ['maniana', 'tarde', 'contraturno_maniana', 'contraturno_tarde']);
             $table->unsignedTinyInteger('orden');
             $table->time('hora_inicio');
             $table->time('hora_fin');
             $table->unsignedSmallInteger('duracion_minutos');
             $table->boolean('es_especial')->default(false); // EF / Taller
             $table->timestamps();
+            $table->unique(['turno', 'orden']);
         });
     }
 
