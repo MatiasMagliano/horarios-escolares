@@ -58,7 +58,7 @@ class HorarioCursoSeeder_3A_TM extends Seeder
                 1 => ['Ed. Tecnológica', 'Brenda Quiroga'],   // LUNES
                 2 => ['F.V.T', 'Yolanda Sucheyre'],           // MARTES
                 3 => ['Ed. Tecnológica', 'Brenda Quiroga'],   // MIÉRCOLES
-                4 => ['Lengua y Lit.', 'Marisa Morales'],     // JUEVES
+                4 => ['Física', 'Natacha Marangón'],     // JUEVES
                 5 => ['F.V.T', 'Yolanda Sucheyre'],           // VIERNES
             ],
             6 => [ // M6

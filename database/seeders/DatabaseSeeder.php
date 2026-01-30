@@ -27,6 +27,9 @@ class DatabaseSeeder extends Seeder
             MateriasPorCursoSeeder_3A::class,
             HorarioCursoSeeder_3A_TM::class,
             HorarioCursoSeeder_3A_CT::class,
+            MateriasPorCursoSeeder_4A::class,
+            HorarioCursoSeeder_4A_TM::class,
+            HorarioCursoSeeder_4A_CT::class,
         ]);
     }
 }
