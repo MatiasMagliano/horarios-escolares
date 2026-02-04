@@ -29,21 +29,21 @@ class HorarioCursoSeeder_4A_TM extends Seeder
             1 => [ // M1
                 1 => ['Biología', 'Yanina Lerda'],                  // LUNES
                 2 => ['Lengua y Lit.', 'Noelia Martinez Villegas'], // MARTES
-                3 => ['Inf. Electrónica', 'Andrea Chiappori'],      // MIÉRCOLES
+                3 => ['Inf. Electrónica I', 'Andrea Chiappori'],      // MIÉRCOLES
                 4 => ['Química', 'Natacha Marangón'],               // JUEVES
                 5 => ['Inglés', 'Carina Chialva'],                  // VIERNES
             ],
             2 => [ // M2
                 1 => ['Biología', 'Yanina Lerda'],                  // LUNES
                 2 => ['Lengua y Lit.', 'Noelia Martinez Villegas'], // MARTES
-                3 => ['Inf. Electrónica', 'Andrea Chiappori'],      // MIÉRCOLES
+                3 => ['Inf. Electrónica I', 'Andrea Chiappori'],      // MIÉRCOLES
                 4 => ['Química', 'Natacha Marangón'],               // JUEVES
                 5 => ['Inglés', 'Carina Chialva'],                  // VIERNES
             ],
             3 => [ // M3
                 1 => ['Física', 'Natacha Marangón'],                // LUNES
                 2 => ['Lengua y Lit.', 'Noelia Martinez Villegas'], // MARTES
-                3 => ['Inf. Electrónica', 'Andrea Chiappori'],      // MIÉRCOLES
+                3 => ['Inf. Electrónica I', 'Andrea Chiappori'],      // MIÉRCOLES
                 4 => ['Química', 'Natacha Marangón'],               // JUEVES
                 5 => ['Inglés', 'Carina Chialva'],                  // VIERNES
             ],
@@ -71,15 +71,15 @@ class HorarioCursoSeeder_4A_TM extends Seeder
             7 => [ // M7
                 1 => ['Geografía', 'Marianela Gatti'],               // LUNES
                 2 => ['Historia', 'Facundo Zurita'],                 // MARTES
-                3 => ['Electrotecnia', 'Pablo Bulacio'],             // MIÉRCOLES
-                4 => ['Elect. Analógica', 'Pablo Bulacio'],          // JUEVES
+                3 => ['Electrotecnia I', 'Pablo Bulacio'],             // MIÉRCOLES
+                4 => ['Elect. Analógica I', 'Pablo Bulacio'],          // JUEVES
                 5 => ['Elect. Digital I', 'Pablo Bulacio'],          // VIERNES
             ],
             8 => [ // M8
                 1 => ['Geografía', 'Marianela Gatti'],               // LUNES
                 2 => ['Historia', 'Facundo Zurita'],                 // MARTES
-                3 => ['Electrotecnia', 'Pablo Bulacio'],             // MIÉRCOLES
-                4 => ['Elect. Analógica', 'Pablo Bulacio'],          // JUEVES
+                3 => ['Electrotecnia I', 'Pablo Bulacio'],             // MIÉRCOLES
+                4 => ['Elect. Analógica I', 'Pablo Bulacio'],          // JUEVES
                 5 => ['Elect. Digital I', 'Pablo Bulacio'],          // VIERNES
             ],
         ];

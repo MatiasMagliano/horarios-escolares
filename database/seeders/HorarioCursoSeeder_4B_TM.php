@@ -4,8 +4,13 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Curso;
+use App\Models\Materia;
+use App\Models\Docente;
+use App\Models\HorarioBase;
+use App\Models\BloqueHorario;
 
-class HorarioCursoSeeder_4B extends Seeder
+class HorarioCursoSeeder_4B_TM extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,7 +20,7 @@ class HorarioCursoSeeder_4B extends Seeder
         // 1 Curso
         $curso = Curso::where([
             'anio' => 4,
-            'division' => 'A',
+            'division' => 'B',
             'turno' => 'maniana',
         ])->firstOrFail();
 

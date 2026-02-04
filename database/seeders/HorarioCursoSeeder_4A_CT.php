@@ -21,7 +21,7 @@ class HorarioCursoSeeder_4A_CT extends Seeder
         $curso = Curso::where([
             'anio' => 4,
             'division' => 'A',
-            'turno' => 'contraturno_maniana',
+            'turno' => 'maniana',
         ])->firstOrFail();
 
         // 2 Grilla
@@ -29,23 +29,23 @@ class HorarioCursoSeeder_4A_CT extends Seeder
             1 => [ // M1
                 1 => [null, null],                          // LUNES
                 2 => ['Biología', 'Yanina Lerda'],          // MARTES
-                3 => ['Electrotecnia', 'Pablo Bulacio'],    // MIÉRCOLES
+                3 => ['Electrotecnia I', 'Pablo Bulacio'],    // MIÉRCOLES
                 4 => [null, null],                          // JUEVES
-                5 => ['Elect. Analógica', 'Pablo Bulacio'], // VIERNES
+                5 => ['Elect. Analógica I', 'Pablo Bulacio'], // VIERNES
             ],
             2 => [ // M2
                 1 => [null, null],                          // LUNES
                 2 => ['Biología', 'Yanina Lerda'],          // MARTES
-                3 => ['Electrotecnia', 'Pablo Bulacio'],    // MIÉRCOLES
+                3 => ['Electrotecnia I', 'Pablo Bulacio'],    // MIÉRCOLES
                 4 => [null, null],                          // JUEVES
-                5 => ['Elect. Analógica', 'Pablo Bulacio'], // VIERNES
+                5 => ['Elect. Analógica I', 'Pablo Bulacio'], // VIERNES
             ],
             3 => [ // M3
                 1 => [null, null],                          // LUNES
                 2 => [null, null],                          // MARTES
-                3 => ['Electrotecnia', 'Pablo Bulacio'],    // MIÉRCOLES
+                3 => ['Electrotecnia I', 'Pablo Bulacio'],    // MIÉRCOLES
                 4 => [null, null],                          // JUEVES
-                5 => ['Elect. Analógica', 'Pablo Bulacio'], // VIERNES
+                5 => ['Elect. Analógica I', 'Pablo Bulacio'], // VIERNES
             ],
             4 => [ // M4
                 1 => [null, null],                          // LUNES

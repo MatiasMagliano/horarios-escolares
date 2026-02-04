@@ -64,7 +64,8 @@ class DocentesSeeder extends Seeder
             'Yanina Sanchez',
             'César Giacchini',
             'Domingo Greggio',
-            'Bruno/Morano'
+            'Bruno/Morano',
+            'Priscila Calizaya'
         ];
 
         foreach ($docentes as $nombre) {

@@ -4,15 +4,16 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Curso;
+use App\Models\Materia;
 
-class MateriasPorCursoSeeder_4B_TM extends Seeder
+class MateriasPorCursoSeeder_4B extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        
         $curso = Curso::where([
             'anio' => 4,
             'division' => 'B',

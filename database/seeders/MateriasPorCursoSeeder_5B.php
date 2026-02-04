@@ -7,7 +7,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Curso;
 use App\Models\Materia;
 
-class MateriasPorCursoSeeder_4A extends Seeder
+class MateriasPorCursoSeeder_5B extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,25 +15,24 @@ class MateriasPorCursoSeeder_4A extends Seeder
     public function run(): void
     {
         $curso = Curso::where([
-            'anio' => 4,
-            'division' => 'A',
+            'anio' => 5,
+            'division' => 'B',
             'turno' => 'maniana',
         ])->firstOrFail();
 
         $materias = [
-            ['nombre' => 'Lengua y Lit.', 'horas_totales' => 4], 
+            ['nombre' => 'Lengua y Lit.', 'horas_totales' => 3], 
             ['nombre' => 'Matemática', 'horas_totales' => 5], 
             ['nombre' => 'Física', 'horas_totales' => 4], 
             ['nombre' => 'Química', 'horas_totales' => 3], 
-            ['nombre' => 'Biología', 'horas_totales' => 4],
+            ['nombre' => 'Psicología', 'horas_totales' => 3],
             ['nombre' => 'Geografía', 'horas_totales' => 3], 
             ['nombre' => 'Historia', 'horas_totales' => 3], 
             ['nombre' => 'Inglés', 'horas_totales' => 3], 
-            ['nombre' => 'Ed. Artística', 'horas_totales' => 2],
-            ['nombre' => 'Elect. Digital I', 'horas_totales' => 4],
-            ['nombre' => 'Elect. Analógica I', 'horas_totales' => 5],
-            ['nombre' => 'Electrotecnia I', 'horas_totales' => 5],
-            ['nombre' => 'Inf. Electrónica I', 'horas_totales' => 3],
+            ['nombre' => 'Música', 'horas_totales' => 2],
+            ['nombre' => 'Inf. Aplicada II', 'horas_totales' => 8],
+            ['nombre' => 'Sist. de Información', 'horas_totales' => 6],
+            ['nombre' => 'Programación II', 'horas_totales' => 6],
         ];
 
         foreach ($materias as $materia) {
