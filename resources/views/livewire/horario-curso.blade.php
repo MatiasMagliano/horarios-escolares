@@ -23,7 +23,7 @@
         @foreach($this->grillas as $turno => $grilla)
 
             <h4 class="mt-4 mb-2">
-                Turno {{ ucfirst($turno) }}
+                Turno {{ $this->designacionTurno($turno) }}
             </h4>
 
             <table class="table table-bordered table-sm table-fixed">
@@ -58,17 +58,17 @@
                         <tr>
 
                             {{-- BLOQUE DE CLASES --}}
-                            <th class="bg-light text-center">
+                            <th class="bg-light">
                                 {{ $bloque->hora_inicio }} - {{ $bloque->hora_fin }}
                             </th>
 
                             @for($dia = 1; $dia <= 5; $dia++)
                                 <td class="text-center">
                                     @if(isset($dias[$dia]))
-                                        <div class="fw-semibold">
+                                        <div class="fw-semibold text-center">
                                             {{ $dias[$dia]->materia->nombre }}
                                         </div>
-                                        <div class="text-muted small">
+                                        <div class="text-muted small text-center">
                                             {{ $dias[$dia]->docente->nombre }}
                                         </div>
                                     @else

@@ -77,4 +77,16 @@ class HorarioCurso extends Component
             default   => throw new \LogicException("Turno inválido: $turnoCurso"),
         };
     }
+
+    // accesor designacion de turno
+    public function designacionTurno(string $turno): string
+    {
+        return match ($turno) {
+            'maniana' => 'Mañana',
+            'tarde' => 'Tarde',
+            'contraturno_maniana' => 'Contraturno Mañana',
+            'contraturno_tarde' => 'Contraturno Tarde',
+            default => 'Contraturno',
+        };
+    }
 }
