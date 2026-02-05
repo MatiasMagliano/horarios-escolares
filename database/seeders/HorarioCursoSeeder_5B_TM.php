@@ -47,35 +47,35 @@ class HorarioCursoSeeder_5B_TM extends Seeder
                 4 => ['Química', 'Carolina Molina'], // JUEVES
                 5 => ['Lengua y Lit.', 'Adam Luna'], // VIERNES
             ],
-            4 => [ // M4
+            5 => [ // M4
                 1 => ['Inf. Aplicada II', 'Andrea Chiappori'], // LUNES
                 2 => ['Matemática', 'Lorena Vera'], // MARTES
                 3 => ['Física', 'Lorena Vera'], // MIÉRCOLES
                 4 => ['Química', 'Carolina Molina'], // JUEVES
                 5 => ['Inf. Aplicada II', 'Andrea Chiappori'], // VIERNES
             ],
-            5 => [ // M5
+            6 => [ // M5
                 1 => ['Inf. Aplicada II', 'Andrea Chiappori'], // LUNES
                 2 => ['Matemática', 'Lorena Vera'], // MARTES
                 3 => ['Física', 'Lorena Vera'], // MIÉRCOLES
                 4 => ['Química', 'Carolina Molina'], // JUEVES
                 5 => ['Inf. Aplicada II', 'Andrea Chiappori'], // VIERNES
             ],
-            6 => [ // M6
+            8 => [ // M6
                 1 => ['Programación II', 'Andrea Chiappori'], // LUNES
                 2 => ['Geografía', 'Marianela Gatti'], // MARTES
                 3 => ['Matemática', 'Lorena Vera'], // MIÉRCOLES
                 4 => ['Inf. Aplicada II', 'Andrea Chiappori'], // JUEVES
                 5 => ['Programación II', 'Andrea Chiappori'], // VIERNES
             ],
-            7 => [ // M7
+            9 => [ // M7
                 1 => ['Programación II', 'Andrea Chiappori'], // LUNES
                 2 => ['Geografía', 'Marianela Gatti'], // MARTES
                 3 => ['Matemática', 'Lorena Vera'], // MIÉRCOLES
                 4 => ['Inf. Aplicada II', 'Andrea Chiappori'], // JUEVES
                 5 => ['Programación II', 'Andrea Chiappori'], // VIERNES
             ],
-            8 => [ // M8
+            10 => [ // M8
                 1 => ['Programación II', 'Andrea Chiappori'], // LUNES
                 2 => ['Geografía', 'Marianela Gatti'], // MARTES
                 3 => ['Matemática', 'Lorena Vera'], // MIÉRCOLES

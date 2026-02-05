@@ -47,35 +47,35 @@ class HorarioCursoSeeder_5A_TM extends Seeder
                 4 => ['Psicología', 'Yolanda Sucheyre'],       // JUEVES
                 5 => ['Geografía', 'Belén Ramos'],             // VIERNES
             ],
-            4 => [ // M4
+            5 => [ // M4
                 1 => ['Electrotecnia II', 'Pablo Barac'],      // LUNES
                 2 => ['Historia', 'Ariel Ardiles'],            // MARTES
                 3 => ['Historia', 'Ariel Ardiles'],            // MIÉRCOLES
                 4 => ['Psicología', 'Yolanda Sucheyre'],       // JUEVES
                 5 => ['Geografía', 'Belén Ramos'],             // VIERNES
             ],
-            5 => [ // M5
+            6 => [ // M5
                 1 => ['Electrotecnia II', 'Pablo Barac'],      // LUNES
                 2 => ['Historia', 'Ariel Ardiles'],            // MARTES
                 3 => ['Inglés', 'Sandra Occhipinti'],          // MIÉRCOLES
                 4 => ['Psicología', 'Yolanda Sucheyre'],       // JUEVES
                 5 => ['Geografía', 'Belén Ramos'],             // VIERNES
             ],
-            6 => [ // M6
+            8 => [ // M6
                 1 => ['Electrotecnia II', 'Pablo Barac'],      // LUNES
                 2 => ['Física', 'Martín Andrada'],             // MARTES
                 3 => ['Inglés', 'Sandra Occhipinti'],          // MIÉRCOLES
                 4 => ['Lengua y Lit.', 'Marisa Morales'],      // JUEVES
                 5 => ['Física', 'Martín Andrada'],             // VIERNES
             ],
-            7 => [ // M7
+            9 => [ // M7
                 1 => ['Electrotecnia II', 'Pablo Barac'],      // LUNES
                 2 => ['Física', 'Martín Andrada'],             // MARTES
                 3 => [null, null],                             // MIÉRCOLES
                 4 => ['Elect. Digital II', 'Ian Concepción'],  // JUEVES
                 5 => ['Física', 'Martín Andrada'],             // VIERNES
             ],
-            8 => [ // M8
+            10 => [ // M8
                 1 => ['Electrotecnia II', 'Pablo Barac'],      // LUNES
                 2 => [null, null],                             // MARTES
                 3 => [null, null],                             // MIÉRCOLES

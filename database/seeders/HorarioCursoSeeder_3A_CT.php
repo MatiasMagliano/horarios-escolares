@@ -47,35 +47,35 @@ class HorarioCursoSeeder_3A_CT extends Seeder
                 4 => [null, null],                        // Jueves
                 5 => [null, null],                        // Viernes
             ],
-            4 => [ // M4
+            5 => [ // M4
                 1 => [null, null],   // Lunes
                 2 => [null, null],   // Martes
                 3 => [null, null],                      // Miércoles
                 4 => [null, null],                      // Jueves
                 5 => [null, null],                      // Viernes
             ],
-            5 => [ // M5
+            6 => [ // M5
                 1 => [null, null],   // Lunes
                 2 => [null, null],   // Martes
                 3 => [null, null],                      // Miércoles
                 4 => [null, null],                      // Jueves
                 5 => [null, null],                      // Viernes
             ],
-            6 => [ // M6
+            8 => [ // M6
                 1 => [null, null],   // Lunes
                 2 => [null, null],   // Martes
                 3 => [null, null],                      // Miércoles
                 4 => [null, null],                      // Jueves
                 5 => [null, null],                      // Viernes
             ],
-            7 => [ // M7
+            9 => [ // M7
                 1 => [null, null],   // Lunes
                 2 => [null, null],   // Martes
                 3 => [null, null],                      // Miércoles
                 4 => [null, null],                      // Jueves
                 5 => [null, null],                      // Viernes
             ],
-            8 => [ // M8
+            10 => [ // M8
                 1 => [null, null],   // Lunes
                 2 => [null, null],   // Martes
                 3 => [null, null],                      // Miércoles

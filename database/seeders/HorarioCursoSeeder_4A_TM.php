@@ -47,35 +47,35 @@ class HorarioCursoSeeder_4A_TM extends Seeder
                 4 => ['Química', 'Natacha Marangón'],               // JUEVES
                 5 => ['Inglés', 'Carina Chialva'],                  // VIERNES
             ],
-            4 => [ // M4
+            5 => [ // M4
                 1 => ['Matemática', 'Ivana Ribodino'],               // LUNES
                 2 => ['Ed. Artística', 'Sonia Bruno'],               // MARTES
                 3 => ['Matemática', 'Ivana Ribodino'],               // MIÉRCOLES
                 4 => ['Lengua y Lit.', 'Noelia Martinez Villegas'],  // JUEVES
                 5 => ['Física', 'Natacha Marangón'],                 // VIERNES
             ],
-            5 => [ // M5
+            6 => [ // M5
                 1 => ['Matemática', 'Ivana Ribodino'],               // LUNES
                 2 => ['Ed. Artística', 'Sonia Bruno'],               // MARTES
                 3 => ['Matemática', 'Ivana Ribodino'],               // MIÉRCOLES
                 4 => ['Elect. Digital I', 'Pablo Bulacio'],          // JUEVES
                 5 => ['Física', 'Natacha Marangón'],                 // VIERNES
             ],
-            6 => [ // M6
+            8 => [ // M6
                 1 => ['Geografía', 'Marianela Gatti'],               // LUNES
                 2 => ['Historia', 'Facundo Zurita'],                 // MARTES
                 3 => ['Matemática', 'Ivana Ribodino'],               // MIÉRCOLES
                 4 => ['Elect. Digital I', 'Pablo Bulacio'],          // JUEVES
                 5 => ['Física', 'Natacha Marangón'],                 // VIERNES
             ],
-            7 => [ // M7
+            9 => [ // M7
                 1 => ['Geografía', 'Marianela Gatti'],               // LUNES
                 2 => ['Historia', 'Facundo Zurita'],                 // MARTES
                 3 => ['Electrotecnia I', 'Pablo Bulacio'],             // MIÉRCOLES
                 4 => ['Elect. Analógica I', 'Pablo Bulacio'],          // JUEVES
                 5 => ['Elect. Digital I', 'Pablo Bulacio'],          // VIERNES
             ],
-            8 => [ // M8
+            10 => [ // M8
                 1 => ['Geografía', 'Marianela Gatti'],               // LUNES
                 2 => ['Historia', 'Facundo Zurita'],                 // MARTES
                 3 => ['Electrotecnia I', 'Pablo Bulacio'],             // MIÉRCOLES

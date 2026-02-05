@@ -47,35 +47,35 @@ class HorarioCursoSeeder_4A_CT extends Seeder
                 4 => [null, null],                          // JUEVES
                 5 => ['Elect. Analógica I', 'Pablo Bulacio'], // VIERNES
             ],
-            4 => [ // M4
+            5 => [ // M4
                 1 => [null, null],                          // LUNES
                 2 => [null, null],                          // MARTES
                 3 => [null, null],                          // MIÉRCOLES
                 4 => [null, null],                          // JUEVES
                 5 => [null, null],                          // VIERNES
             ],
-            5 => [ // M5
+            6 => [ // M5
                 1 => [null, null],                          // LUNES
                 2 => [null, null],                          // MARTES
                 3 => [null, null],                          // MIÉRCOLES
                 4 => [null, null],                          // JUEVES
                 5 => [null, null],                          // VIERNES
             ],
-            6 => [ // M6
+            8 => [ // M6
                 1 => [null, null],                          // LUNES
                 2 => [null, null],                          // MARTES
                 3 => [null, null],                          // MIÉRCOLES
                 4 => [null, null],                          // JUEVES
                 5 => [null, null],                          // VIERNES
             ],
-            7 => [ // M7
+            9 => [ // M7
                 1 => [null, null],                          // LUNES
                 2 => [null, null],                          // MARTES
                 3 => [null, null],                          // MIÉRCOLES
                 4 => [null, null],                          // JUEVES
                 5 => [null, null],                          // VIERNES
             ],
-            8 => [ // M8
+            10 => [ // M8
                 1 => [null, null],                          // LUNES
                 2 => [null, null],                          // MARTES
                 3 => [null, null],                          // MIÉRCOLES

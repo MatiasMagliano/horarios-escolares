@@ -47,35 +47,35 @@ class HorarioCursoSeeder_4B_TM extends Seeder
                 4 => ['Matemática', 'Martín Andrada'], // JUEVES
                 5 => ['Lógica Matemática', 'Martín Andrada'], // VIERNES
             ],
-            4 => [ // M4
+            5 => [ // M4
                 1 => ['Biología', 'Natacha Marangón'], // LUNES
                 2 => ['Inglés', 'Carina Chialva'], // MARTES
                 3 => ['Matemática', 'Martín Andrada'], // MIÉRCOLES
                 4 => ['Biología', 'Natacha Marangón'], // JUEVES
                 5 => ['Lengua y Lit.', 'Adam Luna'], // VIERNES
             ],
-            5 => [ // M5
+            6 => [ // M5
                 1 => ['Biología', 'Natacha Marangón'], // LUNES
                 2 => ['Inglés', 'Carina Chialva'], // MARTES
                 3 => ['Matemática', 'Martín Andrada'], // MIÉRCOLES
                 4 => ['Lengua y Lit.', 'Adam Luna'], // JUEVES
                 5 => ['Lengua y Lit.', 'Adam Luna'], // VIERNES
             ],
-            6 => [ // M6
+            8 => [ // M6
                 1 => ['Biología', 'Natacha Marangón'], // LUNES
                 2 => ['Inglés', 'Carina Chialva'], // MARTES
                 3 => ['Lógica Matemática', 'Martín Andrada'], // MIÉRCOLES
                 4 => ['Lengua y Lit.', 'Adam Luna'], // JUEVES
                 5 => ['Geografía', 'Marcos Morales'], // VIERNES
             ],
-            7 => [ // M7
+            9 => [ // M7
                 1 => ['Ed. Artística', 'Vanina Ibarra'], // LUNES
                 2 => ['Física', 'Natacha Marangón'], // MARTES
                 3 => ['Inf. Aplicada I', 'Andrea Chiappori'], // MIÉRCOLES
                 4 => ['Física', 'Natacha Marangón'], // JUEVES
                 5 => ['Geografía', 'Marcos Morales'], // VIERNES
             ],
-            8 => [ // M8
+            10 => [ // M8
                 1 => ['Ed. Artística', 'Vanina Ibarra'], // LUNES
                 2 => ['Física', 'Natacha Marangón'], // MARTES
                 3 => ['Inf. Aplicada I', 'Andrea Chiappori'], // MIÉRCOLES

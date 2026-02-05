@@ -47,35 +47,35 @@ class HorarioCursoSeeder_7A_TM extends Seeder
                 4 => ['Inglés técnico', 'Carina Chialva'],         // JUEVES
                 5 => ['Elect. Industrial II', 'Ian Concepción']    // VIERNES
             ],
-            4 => [ // M4
+            5 => [ // M4
                 1 => [null, null],                                 // LUNES
                 2 => ['Proy. Integrador', 'Ian Concepción'],       // MARTES
                 3 => ['Telecomunicaciones II', 'Yanina Sanchez'],  // MIÉRCOLES
                 4 => ['Elect. Industrial II', 'Ian Concepción'],   // JUEVES
                 5 => ['Elect. Digital IV', 'Ian Concepción'],      // VIERNES
             ],
-            5 => [ // M5
+            6 => [ // M5
                 1 => [null, null],                                 // LUNES
                 2 => ['Proy. Integrador', 'Ian Concepción'],       // MARTES
                 3 => ['Telecomunicaciones II', 'Yanina Sanchez'],  // MIÉRCOLES
                 4 => ['Elect. Industrial II', 'Ian Concepción'],   // JUEVES
                 5 => ['Elect. Digital IV', 'Ian Concepción'],      // VIERNES
             ],
-            6 => [ // M6
+            8 => [ // M6
                 1 => [null, null],                                         // LUNES
                 2 => ['Proy. Integrador', 'Ian Concepción'],               // MARTES
                 3 => ['M. Jurídico de las Act. Indust.', 'Greca Colazo'],  // MIÉRCOLES
                 4 => ['Higiene y Seguridad', 'Domingo Greggio'],           // JUEVES
                 5 => ['Elect. Digital IV', 'Ian Concepción'],              // VIERNES
             ],
-            7 => [ // M7
+            9 => [ // M7
                 1 => [null, null],                                         // LUNES
                 2 => ['Emprendimientos', 'Laura Perez'],                   // MARTES
                 3 => ['M. Jurídico de las Act. Indust.', 'Greca Colazo'],  // MIÉRCOLES
                 4 => ['Higiene y Seguridad', 'Domingo Greggio'],           // JUEVES
                 5 => ['Elect. Digital IV', 'Ian Concepción'],              // VIERNES
             ],
-            8 => [ // M8
+            10 => [ // M8
                 1 => [null, null],                                         // LUNES
                 2 => ['Emprendimientos', 'Laura Perez'],                   // MARTES
                 3 => ['M. Jurídico de las Act. Indust.', 'Greca Colazo'],  // MIÉRCOLES

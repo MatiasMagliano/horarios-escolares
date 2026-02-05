@@ -47,35 +47,35 @@ class HorarioCursoSeeder_2A_TM extends Seeder
                 4 => ['Biología', 'Marianela Pecorari'],               // JUEVES
                 5 => ['Matemática', 'Ivana Ribodino'],                 // VIERNES
             ],
-            4 => [ // M4
+            5 => [ // M4
                 1 => ['Química', 'Yanina Funes'],                // LUNES
                 2 => ['Lengua y Lit.', 'Noelia Martinez Villegas'], // MARTES
                 3 => ['Ed. Tecnológica', 'Vanesa Farías'],       // MIÉRCOLES
                 4 => ['Inglés', 'Carina Chialva'],               // JUEVES
                 5 => ['Matemática', 'Ivana Ribodino'],           // VIERNES
             ],
-            5 => [ // M5
+            6 => [ // M5
                 1 => ['Química', 'Yanina Funes'],                // LUNES
                 2 => ['Lengua y Lit.', 'Noelia Martinez Villegas'], // MARTES
                 3 => ['Ed. Tecnológica', 'Vanesa Farías'],       // MIÉRCOLES
                 4 => ['Inglés', 'Carina Chialva'],               // JUEVES
                 5 => ['Inglés', 'Carina Chialva'],               // VIERNES
             ],
-            6 => [ // M6
+            8 => [ // M6
                 1 => ['Química', 'Yanina Funes'],                    // LUNES
                 2 => ['Lengua y Lit.', 'Noelia Martinez Villegas'],  // MARTES
                 3 => ['Música', 'Franco Morano'],                    // MIÉRCOLES
                 4 => ['Lengua y Lit.', 'Noelia Martinez Villegas'],  // JUEVES
                 5 => [null, null],                                  // VIERNES
             ],
-            7 => [ // M7
+            9 => [ // M7
                 1 => ['Dib. Técnico', 'Nadia Llarrull'],              // LUNES
                 2 => ['Historia', 'Verónica Gizzi'],                 // MARTES
                 3 => ['Música', 'Franco Morano'],                    // MIÉRCOLES
                 4 => ['Lengua y Lit.', 'Noelia Martinez Villegas'],  // JUEVES
                 5 => [null, null],                                  // VIERNES
             ],
-            8 => [ // M8
+            10 => [ // M8
                 1 => ['Dib. Técnico', 'Nadia Llarrull'],  // LUNES
                 2 => ['Historia', 'Verónica Gizzi'],     // MARTES
                 3 => ['Música', 'Franco Morano'],        // MIÉRCOLES

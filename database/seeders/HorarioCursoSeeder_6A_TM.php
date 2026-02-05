@@ -47,35 +47,35 @@ class HorarioCursoSeeder_6A_TM extends Seeder
                 4 => ['Telecomunicaciones', 'Martín Franch'],               // JUEVES
                 5 => ['Filosofía', 'Yolanda Sucheyre'],                     // VIERNES
             ],
-            4 => [ // M4
+            5 => [ // M4
                 1 => ['Elect. Industrial I', 'Ian Concepción'],             // LUNES
                 2 => ['Econ. y Gestión de la Prod. Ind.', 'Laura Perez'],   // MARTES
                 3 => ['An. matemático', 'Claudia Farías'],                  // MIÉRCOLES
                 4 => ['An. matemático', 'Claudia Farías'],                  // JUEVES
                 5 => ['Elect. Industrial I', 'Ian Concepción'],             // VIERNES
             ],
-            5 => [ // M5
+            6 => [ // M5
                 1 => ['Elect. Industrial I', 'Ian Concepción'],             // LUNES
                 2 => ['Econ. y Gestión de la Prod. Ind.', 'Laura Perez'],   // MARTES
                 3 => ['An. matemático', 'Claudia Farías'],                  // MIÉRCOLES
                 4 => ['An. matemático', 'Claudia Farías'],                  // JUEVES
                 5 => ['Elect. Industrial I', 'Ian Concepción'],             // VIERNES
             ],
-            6 => [ // M6
+            8 => [ // M6
                 1 => ['Ciud. y Política', 'Greca Colazo'],      // LUNES
                 2 => ['Econ. y Gestión de la Prod. Ind.', 'Laura Perez'],             // MARTES
                 3 => ['Lengua y Lit.', 'Noelia Martinez Villegas'],          // MIÉRCOLES
                 4 => ['An. matemático', 'Claudia Farías'],      // JUEVES
                 5 => ['Elect. Industrial I', 'Ian Concepción'],             // VIERNES
             ],
-            7 => [ // M7
+            9 => [ // M7
                 1 => ['Ciud. y Política', 'Greca Colazo'],      // LUNES
                 2 => ['Inglés', 'Sandra Occhipinti'],             // MARTES
                 3 => ['Lengua y Lit.', 'Noelia Martinez Villegas'],                             // MIÉRCOLES
                 4 => ['Teatro', 'Laura Díaz'],  // JUEVES
                 5 => ['Elect. Industrial I', 'Ian Concepción'],             // VIERNES
             ],
-            8 => [ // M8
+            10 => [ // M8
                 1 => ['Ciud. y Política', 'Greca Colazo'],      // LUNES
                 2 => ['Elect. Digital III', 'Ian Concepción'],             // MARTES
                 3 => ['Lengua y Lit.', 'Noelia Martinez Villegas'],                             // MIÉRCOLES

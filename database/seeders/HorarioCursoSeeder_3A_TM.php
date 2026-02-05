@@ -47,35 +47,35 @@ class HorarioCursoSeeder_3A_TM extends Seeder
                 4 => ['Lengua y Lit.', 'Marisa Morales'],     // JUEVES
                 5 => ['Física', 'Natacha Marangón'],           // VIERNES
             ],
-            4 => [ // M4
+            5 => [ // M4
                 1 => ['Ed. Tecnológica', 'Brenda Quiroga'],   // LUNES
                 2 => ['F.V.T', 'Yolanda Sucheyre'],           // MARTES
                 3 => ['Ed. Tecnológica', 'Brenda Quiroga'],   // MIÉRCOLES
                 4 => ['Lengua y Lit.', 'Marisa Morales'],     // JUEVES
                 5 => ['F.V.T', 'Yolanda Sucheyre'],           // VIERNES
             ],
-            5 => [ // M5
+            6 => [ // M5
                 1 => ['Ed. Tecnológica', 'Brenda Quiroga'],   // LUNES
                 2 => ['F.V.T', 'Yolanda Sucheyre'],           // MARTES
                 3 => ['Ed. Tecnológica', 'Brenda Quiroga'],   // MIÉRCOLES
                 4 => ['Física', 'Natacha Marangón'],     // JUEVES
                 5 => ['F.V.T', 'Yolanda Sucheyre'],           // VIERNES
             ],
-            6 => [ // M6
+            8 => [ // M6
                 1 => ['Dib. Técnico', 'Ivana Ribodino'],      // LUNES
                 2 => ['Artística/Música', 'Bruno/Morano'],       // MARTES
                 3 => ['Lengua y Lit.', 'Marisa Morales'],     // MIÉRCOLES
                 4 => ['Física', 'Natacha Marangón'],          // JUEVES
                 5 => ['Inglés', 'Carina Chialva'],            // VIERNES
             ],
-            7 => [ // M7
+            9 => [ // M7
                 1 => ['Dib. Técnico', 'Ivana Ribodino'],      // LUNES
                 2 => ['Artística/Música', 'Bruno/Morano'],       // MARTES
                 3 => ['Lengua y Lit.', 'Marisa Morales'],     // MIÉRCOLES
                 4 => ['Historia', 'Erick Zaccagnini'],        // JUEVES
                 5 => ['Inglés', 'Carina Chialva'],            // VIERNES
             ],
-            8 => [ // M8
+            10 => [ // M8
                 1 => ['Dib. Técnico', 'Ivana Ribodino'],      // LUNES
                 2 => ['Artística/Música', 'Bruno/Morano'],       // MARTES
                 3 => ['Lengua y Lit.', 'Marisa Morales'],     // MIÉRCOLES

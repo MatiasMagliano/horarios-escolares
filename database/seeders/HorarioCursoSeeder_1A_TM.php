@@ -47,35 +47,35 @@ class HorarioCursoSeeder_1A_TM extends Seeder
                 4 => ['Lengua y Lit.', 'Noelia Martinez Villegas'],  // JUEVES
                 5 => ['Ed. Tecnológica', 'Sofía Rodriguez'],         // VIERNES
             ],
-            4 => [ // M4
+            5 => [ // M4
                 1 => ['Ed. Artística', 'M. Elena Mansilla'],   // LUNES
                 2 => ['Inglés', 'Claudia Ramadán'],            // MARTES
                 3 => ['Física', 'Yanina Funes'],               // MIÉRCOLES
                 4 => ['Geografía', 'Marcos Morales'],          // JUEVES
                 5 => ['Ed. Tecnológica', 'Sofía Rodriguez'],  // VIERNES
             ],
-            5 => [ // M5
+            6 => [ // M5
                 1 => ['Ed. Artística', 'M. Elena Mansilla'],   // LUNES
                 2 => ['Inglés', 'Claudia Ramadán'],            // MARTES
                 3 => ['Física', 'Yanina Funes'],               // MIÉRCOLES
                 4 => ['Geografía', 'Marcos Morales'],          // JUEVES
                 5 => ['Matemática', 'Ivana Ribodino'],         // VIERNES
             ],
-            6 => [ // M6
+            8 => [ // M6
                 1 => ['Ciudadanía y Participación', 'Ariel Ardiles'], // LUNES
                 2 => ['Inglés', 'Claudia Ramadán'],                    // MARTES
                 3 => ['Física', 'Yanina Funes'],                       // MIÉRCOLES
                 4 => ['Geografía', 'Marcos Morales'],                  // JUEVES
                 5 => ['Matemática', 'Ivana Ribodino'],                 // VIERNES
             ],
-            7 => [ // M7
+            9 => [ // M7
                 1 => ['Ciudadanía y Participación', 'Ariel Ardiles'],   // LUNES
                 2 => ['Lengua y Lit.', 'Noelia Martinez Villegas'],     // MARTES
                 3 => ['Matemática', 'Ivana Ribodino'],                  // MIÉRCOLES
                 4 => ['Dib. Técnico', 'Nadia Llarrull'],                // JUEVES
                 5 => ['Matemática', 'Ivana Ribodino'],                  // VIERNES
             ],
-            8 => [ // M8
+            10 => [ // M8
                 1 => ['Ciudadanía y Participación', 'Ariel Ardiles'], // LUNES
                 2 => ['Lengua y Lit.', 'Noelia Martinez Villegas'],   // MARTES
                 3 => ['Matemática', 'Ivana Ribodino'],                // MIÉRCOLES
