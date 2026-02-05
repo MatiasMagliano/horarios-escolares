@@ -39,16 +39,31 @@
                 </thead>
                 <tbody>
                     @forelse($grilla as $orden => $dias)
-                    @php
-                        $ref = $dias->first();
-                    @endphp
+                        @php
+                            $bloque = $dias['bloque'];
+                            $dias = $dias['dias'];
+                        @endphp
+
+                        @if($bloque->tipo === 'recreo')
+                            <tr class="table-secondary">
+                                <th class="text-center small text-muted">
+                                    {{ $bloque->hora_inicio }} - {{ $bloque->hora_fin }}
+                                </th>
+                                <td colspan="5" class="text-center fw-bold small text-muted">
+                                    RECREO
+                                </td>
+                            </tr>
+                            @continue
+                        @endif
                         <tr>
-                            <th class="bg-light text-center" style="width: 10%;">
-                                {{ $ref->bloque->hora_inicio }} - {{ $ref->bloque->hora_fin }}
+
+                            {{-- BLOQUE DE CLASES --}}
+                            <th class="bg-light text-center">
+                                {{ $bloque->hora_inicio }} - {{ $bloque->hora_fin }}
                             </th>
-                            
+
                             @for($dia = 1; $dia <= 5; $dia++)
-                                <td class="text-center" style="width: 18%;">
+                                <td class="text-center">
                                     @if(isset($dias[$dia]))
                                         <div class="fw-semibold">
                                             {{ $dias[$dia]->materia->nombre }}

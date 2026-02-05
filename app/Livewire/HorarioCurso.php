@@ -39,14 +39,26 @@ class HorarioCurso extends Component
 
         return collect([$turnoCurso, $turnoContraturno])
             ->mapWithKeys(function ($turno) {
-                $grilla = HorarioBase::with(['materia', 'docente', 'bloque'])
+                // traer todos los bloques
+                $bloques = BloqueHorario::where('turno', $turno)->orderBy('orden')->get();
+
+                // traer los horarios
+                $horarios = HorarioBase::with(['materia', 'docente', 'bloque'])
                     ->where('curso_id', $this->cursoId)
-                    ->whereHas('bloque', fn ($q) =>
-                        $q->where('turno', $turno)
-                    )
+                    ->whereHas('bloque', fn ($q) => $q->where('turno', $turno))
                     ->get()
                     ->groupBy(fn ($h) => $h->bloque->orden)
                     ->map(fn ($items) => $items->keyBy('dia_semana'));
+
+                // armar la grilla
+                $grilla = $bloques->mapWithKeys(function ($bloque) use ($horarios) {
+                    return [
+                        $bloque->orden => collect([
+                            'bloque' => $bloque,
+                            'dias' => $horarios[$bloque->orden] ?? collect()
+                        ])
+                    ];
+                });
 
                 return [$turno => $grilla];
             });

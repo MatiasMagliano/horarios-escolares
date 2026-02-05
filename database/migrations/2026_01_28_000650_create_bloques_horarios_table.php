@@ -19,7 +19,7 @@ return new class extends Migration
             $table->time('hora_inicio');
             $table->time('hora_fin');
             $table->unsignedSmallInteger('duracion_minutos');
-            $table->boolean('es_especial')->default(false); // EF / Taller
+            $table->enum('tipo', ['clase', 'recreo', 'ef', 'taller']);
             $table->timestamps();
             $table->unique(['turno', 'orden']);
         });
