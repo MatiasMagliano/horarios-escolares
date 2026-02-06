@@ -14,7 +14,15 @@ class BloqueHorario extends Model
         'hora_inicio',
         'hora_fin',
         'duracion_minutos',
-        'es_especial',
+        'tipo',
+    ];
+
+    // casteo de las variables de tiempo para que sean formateadas al momento de usarlas
+    protected $casts = [
+        'hora_inicio' => 'datetime',
+        'hora_fin' => 'datetime',
+        'duracion_minutos' => 'integer',
+        'orden' => 'integer',
     ];
 
     public function horariosBase()

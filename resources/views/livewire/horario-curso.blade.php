@@ -34,7 +34,7 @@
                     <table class="table table-bordered table-sm table-fixed">
                         <thead class="table-light">
                             <tr>
-                                <th class="text-center align-middle" style="width: 10%;">Bloque</th>
+                                <th class="text-center align-middle" style="width: 10%;">·</th>
                                 <th class="text-center align-middle" style="width: 18%;">Lunes</th>
                                 <th class="text-center align-middle" style="width: 18%;">Martes</th>
                                 <th class="text-center align-middle" style="width: 18%;">Miércoles</th>
@@ -52,7 +52,7 @@
                                 @if($bloque->tipo === 'recreo')
                                     <tr class="table-secondary">
                                         <th class="text-center small text-muted align-middle">
-                                            {{ $bloque->hora_inicio }} - {{ $bloque->hora_fin }}
+                                            {{ $bloque->hora_inicio->format('H:i') }} - {{ $bloque->hora_fin->format('H:i') }}
                                         </th>
                                         <td colspan="5" class="text-center fw-bold small text-muted align-middle">
                                             RECREO
@@ -63,8 +63,8 @@
                                 <tr>
 
                                     {{-- BLOQUE DE CLASES --}}
-                                    <th class="bg-light small">
-                                        {{ $bloque->hora_inicio }} - {{ $bloque->hora_fin }}
+                                    <th class="bg-light small text-center align-middle">
+                                        {{ $bloque->hora_inicio->format('H:i') }} - {{ $bloque->hora_fin->format('H:i') }}
                                     </th>
 
                                     @for($dia = 1; $dia <= 5; $dia++)
@@ -94,5 +94,5 @@
                 @endforeach
             @endif
         </div>
-    </div>  
+    </div>
 </div>
