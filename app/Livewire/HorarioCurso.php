@@ -43,7 +43,7 @@ class HorarioCurso extends Component
                 $bloques = BloqueHorario::where('turno', $turno)->orderBy('orden')->get();
 
                 // traer los horarios
-                $horarios = HorarioBase::with(['materia', 'docente', 'bloque'])
+                $horarios = HorarioBase::with(['cursoMateria.materia', 'docente', 'bloque'])
                     ->where('curso_id', $this->cursoId)
                     ->whereHas('bloque', fn ($q) => $q->where('turno', $turno))
                     ->get()

@@ -12,10 +12,18 @@ class Curso extends Model
         'ciclo',
         'turno',
     ];
+    
+    // relación con pivot curso_materia
+    public function cursoMaterias()
+    {
+        return $this->hasMany(CursoMateria::class);
+    }
 
     public function materias()
     {
-        return $this->hasMany(Materia::class);
+        return $this->belongsToMany(Materia::class,'curso_materia')
+            ->withPivot('horas_totales')
+            ->withTimestamps();
     }
 
     public function horariosBase()
@@ -43,5 +51,4 @@ class Curso extends Model
             default   => '—',
         };
     }
-
 }

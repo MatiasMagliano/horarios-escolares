@@ -17,7 +17,8 @@ class HorarioBase extends Model
     ];
 
     public function curso()   { return $this->belongsTo(Curso::class); }
-    public function materia() { return $this->belongsTo(Materia::class); }
+    public function cursoMateria(){ return $this->belongsTo(CursoMateria::class); }
     public function docente() { return $this->belongsTo(Docente::class); }
     public function bloque()  { return $this->belongsTo(BloqueHorario::class, 'bloque_id'); }
+
 }

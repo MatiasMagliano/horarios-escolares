@@ -12,9 +12,17 @@ class Materia extends Model
         'horas_totales', // en módulos
     ];
 
-    public function curso()
+    // relaciones con tabla pivot curso_materia
+    public function cursoMaterias()
     {
-        return $this->belongsTo(Curso::class);
+        return $this->hasMany(CursoMateria::class);
+    }
+
+    public function cursos()
+    {
+        return $this->belongsToMany(Curso::class,'curso_materia')
+            ->withPivot('horas_totales')
+            ->withTimestamps();
     }
 
     public function horariosBase()
