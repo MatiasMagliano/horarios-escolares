@@ -23,15 +23,25 @@ class Curso extends Model
         return $this->hasMany(HorarioBase::class);
     }
 
-    /**
-     * Devuelve el turno contraturno lógico del curso
-     */
-    public function turnoContrario(): string
+    public function nombreCompleto(): string
+    {
+        return "{$this->anio}° {$this->division} ({$this->turno})";
+    }
+
+    // accesor designacion de ciclo
+    public function getCicloAttribute(): string
+    {
+        return $this->anio <= 3 ? 'CB' : 'CE';
+    }
+
+    // accesor designación de turno
+    public function getTurnoDesignacionAttribute(): string
     {
         return match ($this->turno) {
-            'maniana' => 'tarde',
-            'tarde'   => 'maniana',
-            default   => 'contraturno',
+            'maniana' => 'Mañana',
+            'tarde'   => 'Tarde',
+            default   => '—',
         };
     }
+
 }
