@@ -8,7 +8,7 @@ use App\Models\Curso;
 use App\Models\Materia;
 use App\Models\CursoMateria;
 
-class MateriasPorCursoSeeder_3A extends Seeder
+class MateriasPorCursoSeeder_3B extends Seeder
 {
     /**
      * Run the database seeds.
@@ -17,8 +17,8 @@ class MateriasPorCursoSeeder_3A extends Seeder
     {
         $curso = Curso::where([
             'anio' => 3,
-            'division' => 'A',
-            'turno' => 'maniana',
+            'division' => 'B',
+            'turno' => 'tarde',
         ])->firstOrFail();
 
         $materias = [

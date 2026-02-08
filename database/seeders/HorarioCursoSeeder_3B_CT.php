@@ -11,7 +11,7 @@ use App\Models\Docente;
 use App\Models\HorarioBase;
 use Exception;
 
-class HorarioCursoSeeder_3A_CT extends Seeder
+class HorarioCursoSeeder_3B_CT extends Seeder
 {
     /**
      * Run the database seeds.
@@ -21,67 +21,67 @@ class HorarioCursoSeeder_3A_CT extends Seeder
         // 1 Curso
         $curso = Curso::where([
             'anio' => 3,
-            'division' => 'A',
-            'turno' => 'maniana',
+            'division' => 'B',
+            'turno' => 'tarde',
         ])->firstOrFail();
 
-        // 2 grilla de horarios
+        // 2 Grilla
         $grilla = [
             1 => [ // M1
-                1 => ['Dib. Técnico', 'Ivana Ribodino'], // Lunes
-                2 => [null, null],                    // Martes
-                3 => ['Historia', 'Erick Zaccagnini'], // Miércoles
-                4 => [null, null],                    // Jueves
-                5 => [null, null],                    // Viernes
+                1 => [null, null],  // LUNES
+                2 => [null, null],  // MARTES
+                3 => [null, null],  // MIÉRCOLES
+                4 => [null, null],  // JUEVES
+                5 => [null, null],  // VIERNES
             ],
             2 => [ // M2
-                1 => [null, null],                    // Lunes
-                2 => [null, null],                    // Martes
-                3 => ['Historia', 'Erick Zaccagnini'], // Miércoles
-                4 => [null, null],                    // Jueves
-                5 => [null, null],                    // Viernes
+                1 => [null, null],  // LUNES
+                2 => [null, null],  // MARTES
+                3 => [null, null],  // MIÉRCOLES
+                4 => [null, null],  // JUEVES
+                5 => [null, null],  // VIERNES
             ],
             3 => [ // M3
-                1 => [null, null],      // Lunes
-                2 => [null, null],      // Martes
-                3 => [null, null], // Miércoles
-                4 => [null, null],                        // Jueves
-                5 => [null, null],                        // Viernes
+                1 => [null, null],  // LUNES
+                2 => [null, null],  // MARTES
+                3 => [null, null],  // MIÉRCOLES
+                4 => [null, null],  // JUEVES
+                5 => [null, null],  // VIERNES
             ],
             5 => [ // M4
-                1 => [null, null],   // Lunes
-                2 => [null, null],   // Martes
-                3 => [null, null],                      // Miércoles
-                4 => [null, null],                      // Jueves
-                5 => [null, null],                      // Viernes
+                1 => [null, null],  // LUNES
+                2 => [null, null],  // MARTES
+                3 => [null, null],  // MIÉRCOLES
+                4 => [null, null],  // JUEVES
+                5 => [null, null],  // VIERNES
             ],
             6 => [ // M5
-                1 => [null, null],   // Lunes
-                2 => [null, null],   // Martes
-                3 => [null, null],                      // Miércoles
-                4 => [null, null],                      // Jueves
-                5 => [null, null],                      // Viernes
+                1 => [null, null],  // LUNES
+                2 => [null, null],  // MARTES
+                3 => [null, null],  // MIÉRCOLES
+                4 => [null, null],  // JUEVES
+                5 => [null, null],  // VIERNES
             ],
             8 => [ // M6
-                1 => [null, null],   // Lunes
-                2 => [null, null],   // Martes
-                3 => [null, null],                      // Miércoles
-                4 => [null, null],                      // Jueves
-                5 => [null, null],                      // Viernes
+                1 => [null, null],  // LUNES
+                2 => [null, null],  // MARTES
+                3 => ['Física', 'Marianela Pecorari'],  // MIÉRCOLES
+                4 => [null, null],  // JUEVES
+                5 => [null, null],  // VIERNES
             ],
             9 => [ // M7
-                1 => [null, null],   // Lunes
-                2 => [null, null],   // Martes
-                3 => [null, null],                      // Miércoles
-                4 => [null, null],                      // Jueves
-                5 => [null, null],                      // Viernes
+                1 => [null, null],  // LUNES
+                2 => [null, null],  // MARTES
+                3 => ['Física', 'Marianela Pecorari'],  // MIÉRCOLES
+                4 => [null, null],  // JUEVES
+                5 => [null, null],  // VIERNES
             ],
             10 => [ // M8
-                1 => [null, null],   // Lunes
-                2 => [null, null],   // Martes
-                3 => [null, null],                      // Miércoles
-                4 => [null, null],                      // Jueves
-                5 => [null, null],                      // Viernes
+                1 => [null, null],  // LUNES
+                2 => [null, null],  // MARTES
+                3 => ['Física', 'Marianela Pecorari'],  // MIÉRCOLES
+                4 => [null, null],  // JUEVES
+                5 => [null, null],  // VIERNES
             ],
         ];
 
@@ -96,7 +96,7 @@ class HorarioCursoSeeder_3A_CT extends Seeder
 
                 // SELECCIÓN DE BLOQUE HORARIO
                 $bloque = BloqueHorario::where([
-                    'turno' => 'contraturno_maniana',
+                    'turno' => 'contraturno_tarde',
                     'orden' => $orden,
                 ])->firstOrFail();
 

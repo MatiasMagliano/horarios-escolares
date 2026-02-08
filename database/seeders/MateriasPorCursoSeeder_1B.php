@@ -8,7 +8,7 @@ use App\Models\Curso;
 use App\Models\Materia;
 use App\Models\CursoMateria;
 
-class MateriasPorCursoSeeder_2A extends Seeder
+class MateriasPorCursoSeeder_1B extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,21 +16,20 @@ class MateriasPorCursoSeeder_2A extends Seeder
     public function run(): void
     {
         $curso = Curso::where([
-            'anio' => 2,
-            'division' => 'A',
-            'turno' => 'maniana',
+            'anio' => 1,
+            'division' => 'B',
+            'turno' => 'tarde',
         ])->firstOrFail();
 
-        // se asigna, de acuerdo a currícula NOMBRE.MATERIA --> CARGA.HORARIA
         $materias = [
+            ['nombre' => 'Cs. Ss. - Geografía', 'horas_totales' => 5],
             ['nombre' => 'Lengua y Literatura', 'horas_totales' => 5],
             ['nombre' => 'Matemática', 'horas_totales' => 5],
-            ['nombre' => 'Biología', 'horas_totales' => 3],
-            ['nombre' => 'Cs. Ns. - Química', 'horas_totales' => 3],
-            ['nombre' => 'Cs. Ss. - Historia', 'horas_totales' => 5],
-            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3],
-            ['nombre' => 'Ed. Art. - Música', 'horas_totales' => 3],
+            ['nombre' => 'Cs. Ns. - Biología', 'horas_totales' => 3],
             ['nombre' => 'Ed. Tecnológica', 'horas_totales' => 4],
+            ['nombre' => 'Ed. Art. - Art. Visuales', 'horas_totales' => 3],
+            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3],
+            ['nombre' => 'Cs. Ns. - Física', 'horas_totales' => 3],
             ['nombre' => 'Ciud. y Participación', 'horas_totales' => 3],
             ['nombre' => 'Dib. Técnico', 'horas_totales' => 2],
         ];

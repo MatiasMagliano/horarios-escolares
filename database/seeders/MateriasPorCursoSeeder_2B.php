@@ -5,10 +5,10 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Curso;
-use App\Models\Materia;
 use App\Models\CursoMateria;
+use App\Models\Materia;
 
-class MateriasPorCursoSeeder_2A extends Seeder
+class MateriasPorCursoSeeder_2B extends Seeder
 {
     /**
      * Run the database seeds.
@@ -17,8 +17,8 @@ class MateriasPorCursoSeeder_2A extends Seeder
     {
         $curso = Curso::where([
             'anio' => 2,
-            'division' => 'A',
-            'turno' => 'maniana',
+            'division' => 'B',
+            'turno' => 'tarde',
         ])->firstOrFail();
 
         // se asigna, de acuerdo a currícula NOMBRE.MATERIA --> CARGA.HORARIA

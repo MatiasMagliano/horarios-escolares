@@ -6,6 +6,7 @@ use App\Models\Curso;
 new class extends Component {
 
     public $cursoIdSeleccionado;
+    public ?int $cursoAEliminar = null;
 
     protected $listeners = ['curso-guardado' => '$refresh', 'curso-eliminado' => '$refresh'];
 
@@ -24,12 +25,23 @@ new class extends Component {
     }
 
     // eliminar curso
-    public function eliminar($id)
+    public function confirmarEliminacion($id)
     {
-        $curso = Curso::find($id);
-        $curso->delete();
-        $this->dispatch('curso-eliminado');
+        $this->cursoAEliminar = $id;
+        $this->dispatch('abrir-modal-eliminar');
     }
+
+    public function eliminar()
+    {
+        if ($this->cursoAEliminar) {
+            Curso::find($this->cursoAEliminar)?->delete();
+        }
+
+        $this->cursoAEliminar = null;
+
+        $this->dispatch('cerrar-modal-eliminar');
+    }
+
 
     // renderizar la vista
     public function render()
@@ -61,7 +73,7 @@ new class extends Component {
                 <th style="width: 10%;">División</th>
                 <th style="width: 15%;">Ciclo</th>
                 <th style="width: 20%;">Turno</th>
-                <th style="width: 25%;">Acciones</th>
+                <th style="width: 25%;">Herramientas</th>
             </tr>
         </thead>
 
@@ -93,7 +105,7 @@ new class extends Component {
                         </button>
 
                         {{-- Botón de eliminar --}}
-                        <button wire:click="eliminar({{ $curso->id }})" class="btn btn-sm btn-outline-danger">
+                        <button wire:click="confirmarEliminacion({{ $curso->id }})" class="btn btn-sm btn-outline-danger">
                             <i class="bi bi-trash"></i>
                         </button>
                     </td>
@@ -108,9 +120,9 @@ new class extends Component {
         </tbody>
     </table>
 
-    {{-- MODAL --}}
+    {{-- MODAL NUEVO/EDITAR --}}
     <div wire:ignore.self class="modal fade" id="cursoModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
             <div class="modal-content">
 
                 <div class="modal-header">
@@ -130,4 +142,38 @@ new class extends Component {
             </div>
         </div>
     </div>
+
+    {{-- MODAL ELIMINAR --}}
+    <div wire:ignore.self class="modal fade" id="eliminarModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+            <div class="modal-content">
+
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    ¿Estás seguro de que querés eliminar este curso?
+                    <br>
+                    <small class="text-muted">
+                        Esta acción no se puede deshacer.
+                    </small>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button wire:click="eliminar"
+                            class="btn btn-danger">
+                        Sí, eliminar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>
+

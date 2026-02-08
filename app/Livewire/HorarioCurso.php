@@ -38,24 +38,33 @@ class HorarioCurso extends Component
         $turnoContraturno = $this->contraturnoDe($turnoCurso);
 
         return collect([$turnoCurso, $turnoContraturno])
-            ->mapWithKeys(function ($turno) {
+            ->mapWithKeys(function ($turno) use ($turnoCurso, $turnoContraturno) {
                 // traer todos los bloques
-                $bloques = BloqueHorario::where('turno', $turno)->orderBy('orden')->get();
+                $bloques = BloqueHorario::whereIn('turno', [$turnoCurso, $turnoContraturno])
+                    ->orderBy('orden')
+                    ->get()
+                    ->groupBy('turno');
 
                 // traer los horarios
                 $horarios = HorarioBase::with(['cursoMateria.materia', 'docente', 'bloque'])
                     ->where('curso_id', $this->cursoId)
-                    ->whereHas('bloque', fn ($q) => $q->where('turno', $turno))
+                    ->whereHas('bloque', fn ($q) =>
+                        $q->whereIn('turno', [$turnoCurso, $turnoContraturno])
+                    )
                     ->get()
-                    ->groupBy(fn ($h) => $h->bloque->orden)
-                    ->map(fn ($items) => $items->keyBy('dia_semana'));
+                    ->groupBy(fn ($h) => $h->bloque->turno)
+                    ->map(fn ($items) =>
+                        $items->groupBy(fn ($h) => $h->bloque->orden)
+                              ->map(fn ($i) => $i->keyBy('dia_semana'))
+                    );
 
                 // armar la grilla
-                $grilla = $bloques->mapWithKeys(function ($bloque) use ($horarios) {
+                $bloquesDelTurno = $bloques->get($turno, collect());
+                $grilla = $bloquesDelTurno->mapWithKeys(function ($bloque) use ($horarios, $turno) {
                     return [
                         $bloque->orden => collect([
                             'bloque' => $bloque,
-                            'dias' => $horarios[$bloque->orden] ?? collect()
+                            'dias' => $horarios->get($turno)?->get($bloque->orden) ?? collect(),
                         ])
                     ];
                 });

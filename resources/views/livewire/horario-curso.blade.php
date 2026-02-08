@@ -6,7 +6,7 @@
                 <div class="form-group">
                     <label class="form-label" for="cursoId">Curso</label>
                     <select wire:model.live="cursoId" wire:key="curso-select" id="cursoId" class="form-select form-select-lg">
-                        <option selected value="">Seleccione un curso...</option>
+                        <option value="">Seleccione un curso...</option>
                         @foreach($this->cursos as $curso)
                             <option value="{{ $curso->id }}">
                                 {{ $curso->anio }}º {{ $curso->division }}
@@ -71,7 +71,7 @@
                                         <td class="text-center align-middle">
                                             @if(isset($dias[$dia]))
                                                 <div class="fw-semibold text-center">
-                                                    {{ $dias[$dia]->materia->nombre }}
+                                                    {{ $dias[$dia]->cursoMateria->materia->nombre }}
                                                 </div>
                                                 <div class="text-muted small text-center">
                                                     {{ $dias[$dia]->docente->nombre }}

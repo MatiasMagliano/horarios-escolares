@@ -65,7 +65,16 @@ class DocentesSeeder extends Seeder
             'César Giacchini',
             'Domingo Greggio',
             'Bruno/Morano',
-            'Priscila Calizaya'
+            'Priscila Calizaya',
+            'Flavia Eberhardt',
+            'Nicolás Coria',
+            'Miriam Porcel',
+            'Patricia Solís',
+            'Micaela Acuña',
+            'Florentina Arinci',
+            'Mónica Rosso',
+            'Marianela Gatti',
+            'Carolina Rojas'
         ];
 
         foreach ($docentes as $nombre) {

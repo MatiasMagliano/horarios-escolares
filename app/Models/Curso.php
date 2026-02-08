@@ -14,32 +14,21 @@ class Curso extends Model
     ];
     
     // relación con pivot curso_materia
-    public function cursoMaterias()
-    {
-        return $this->hasMany(CursoMateria::class);
-    }
+    public function cursoMaterias() { return $this->hasMany(CursoMateria::class); }
+
+    public function horariosBase() { return $this->hasMany(HorarioBase::class); }
+
+    public function nombreCompleto(): string { return "{$this->anio}° {$this->division} ({$this->turno})"; }
+
+    
+    // accesor designacion de ciclo
+    public function getCicloAttribute(): string { return $this->anio <= 3 ? 'CB' : 'CE'; }
 
     public function materias()
     {
         return $this->belongsToMany(Materia::class,'curso_materia')
             ->withPivot('horas_totales')
             ->withTimestamps();
-    }
-
-    public function horariosBase()
-    {
-        return $this->hasMany(HorarioBase::class);
-    }
-
-    public function nombreCompleto(): string
-    {
-        return "{$this->anio}° {$this->division} ({$this->turno})";
-    }
-
-    // accesor designacion de ciclo
-    public function getCicloAttribute(): string
-    {
-        return $this->anio <= 3 ? 'CB' : 'CE';
     }
 
     // accesor designación de turno

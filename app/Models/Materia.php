@@ -8,7 +8,6 @@ class Materia extends Model
 {
     protected $fillable = [
         'nombre',
-        'curso_id',
         'horas_totales', // en módulos
     ];
 

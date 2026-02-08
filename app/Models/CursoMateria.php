@@ -14,18 +14,9 @@ class CursoMateria extends Model
         'horas_totales',
     ];
 
-    public function curso()
-    {
-        return $this->belongsTo(Curso::class);
-    }
+    public function curso() { return $this->belongsTo(Curso::class); }
 
-    public function materia()
-    {
-        return $this->belongsTo(Materia::class);
-    }
+    public function materia() { return $this->belongsTo(Materia::class); }
 
-    public function horarios()
-    {
-        return $this->hasMany(HorarioBase::class);
-    }
+    public function horarioBase() { return $this->hasMany(HorarioBase::class); }
 }

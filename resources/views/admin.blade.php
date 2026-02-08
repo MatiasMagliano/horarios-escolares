@@ -66,6 +66,18 @@
             modal.hide();
         });
 
+        const eliminarModal = new bootstrap.Modal(
+        document.getElementById('eliminarModal')
+        );
+
+        Livewire.on('abrir-modal-eliminar', () => {
+            eliminarModal.show();
+        });
+
+        Livewire.on('cerrar-modal-eliminar', () => {
+            eliminarModal.hide();
+        });
+
     });
 </script>
 
