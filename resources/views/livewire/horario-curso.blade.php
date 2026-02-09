@@ -5,7 +5,8 @@
             <div class="mb-4 flex gap-4 items-end">
                 <div class="form-group">
                     <label class="form-label" for="cursoId">Curso</label>
-                    <select wire:model.live="cursoId" wire:key="curso-select" id="cursoId" class="form-select form-select-lg">
+                    <select wire:model.live="cursoId" wire:key="curso-select" id="cursoId"
+                        class="form-select form-select-lg">
                         <option value="">Seleccione un curso...</option>
                         @foreach($this->cursos as $curso)
                             <option value="{{ $curso->id }}">
@@ -14,6 +15,14 @@
                         @endforeach
                     </select>
                 </div>
+            </div>
+            <div class="mb-4 flex flex-col gap-2" id="advertencias">
+                @foreach($this->advertencias as $advertencia)
+                    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
+                        <p class="font-bold">Atención</p>
+                        <p>{{ $advertencia }}</p>
+                    </div>
+                @endforeach
             </div>
         </div>
 
@@ -74,7 +83,7 @@
                                                     {{ $dias[$dia]->cursoMateria->materia->nombre }}
                                                 </div>
                                                 <div class="text-muted small text-center">
-                                                    {{ $dias[$dia]->docente->nombre }}
+                                                    {{ $dias[$dia]->cursoMateria->docente?->nombre ?? '—' }}
                                                 </div>
                                             @else
                                                 <span class="text-muted">—</span>

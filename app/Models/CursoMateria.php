@@ -11,12 +11,15 @@ class CursoMateria extends Model
     protected $fillable = [
         'curso_id',
         'materia_id',
+        'docente_id',
         'horas_totales',
     ];
 
     public function curso() { return $this->belongsTo(Curso::class); }
 
     public function materia() { return $this->belongsTo(Materia::class); }
+
+    public function docente() { return $this->belongsTo(Docente::class); }
 
     public function horarioBase() { return $this->hasMany(HorarioBase::class); }
 }

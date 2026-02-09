@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('curso_id')->constrained('cursos')->cascadeOnDelete();
             $table->foreignId('curso_materia_id')->nullable()->constrained('curso_materia')->cascadeOnDelete();
-            $table->foreignId('docente_id')->constrained('docentes')->cascadeOnDelete();
             $table->foreignId('bloque_id')->constrained('bloques_horarios');
             $table->unsignedTinyInteger('dia_semana'); // 1=Lunes ... 7=Domingo
             $table->timestamps();

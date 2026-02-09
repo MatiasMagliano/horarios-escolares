@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('curso_id')->constrained()->cascadeOnDelete();
             $table->foreignId('materia_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('docente_id')->constrained()->cascadeOnDelete();
             $table->unsignedTinyInteger('horas_totales');
             $table->timestamps();
             $table->unique(['curso_id', 'materia_id']);

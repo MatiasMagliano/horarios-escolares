@@ -34,32 +34,16 @@ class HorarioCurso extends Component
         }
 
         $curso = Curso::findOrFail($this->cursoId);
-        $turnoCurso = $curso->turno;
-        $turnoContraturno = $this->contraturnoDe($turnoCurso);
+        $turnos = [$curso->turno, $this->contraturnoDe($curso->turno)];
 
-        return collect([$turnoCurso, $turnoContraturno])
-            ->mapWithKeys(function ($turno) use ($turnoCurso, $turnoContraturno) {
-                // traer todos los bloques
-                $bloques = BloqueHorario::whereIn('turno', [$turnoCurso, $turnoContraturno])
-                    ->orderBy('orden')
-                    ->get()
-                    ->groupBy('turno');
+        // Helper methods simplify the main logic and help type inference
+        $bloques = $this->getBloquesForTurnos($turnos);
+        $horarios = $this->getHorariosForCursoAndTurnos($this->cursoId, $turnos);
 
-                // traer los horarios
-                $horarios = HorarioBase::with(['cursoMateria.materia', 'docente', 'bloque'])
-                    ->where('curso_id', $this->cursoId)
-                    ->whereHas('bloque', fn ($q) =>
-                        $q->whereIn('turno', [$turnoCurso, $turnoContraturno])
-                    )
-                    ->get()
-                    ->groupBy(fn ($h) => $h->bloque->turno)
-                    ->map(fn ($items) =>
-                        $items->groupBy(fn ($h) => $h->bloque->orden)
-                              ->map(fn ($i) => $i->keyBy('dia_semana'))
-                    );
-
-                // armar la grilla
+        return collect($turnos)
+            ->mapWithKeys(function ($turno) use ($bloques, $horarios) {
                 $bloquesDelTurno = $bloques->get($turno, collect());
+
                 $grilla = $bloquesDelTurno->mapWithKeys(function ($bloque) use ($horarios, $turno) {
                     return [
                         $bloque->orden => collect([
@@ -73,6 +57,31 @@ class HorarioCurso extends Component
             });
     }
 
+    private function getBloquesForTurnos(array $turnos)
+    {
+        return BloqueHorario::whereIn('turno', $turnos)
+            ->orderBy('orden')
+            ->get()
+            ->groupBy('turno');
+    }
+
+    private function getHorariosForCursoAndTurnos($cursoId, array $turnos)
+    {
+        return HorarioBase::with(['cursoMateria.materia', 'cursoMateria.docente', 'bloque'])
+            ->where('curso_id', $cursoId)
+            ->whereHas(
+                'bloque',
+                fn($q) => $q->whereIn('turno', $turnos)
+            )
+            ->get()
+            ->groupBy(fn($h) => $h->bloque->turno)
+            ->map(
+                fn($items) =>
+                $items->groupBy(fn($h) => $h->bloque->orden)
+                    ->map(fn($i) => $i->keyBy('dia_semana'))
+            );
+    }
+
     public function render()
     {
         return view('livewire.horario-curso');
@@ -82,8 +91,8 @@ class HorarioCurso extends Component
     {
         return match ($turnoCurso) {
             'maniana' => 'contraturno_maniana',
-            'tarde'   => 'contraturno_tarde',
-            default   => throw new \LogicException("Turno inválido: $turnoCurso"),
+            'tarde' => 'contraturno_tarde',
+            default => throw new \LogicException("Turno inválido: $turnoCurso"),
         };
     }
 
@@ -97,5 +106,29 @@ class HorarioCurso extends Component
             'contraturno_tarde' => 'Contraturno Tarde',
             default => 'Contraturno',
         };
+    }
+
+    public function getAdvertenciasProperty()
+    {
+        if (!$this->cursoId) {
+            return [];
+        }
+
+        $advertencias = [];
+
+        // 1. Validar Carga Horaria Incompleta
+        $materias = \App\Models\CursoMateria::where('curso_id', $this->cursoId)
+            ->withCount('horarioBase')
+            ->with('materia')
+            ->get();
+
+        foreach ($materias as $km) {
+            if ($km->horario_base_count < $km->horas_totales) {
+                $faltantes = $km->horas_totales - $km->horario_base_count;
+                $advertencias[] = "Faltan asignar {$faltantes} horas de " . $km->materia->nombre;
+            }
+        }
+
+        return $advertencias;
     }
 }

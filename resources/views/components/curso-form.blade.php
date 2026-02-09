@@ -141,6 +141,15 @@ new class extends Component
                 {{ $editing ? 'Actualizar' : 'Guardar' }}
             </button>
 
+            @if($editing && $curso)
+                <hr class="my-4">
+
+                <livewire:curso-materias 
+                    :curso="$curso" 
+                    :key="'materias-'.$curso->id"
+                />
+            @endif
+
         </form>
 
     </div>
