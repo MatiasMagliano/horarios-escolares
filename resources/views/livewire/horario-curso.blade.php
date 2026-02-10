@@ -16,14 +16,17 @@
                     </select>
                 </div>
             </div>
-            <div class="mb-4 flex flex-col gap-2" id="advertencias">
-                @foreach($this->advertencias as $advertencia)
-                    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
-                        <p class="font-bold">Atención</p>
-                        <p>{{ $advertencia }}</p>
+            @if($this->advertencias)
+                <div class="mb-4 flex flex-col gap-2" id="advertencias">
+                    <div class="alert alert-warning" role="alert">
+                        <h4 class="alert-heading">Atención</h4>
+                        <hr>
+                        @foreach($this->advertencias as $advertencia)
+                            <p class="mb-0">{{ $advertencia }}</p>
+                        @endforeach
                     </div>
-                @endforeach
-            </div>
+                </div>
+            @endif
         </div>
 
         <div class="card-body">
@@ -77,12 +80,12 @@
                                     </th>
 
                                     @for($dia = 1; $dia <= 5; $dia++)
-                                        <td class="text-center align-middle">
+                                        <td wire:click="editarCelda({{ $bloque->id }}, {{ $dia }})" class="text-center align-middle">
                                             @if(isset($dias[$dia]))
-                                                <div class="fw-semibold text-center">
+                                                <div class="fw-semibold text-center cursor-pointer">
                                                     {{ $dias[$dia]->cursoMateria->materia->nombre }}
                                                 </div>
-                                                <div class="text-muted small text-center">
+                                                <div class="text-muted small text-center cursor-pointer">
                                                     {{ $dias[$dia]->cursoMateria->docente?->nombre ?? '—' }}
                                                 </div>
                                             @else
@@ -102,6 +105,43 @@
                     </table>
                 @endforeach
             @endif
+        </div>
+    </div>
+
+    {{-- MODAL EDITAR CELDA --}}
+    <div wire:ignore.self class="modal fade" id="editarCelda" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        EDICIÓN DE HORARIO
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Materia</label>
+                        <select wire:model="cursoMateriaSeleccionada" class="form-select">
+                            <option value="">— Vaciar celda —</option>
+
+                            @foreach($this->cursoMaterias as $cm)
+                                <option value="{{ $cm->id }}">
+                                    {{ $cm->materia->nombre }}
+                                    ({{ $cm->horario_base_count }} / {{ $cm->horas_totales }} hs)
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" wire:click="guardarCelda">Guardar</button>
+                </div>
+
+            </div>
         </div>
     </div>
 </div>

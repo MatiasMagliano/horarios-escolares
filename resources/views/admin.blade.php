@@ -54,28 +54,37 @@
 <script>
     document.addEventListener('livewire:init', () => {
 
+        // modal nuevo curso
         const modal = new bootstrap.Modal(
             document.getElementById('cursoModal')
         );
-
         Livewire.on('abrir-modal', () => {
             modal.show();
         });
-
         Livewire.on('curso-guardado', () => {
             modal.hide();
         });
 
+        // modal eliminar curso
         const eliminarModal = new bootstrap.Modal(
         document.getElementById('eliminarModal')
         );
-
         Livewire.on('abrir-modal-eliminar', () => {
             eliminarModal.show();
         });
-
         Livewire.on('cerrar-modal-eliminar', () => {
             eliminarModal.hide();
+        });
+
+        // modal editar celda
+        const modalEditarCelda = new bootstrap.Modal(
+            document.getElementById('editarCelda')
+        );
+        Livewire.on('abrir-modal-editar-celda', () => {
+            modalEditarCelda.show();
+        });
+        Livewire.on('cerrar-modal-editar-celda', () => {
+            modalEditarCelda.hide();
         });
 
     });
