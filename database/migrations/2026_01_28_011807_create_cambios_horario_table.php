@@ -18,7 +18,13 @@ return new class extends Migration
             $table->text('motivo');
             $table->date('fecha_desde');
             $table->date('fecha_hasta')->nullable();
-            $table->foreignId('autorizado_por')->nullable()->constrained('users'); // ej.: dirección
+            $table->foreignId('autorizado_por')->nullable()->constrained('users');
+            $table->timestamp('autorizado_en')->nullable();
+            $table->foreignId('firmado_por')->nullable()->constrained('users');
+            $table->timestamp('firmado_en')->nullable();
+            $table->timestamp('activado_en')->nullable();
+            $table->timestamp('finalizado_en')->nullable();
+            $table->foreignId('pedido_por')->nullable()->constrained('users'); // ej.: vice-dirección
             $table->timestamps();
         });
     }

@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('cambios_horario_detalle', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('c_horario_id')->constrained('cambios_horario')->cascadeOnDelete();
-            $table->foreignId('h_base_id')->constrained('horarios_base')->cascadeOnDelete();
-            $table->foreignId('n_doc_id')->nullable()->constrained('docentes');
-            $table->foreignId('n_blq_id')->nullable()->constrained('bloques_horarios');
-            $table->foreignId('n_curso_id')->nullable()->constrained('cursos');
+            $table->foreignId('cambio_horario_id')->constrained('cambios_horario')->cascadeOnDelete();
+            $table->foreignId('horario_base_id')->constrained('horarios_base')->cascadeOnDelete();
+            $table->foreignId('docente_nuevo_id')->nullable()->constrained('docentes');
+            $table->foreignId('bloque_nuevo_id')->nullable()->constrained('bloques_horarios');
+            $table->foreignId('curso_nuevo_id')->nullable()->constrained('cursos');
             $table->unsignedTinyInteger('dia_nuevo')->nullable();
             $table->string('observaciones')->nullable();
             $table->timestamps();
