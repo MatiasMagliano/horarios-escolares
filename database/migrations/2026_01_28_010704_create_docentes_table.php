@@ -14,7 +14,12 @@ return new class extends Migration
         Schema::create('docentes', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->string('telefono');
+            $table->string('nombre_completo');
+            $table->string('dni');
+            $table->string('telefono')->nullable();
+            $table->string('email')->nullable();
+            $table->date('nacimiento');
+            $table->boolean('activo')->default(true);
             $table->timestamps();
         });
     }

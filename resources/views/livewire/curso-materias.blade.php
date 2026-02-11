@@ -76,7 +76,7 @@ new class extends Component {
 
 <div class="mt-4">
 
-    <h5 class="mb-3">📚 Materias del Curso</h5>
+    <h5 class="mb-3">Materias del Curso</h5>
 
     {{-- FORM INLINE --}}
     <div class="row g-2 mb-3">
@@ -104,7 +104,7 @@ new class extends Component {
         </div>
 
         <div class="col-md-2">
-            <button wire:click="guardar" class="btn btn-primary w-100">
+            <button type="button" wire:click="guardar" class="btn btn-primary w-100">
                 Agregar
             </button>
         </div>

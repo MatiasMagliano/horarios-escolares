@@ -16,13 +16,13 @@
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#materias">
-            Materias
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#docentes">
+            Docentes
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#docentes">
-            Docentes
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#cambios">
+            Cambios horarios
         </button>
     </li>
 </ul>
@@ -37,21 +37,20 @@
         <livewire:curso-index />
     </div>
 
-    <div class="tab-pane fade" id="materias">
-        <div class="alert alert-secondary">
-            CRUD de materias (pendiente)
-        </div>
+    <div class="tab-pane fade" id="docentes">
+        <livewire:docente-index />
     </div>
 
-    <div class="tab-pane fade" id="docentes">
+    <div class="tab-pane fade" id="cambios">
         <div class="alert alert-secondary">
-            CRUD de docentes (pendiente)
+            CRUD de Cambios de Horarios (actas)
         </div>
     </div>
 
 </div>
 
 <script>
+    
     document.addEventListener('livewire:init', () => {
 
         // modal nuevo curso
@@ -61,7 +60,7 @@
         Livewire.on('abrir-modal', () => {
             modal.show();
         });
-        Livewire.on('curso-guardado', () => {
+        Livewire.on('curso-guardado-y-cerrar', () => {
             modal.hide();
         });
 
@@ -85,6 +84,17 @@
         });
         Livewire.on('cerrar-modal-editar-celda', () => {
             modalEditarCelda.hide();
+        });
+
+        // modal crear docente
+        const modalCrearDocente = new bootstrap.Modal(
+            document.getElementById('docenteModal')
+        );
+        Livewire.on('modal-crear-docente', () => {
+            modalCrearDocente.show();
+        });
+        Livewire.on('docente-guardado', () => {
+            modalCrearDocente.hide();
         });
 
     });
