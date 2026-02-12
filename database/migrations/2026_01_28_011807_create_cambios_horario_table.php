@@ -19,12 +19,15 @@ return new class extends Migration
             $table->date('fecha_desde');
             $table->date('fecha_hasta')->nullable();
             $table->foreignId('autorizado_por')->nullable()->constrained('users');
-            $table->timestamp('autorizado_en')->nullable();
+            $table->date('autorizado_en')->nullable();
             $table->foreignId('firmado_por')->nullable()->constrained('users');
-            $table->timestamp('firmado_en')->nullable();
-            $table->timestamp('activado_en')->nullable();
-            $table->timestamp('finalizado_en')->nullable();
-            $table->foreignId('pedido_por')->nullable()->constrained('users'); // ej.: vice-dirección
+            $table->date('firmado_en')->nullable();
+            $table->foreignId('activado_por')->nullable()->constrained('users');
+            $table->date('activado_en')->nullable();
+            $table->foreignId('finalizado_por')->nullable()->constrained('users');
+            $table->date('finalizado_en')->nullable();
+            $table->foreignId('pedido_por')->nullable()->constrained('users');
+            $table->date('pedido_en')->nullable();
             $table->timestamps();
         });
     }

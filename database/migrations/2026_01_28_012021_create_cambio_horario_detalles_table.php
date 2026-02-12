@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cambios_horario_detalle', function (Blueprint $table) {
+        Schema::create('cambio_horario_detalles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('cambio_horario_id')->constrained('cambios_horario')->cascadeOnDelete();
             $table->foreignId('horario_base_id')->constrained('horarios_base')->cascadeOnDelete();

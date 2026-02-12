@@ -48,6 +48,7 @@ new class extends Component {
         ]);
 
         $this->reset(['materia_id','docente_id','horas_totales']);
+        $this->dispatch('curso-materias-actualizadas');
     }
 
     public function eliminar($id)

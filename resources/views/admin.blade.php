@@ -42,9 +42,7 @@
     </div>
 
     <div class="tab-pane fade" id="cambios">
-        <div class="alert alert-secondary">
-            CRUD de Cambios de Horarios (actas)
-        </div>
+        <livewire:cambio-horario />
     </div>
 
 </div>
@@ -95,6 +93,17 @@
         });
         Livewire.on('docente-guardado', () => {
             modalCrearDocente.hide();
+        });
+
+        // modal detalle cambio horario
+        const modalDetalleCambioHorario = new bootstrap.Modal(
+            document.getElementById('detalleCambioHorario')
+        );
+        Livewire.on('abrir-modal-detalle-cambio-horario', () => {
+            modalDetalleCambioHorario.show();
+        });
+        Livewire.on('cerrar-modal-detalle-cambio-horario', () => {
+            modalDetalleCambioHorario.hide();
         });
 
     });

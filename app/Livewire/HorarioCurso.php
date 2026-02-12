@@ -10,6 +10,8 @@ use App\Models\CursoMateria;
 
 class HorarioCurso extends Component
 {
+    protected $listeners = ['curso-materias-actualizadas' => '$refresh'];
+
     public $cursoId = null;
     public $turnoVista = 'maniana';
     public $celdaSeleccionada = null;
