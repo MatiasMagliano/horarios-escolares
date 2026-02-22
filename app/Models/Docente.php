@@ -22,6 +22,17 @@ class Docente extends Model
         'activo' => 'boolean',
     ];
 
+    // RELACIONES
+    public function cursoMaterias()
+    {
+        return $this->hasMany(CursoMateria::class);
+    }
+
+    public function horariosBase()
+    {
+        return $this->hasMany(HorarioBase::class);
+    }
+
     // accesor para mostrar DNI con puntos cada 3 dígitos
     public function getDocumentoAttribute(): string
     {
@@ -32,15 +43,5 @@ class Docente extends Model
     public function getEdadAttribute()
     {
         return $this->nacimiento->diffForHumans();
-    }
-
-    public function cursoMaterias()
-    {
-        return $this->hasMany(CursoMateria::class);
-    }
-
-    public function horariosBase()
-    {
-        return $this->hasMany(HorarioBase::class);
     }
 }

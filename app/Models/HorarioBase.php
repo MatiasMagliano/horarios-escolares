@@ -15,8 +15,8 @@ class HorarioBase extends Model
         'dia_semana',
     ];
 
-    public function curso()   { return $this->belongsTo(Curso::class); }
+    public function curso() { return $this->belongsTo(Curso::class); }
     public function cursoMateria(){ return $this->belongsTo(CursoMateria::class, 'curso_materia_id'); }
-    public function bloque()  { return $this->belongsTo(BloqueHorario::class, 'bloque_id'); }
+    public function bloque() { return $this->belongsTo(BloqueHorario::class, 'bloque_id'); }
 
 }

@@ -19,6 +19,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Provee los datos institucionales a todas las vistas
+        view()->composer('*', function ($view) {
+            $view->with(
+                'institucion_global',
+                \App\Models\DatosInstitucionales::where('vigente', true)->first()
+            );
+        });
     }
 }

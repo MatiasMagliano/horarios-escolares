@@ -12,21 +12,21 @@ class Curso extends Model
         'ciclo',
         'turno',
     ];
-    
+
     // relación con pivot curso_materia
-    public function cursoMaterias() { return $this->hasMany(CursoMateria::class); }
+    public function cursoMaterias()
+    {
+        return $this->hasMany(CursoMateria::class);
+    }
 
-    public function horariosBase() { return $this->hasMany(HorarioBase::class); }
-
-    public function nombreCompleto(): string { return "{$this->anio}° {$this->division} ({$this->turno})"; }
-
-    
-    // accesor designacion de ciclo
-    public function getCicloAttribute(): string { return $this->anio <= 3 ? 'CB' : 'CE'; }
+    public function horariosBase()
+    {
+        return $this->hasMany(HorarioBase::class);
+    }
 
     public function materias()
     {
-        return $this->belongsToMany(Materia::class,'curso_materia')
+        return $this->belongsToMany(Materia::class, 'curso_materia')
             ->withPivot('horas_totales')
             ->withTimestamps();
     }
@@ -39,5 +39,17 @@ class Curso extends Model
             'tarde'   => 'Tarde',
             default   => '—',
         };
+    }
+
+    // accesor nombre completo del curso
+    public function getNombreCompletoAttribute(): string
+    {
+        return "{$this->anio}° {$this->division} ({$this->turno_designacion})";
+    }
+
+    // accesor designacion de ciclo
+    public function getCicloAttribute(): string
+    {
+        return $this->anio <= 3 ? 'CB' : 'CE';
     }
 }

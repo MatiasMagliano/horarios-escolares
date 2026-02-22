@@ -9,6 +9,7 @@
 
         {{-- Bootstrap --}}
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://unpkg.com/trix@2.0.0/dist/trix.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
         <!-- Fonts -->
@@ -17,6 +18,7 @@
 
         {{-- Livewire --}}
         @livewireStyles
+        <script src="https://unpkg.com/trix@2.0.0/dist/trix.umd.min.js"></script>
     </head>
     <body>
         @include('layouts.navigation')

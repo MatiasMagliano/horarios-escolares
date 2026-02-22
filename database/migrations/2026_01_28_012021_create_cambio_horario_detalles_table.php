@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('curso_nuevo_id')->nullable()->constrained('cursos');
             $table->unsignedTinyInteger('dia_nuevo')->nullable();
             $table->string('observaciones')->nullable();
+            $table->boolean('aplicado')->default(false);
             $table->timestamps();
         });
     }
