@@ -85,8 +85,7 @@ abstract class BaseCursoSeeder extends Seeder
     {
         return CursoMateria::with('materia')
             ->where('curso_id', $curso->id)
-            ->where('es_vigente', true)
-            ->whereNull('vigente_hasta')
+            ->vigente()
             ->get()
             ->keyBy(fn ($cm) => $cm->materia->nombre);
     }
@@ -141,12 +140,11 @@ abstract class BaseCursoSeeder extends Seeder
     protected function validarCargaHoraria(Curso $curso): void
     {
         $inconsistencias = CursoMateria::where('curso_id', $curso->id)
-            ->where('es_vigente', true)
-            ->whereNull('vigente_hasta')
+            ->vigente()
             ->with('materia')
             ->withCount([
                 'horarioBase as horario_base_count' => function ($query) {
-                    $query->where('es_vigente', true)->whereNull('vigente_hasta');
+                    $query->vigente();
                 }
             ])
             ->get()

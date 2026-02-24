@@ -7,9 +7,12 @@ use App\Models\Curso;
 use App\Models\BloqueHorario;
 use App\Models\HorarioBase;
 use App\Models\CursoMateria;
+use Illuminate\Support\Carbon;
 
 class HorarioCurso extends Component
 {
+    protected const FECHA_VIGENCIA_INICIAL = '2026-01-01';
+
     protected $listeners = ['curso-materias-actualizadas' => '$refresh'];
 
     public $cursoId = null;
@@ -35,7 +38,11 @@ class HorarioCurso extends Component
             return collect();
         }
 
-        $curso = Curso::findOrFail($this->cursoId);
+        $curso = $this->cursoSeleccionado;
+        if (!$curso) {
+            return collect();
+        }
+
         $turnos = [$curso->turno, $this->contraturnoDe($curso->turno)];
 
         // Helper methods simplify the main logic and help type inference
@@ -73,6 +80,7 @@ class HorarioCurso extends Component
     {
         return HorarioBase::with(['cursoMateria.materia', 'cursoMateria.docente', 'bloque'])
             ->where('curso_id', $cursoId)
+            ->vigente()
             ->whereHas(
                 'bloque',
                 fn($q) => $q->whereIn('turno', $turnos)
@@ -98,31 +106,103 @@ class HorarioCurso extends Component
             'curso_id' => $this->cursoId,
             'bloque_id' => $bloqueId,
             'dia_semana' => $dia,
-        ])->first();
+        ])
+            ->vigente()
+            ->first();
 
         $this->cursoMateriaSeleccionada = $horarioExistente?->curso_materia_id;
 
         $this->dispatch('abrir-modal-editar-celda');
     }
+
     public function guardarCelda()
     {
-        if (!$this->cursoMateriaSeleccionada) {
-            HorarioBase::where([
-                'curso_id' => $this->cursoId,
-                'bloque_id' => $this->celdaSeleccionada['bloque_id'],
-                'dia_semana' => $this->celdaSeleccionada['dia'],
-            ])->delete();
+        if (!$this->celdaSeleccionada || !$this->cursoId) {
+            return;
+        }
+
+        $bloqueId = (int) $this->celdaSeleccionada['bloque_id'];
+        $dia = (int) $this->celdaSeleccionada['dia'];
+        $vigenteDesde = $this->fechaVigencia();
+
+        $queryCelda = HorarioBase::query()
+            ->where('curso_id', $this->cursoId)
+            ->where('bloque_id', $bloqueId)
+            ->where('dia_semana', $dia);
+
+        $horarioVigente = (clone $queryCelda)
+            ->vigente()
+            ->first();
+
+        // Reusar la versión del día para evitar colisiones con el unique SCD2.
+        $versionHoy = (clone $queryCelda)
+            ->where('vigente_desde', $vigenteDesde)
+            ->first();
+
+        $cursoMateriaId = $this->cursoMateriaSeleccionada
+            ? (int) $this->cursoMateriaSeleccionada
+            : null;
+
+        if ($cursoMateriaId !== null) {
+            $materiaEsValida = CursoMateria::whereKey($cursoMateriaId)
+                ->where('curso_id', $this->cursoId)
+                ->vigente()
+                ->exists();
+
+            if (!$materiaEsValida) {
+                return;
+            }
+        }
+
+        if ($cursoMateriaId === null) {
+            if ($horarioVigente) {
+                $horarioVigente->update([
+                    'es_vigente' => false,
+                    'vigente_hasta' => $vigenteDesde,
+                    'cambio_horario_id' => null,
+                ]);
+            }
         } else {
-            HorarioBase::updateOrCreate(
-                [
+            if ($horarioVigente && (int) $horarioVigente->curso_materia_id === $cursoMateriaId) {
+                $this->dispatch('cerrar-modal-editar-celda');
+                return;
+            }
+
+            if ($versionHoy) {
+                $versionHoy->update([
+                    'curso_materia_id' => $cursoMateriaId,
+                    'vigente_hasta' => null,
+                    'es_vigente' => true,
+                    'cambio_horario_id' => null,
+                ]);
+
+                if ($horarioVigente && $horarioVigente->id !== $versionHoy->id) {
+                    $horarioVigente->update([
+                        'es_vigente' => false,
+                        'vigente_hasta' => Carbon::parse($vigenteDesde)->subDay()->toDateString(),
+                        'cambio_horario_id' => null,
+                    ]);
+                }
+            } else {
+                if ($horarioVigente) {
+                    $horarioVigente->update([
+                        'es_vigente' => false,
+                        'vigente_hasta' => Carbon::parse($vigenteDesde)->subDay()->toDateString(),
+                        'cambio_horario_id' => null,
+                    ]);
+                }
+
+                HorarioBase::create([
                     'curso_id' => $this->cursoId,
-                    'bloque_id' => $this->celdaSeleccionada['bloque_id'],
-                    'dia_semana' => $this->celdaSeleccionada['dia'],
-                ],
-                [
-                    'curso_materia_id' => $this->cursoMateriaSeleccionada,
-                ]
-            );
+                    'bloque_id' => $bloqueId,
+                    'dia_semana' => $dia,
+                    'curso_materia_id' => $cursoMateriaId,
+                    'vigente_desde' => $vigenteDesde,
+                    'vigente_hasta' => null,
+                    'es_vigente' => true,
+                    'cambio_horario_id' => null,
+                ]);
+            }
         }
 
         $this->dispatch('cerrar-modal-editar-celda');
@@ -135,10 +215,7 @@ class HorarioCurso extends Component
             return collect();
         }
 
-        return CursoMateria::where('curso_id', $this->cursoId)
-            ->withCount('horarioBase')
-            ->with(['materia', 'docente'])
-            ->get()
+        return $this->cursoMateriasConCarga
             ->filter(function ($cm) {
                 // Siempre permitir la materia actualmente seleccionada
                 if ($cm->id == $this->cursoMateriaSeleccionada) {
@@ -180,10 +257,7 @@ class HorarioCurso extends Component
         $advertencias = [];
 
         // 1. Validar Carga Horaria Incompleta
-        $materias = CursoMateria::where('curso_id', $this->cursoId)
-            ->withCount('horarioBase')
-            ->with('materia')
-            ->get();
+        $materias = $this->cursoMateriasConCarga;
 
         if ($materias->isEmpty()) {
             return ['El curso no tiene materias asignadas.'];
@@ -206,6 +280,43 @@ class HorarioCurso extends Component
             }
         }
         return $advertencias;
+    }
+
+    public function getCursoSeleccionadoProperty()
+    {
+        if (!$this->cursoId) {
+            return null;
+        }
+
+        return Curso::query()
+            ->select(['id', 'turno'])
+            ->find($this->cursoId);
+    }
+
+    public function getCursoMateriasConCargaProperty()
+    {
+        if (!$this->cursoId) {
+            return collect();
+        }
+
+        return CursoMateria::query()
+            ->where('curso_id', $this->cursoId)
+            ->vigente()
+            ->withCount([
+                'horarioBase as horario_base_count' => function ($query) {
+                    $query->vigente();
+                }
+            ])
+            ->with(['materia', 'docente'])
+            ->get();
+    }
+
+    private function fechaVigencia(): string
+    {
+        $hoy = Carbon::today();
+        $inicio = Carbon::parse(static::FECHA_VIGENCIA_INICIAL);
+
+        return $hoy->lessThan($inicio) ? $inicio->toDateString() : $hoy->toDateString();
     }
 
     public function render()

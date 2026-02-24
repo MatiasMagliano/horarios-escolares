@@ -47,7 +47,7 @@
                 <table class="table table-bordered table-sm table-fixed">
                     <thead class="table-light">
                         <tr>
-                            <th class="text-center align-middle" style="width: 10%;">·</th>
+                            <th class="text-center align-middle" style="width: 10%;">HORA/DÍA</th>
                             <th class="text-center align-middle" style="width: 18%;">Lunes</th>
                             <th class="text-center align-middle" style="width: 18%;">Martes</th>
                             <th class="text-center align-middle" style="width: 18%;">Miércoles</th>
@@ -58,8 +58,8 @@
                     <tbody>
                         @forelse($grilla as $orden => $dias)
                         @php
-                        $bloque = $dias['bloque'];
-                        $dias = $dias['dias'];
+                            $bloque = $dias['bloque'];
+                            $dias = $dias['dias'];
                         @endphp
 
                         @if($bloque->tipo === 'recreo')
@@ -81,14 +81,20 @@
                             </th>
 
                             @for($dia = 1; $dia <= 5; $dia++)
+                                @php
+                                $horario = $dias[$dia] ?? null;
+                                $cursoMateria = $horario?->cursoMateria;
+                                $materia = $cursoMateria?->materia;
+                                $docente = $cursoMateria?->docente;
+                                @endphp
                                 <td wire:click="editarCelda({{ $bloque->id }}, {{ $dia }})" class="text-center align-middle" style="cursor: pointer;">
-                                @if(isset($dias[$dia]))
+                                @if($materia)
                                 <div class="fw-semibold text-center">
-                                    {{ $dias[$dia]->cursoMateria->materia->nombre }}
+                                    {{ $materia->nombre }}
                                 </div>
                                 <div class="text-muted small text-center">
-                                    {{ $dias[$dia]->cursoMateria->docente?->nombre ?? '—' }}
-                                    @if(!$dias[$dia]->cursoMateria->docente?->activo)
+                                    {{ $docente?->nombre ?? '—' }}
+                                    @if($docente && !$docente->activo)
                                     <br>
                                     <span class="badge bg-danger ms-1">
                                         docente inactivo

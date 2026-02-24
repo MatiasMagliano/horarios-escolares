@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class CursoMateria extends Model
 {
@@ -26,4 +27,9 @@ class CursoMateria extends Model
     public function docente() { return $this->belongsTo(Docente::class); }
 
     public function horarioBase() { return $this->hasMany(HorarioBase::class); }
+
+    public function scopeVigente(Builder $query): Builder
+    {
+        return $query->where('es_vigente', true)->whereNull('vigente_hasta');
+    }
 }
