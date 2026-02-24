@@ -13,12 +13,25 @@ return new class extends Migration
     {
         Schema::create('horarios_base', function (Blueprint $table) {
             $table->id();
+
+            // anclaje en la Grilla
             $table->foreignId('curso_id')->constrained('cursos')->cascadeOnDelete();
-            $table->foreignId('curso_materia_id')->nullable()->constrained('curso_materia')->cascadeOnDelete();
+            $table->foreignId('curso_materia_id')->nullable()->constrained('curso_materia')->nullOnDelete();
             $table->foreignId('bloque_id')->constrained('bloques_horarios');
             $table->unsignedTinyInteger('dia_semana'); // 1=Lunes ... 7=Domingo
+
+            // Versionado SCD2
+            $table->date('vigente_desde');
+            $table->date('vigente_hasta')->nullable();
+            $table->boolean('es_vigente')->default(true)->index();
+
+            // Trazabilidad
+            $table->foreignId('cambio_horario_id')->nullable()->constrained('cambios_horario')->nullOnDelete();
+
             $table->timestamps();
-            $table->unique(['curso_id', 'bloque_id', 'dia_semana'], 'curso_bloque_dia_unique');
+
+            // El unique ahora incluye la versión temporal
+            $table->unique(['curso_id', 'bloque_id', 'dia_semana', 'vigente_desde'], 'curso_bloque_dia_version_unique');
         });
     }
 

@@ -14,6 +14,8 @@ use Exception;
 
 abstract class BaseCursoSeeder extends Seeder
 {
+    protected const FECHA_VIGENCIA_INICIAL = '2026-01-01';
+
     public function run(): void
     {
         DB::transaction(function () {
@@ -55,6 +57,8 @@ abstract class BaseCursoSeeder extends Seeder
 
     protected function seedMaterias(Curso $curso): void
     {
+        $vigenteDesde = $this->vigenteDesde();
+
         foreach ($this->materias() as $data) {
 
             $materia = Materia::where('nombre', $data['nombre'])->firstOrFail();
@@ -64,10 +68,14 @@ abstract class BaseCursoSeeder extends Seeder
                 [
                     'curso_id' => $curso->id,
                     'materia_id' => $materia->id,
+                    'vigente_desde' => $vigenteDesde,
                 ],
                 [
                     'horas_totales' => $data['horas_totales'],
                     'docente_id' => $docente->id,
+                    'vigente_hasta' => null,
+                    'es_vigente' => true,
+                    'cambio_horario_id' => null,
                 ]
             );
         }
@@ -77,12 +85,16 @@ abstract class BaseCursoSeeder extends Seeder
     {
         return CursoMateria::with('materia')
             ->where('curso_id', $curso->id)
+            ->where('es_vigente', true)
+            ->whereNull('vigente_hasta')
             ->get()
             ->keyBy(fn ($cm) => $cm->materia->nombre);
     }
 
     protected function seedHorario(Curso $curso, string $turnoBloque, array $grilla, $cursoMaterias): void
     {
+        $vigenteDesde = $this->vigenteDesde();
+
         $bloques = BloqueHorario::where('turno', $turnoBloque)
             ->get()
             ->keyBy('orden');
@@ -111,10 +123,14 @@ abstract class BaseCursoSeeder extends Seeder
                     [
                         'curso_id'   => $curso->id,
                         'dia_semana' => $dia,
-                        'bloque_id'  => $bloque->id
+                        'bloque_id'  => $bloque->id,
+                        'vigente_desde' => $vigenteDesde,
                     ],
                     [
                         'curso_materia_id' => $cursoMateria->id,
+                        'vigente_hasta' => null,
+                        'es_vigente' => true,
+                        'cambio_horario_id' => null,
                     ]
                 );
             }
@@ -125,8 +141,14 @@ abstract class BaseCursoSeeder extends Seeder
     protected function validarCargaHoraria(Curso $curso): void
     {
         $inconsistencias = CursoMateria::where('curso_id', $curso->id)
+            ->where('es_vigente', true)
+            ->whereNull('vigente_hasta')
             ->with('materia')
-            ->withCount('horarioBase')
+            ->withCount([
+                'horarioBase as horario_base_count' => function ($query) {
+                    $query->where('es_vigente', true)->whereNull('vigente_hasta');
+                }
+            ])
             ->get()
             ->filter(fn ($cm) => $cm->horario_base_count != $cm->horas_totales);
 
@@ -140,5 +162,10 @@ abstract class BaseCursoSeeder extends Seeder
 
             throw new Exception("Carga horaria inconsistente en {$curso->nombreCompleto()}");
         }
+    }
+
+    protected function vigenteDesde(): string
+    {
+        return static::FECHA_VIGENCIA_INICIAL;
     }
 }

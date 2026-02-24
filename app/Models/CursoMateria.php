@@ -13,6 +13,10 @@ class CursoMateria extends Model
         'materia_id',
         'docente_id',
         'horas_totales',
+        'vigente_desde',
+        'vigente_hasta',
+        'es_vigente',
+        'cambio_horario_id',
     ];
 
     public function curso() { return $this->belongsTo(Curso::class); }

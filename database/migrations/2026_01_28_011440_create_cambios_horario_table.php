@@ -19,18 +19,19 @@ return new class extends Migration
             $table->year('anio_acta')->nullable();
 
             // Datos formales del documento
-            $table->foreignId('docente_solicitante_id')->nullable()->constrained('docentes');
-            $table->string('tipo_institucional')->nullable(); // cambio | permuta
-            $table->foreignId('curso_id')->nullable()->constrained('cursos');
-            $table->enum('tipo', ['temporal', 'permanente']);
-            $table->enum('estado', ['borrador', 'autorizado', 'firmado', 'activo', 'finalizado']);
-            $table->date('fecha_desde');
-            $table->date('fecha_hasta')->nullable();
+            $table->enum('duracion', ['temporal', 'permanente']);
+            $table->enum('tipo_cambio', ['cambio', 'permuta']);
+            $table->foreignId('docente_id')->constrained('docentes'); // docente que solicita el cambio o permuta
+            $table->foreignId('curso_id')->constrained('cursos');
+            $table->foreignId('materia_id')->constrained('materias');
             $table->year('ciclo_lectivo')->nullable();
-            $table->longText('detalle_acta')->nullable();
-            $table->string('archivo_acta')->nullable(); // PDF firmado
+            $table->date('fecha_desde'); // fecha de inicio del cambio o permuta
+            $table->date('fecha_hasta')->nullable(); // fecha de fin del cambio o permuta (solo para cambios temporales)
+            $table->longText('acta')->nullable(); // ¿HTML listo para imprimir?
+            $table->string('path_acta')->nullable(); // path al PDF firmado
+            $table->enum('estado', ['borrador', 'autorizado', 'firmado', 'activo', 'finalizado']); // perteneciente a la máquina de estados
 
-            // máquina de estados
+            // metadatos de máquina de estados
             $table->foreignId('autorizado_por')->nullable()->constrained('users');
             $table->date('autorizado_en')->nullable();
             $table->foreignId('firmado_por')->nullable()->constrained('users');

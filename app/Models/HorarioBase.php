@@ -13,6 +13,10 @@ class HorarioBase extends Model
         'curso_materia_id',
         'bloque_id',
         'dia_semana',
+        'vigente_desde',
+        'vigente_hasta',
+        'es_vigente',
+        'cambio_horario_id',
     ];
 
     public function curso() { return $this->belongsTo(Curso::class); }
