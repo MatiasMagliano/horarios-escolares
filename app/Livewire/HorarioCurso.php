@@ -78,7 +78,8 @@ class HorarioCurso extends Component
     // HELPER DE getGrillasProperty
     private function getHorariosForCursoAndTurnos($cursoId, array $turnos)
     {
-        return HorarioBase::with(['cursoMateria.materia', 'cursoMateria.docente', 'bloque'])
+        return HorarioBase::query()
+            ->conDocenteVigente()
             ->where('curso_id', $cursoId)
             ->vigente()
             ->whereHas(
@@ -146,7 +147,6 @@ class HorarioCurso extends Component
         if ($cursoMateriaId !== null) {
             $materiaEsValida = CursoMateria::whereKey($cursoMateriaId)
                 ->where('curso_id', $this->cursoId)
-                ->vigente()
                 ->exists();
 
             if (!$materiaEsValida) {
@@ -301,7 +301,6 @@ class HorarioCurso extends Component
 
         return CursoMateria::query()
             ->where('curso_id', $this->cursoId)
-            ->vigente()
             ->withCount([
                 'horarioBase as horario_base_count' => function ($query) {
                     $query->vigente();

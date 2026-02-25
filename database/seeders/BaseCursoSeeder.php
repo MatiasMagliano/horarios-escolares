@@ -8,6 +8,7 @@ use App\Models\Curso;
 use App\Models\Materia;
 use App\Models\Docente;
 use App\Models\CursoMateria;
+use App\Models\CmDocente;
 use App\Models\BloqueHorario;
 use App\Models\HorarioBase;
 use Exception;
@@ -64,20 +65,35 @@ abstract class BaseCursoSeeder extends Seeder
             $materia = Materia::where('nombre', $data['nombre'])->firstOrFail();
             $docente = Docente::where('nombre', $data['docente'])->firstOrFail();
 
-            CursoMateria::updateOrCreate(
+            $cm = CursoMateria::updateOrCreate(
                 [
                     'curso_id' => $curso->id,
                     'materia_id' => $materia->id,
-                    'vigente_desde' => $vigenteDesde,
                 ],
                 [
                     'horas_totales' => $data['horas_totales'],
+                ]
+            );
+
+            $cmDocenteVigente = CmDocente::updateOrCreate(
+                [
+                    'curso_materia_id' => $cm->id,
+                    'vigente_desde' => $vigenteDesde,
+                ],
+                [
                     'docente_id' => $docente->id,
                     'vigente_hasta' => null,
                     'es_vigente' => true,
-                    'cambio_horario_id' => null,
                 ]
             );
+
+            CmDocente::where('curso_materia_id', $cm->id)
+                ->where('id', '!=', $cmDocenteVigente->id)
+                ->where('es_vigente', true)
+                ->update([
+                    'es_vigente' => false,
+                    'vigente_hasta' => $vigenteDesde,
+                ]);
         }
     }
 
@@ -85,7 +101,6 @@ abstract class BaseCursoSeeder extends Seeder
     {
         return CursoMateria::with('materia')
             ->where('curso_id', $curso->id)
-            ->vigente()
             ->get()
             ->keyBy(fn ($cm) => $cm->materia->nombre);
     }
@@ -140,7 +155,6 @@ abstract class BaseCursoSeeder extends Seeder
     protected function validarCargaHoraria(Curso $curso): void
     {
         $inconsistencias = CursoMateria::where('curso_id', $curso->id)
-            ->vigente()
             ->with('materia')
             ->withCount([
                 'horarioBase as horario_base_count' => function ($query) {

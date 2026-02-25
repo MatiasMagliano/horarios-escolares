@@ -76,9 +76,13 @@ new class extends Component
     {
         if (!$this->docente) return;
 
-        if ($this->docente->cursoMaterias()->exists()) {
-            $this->docente->update(['activo' => false]);
-            session()->flash('error', 'No se puede eliminar el docente porque tiene materias asignadas. Se pasa a ""inactivo"" en su lugar.');
+        if ($this->docente->tieneAsignacionesVigentes()) {
+            session()->flash('error', 'No se puede eliminar el docente porque tiene materias activas asignadas.');
+            return;
+        }
+
+        if ($this->docente->tieneHistorialAsignaciones()) {
+            session()->flash('error', 'No se puede eliminar el docente porque tiene historial de asignaciones. Debe conservarse por trazabilidad.');
             return;
         }
 
@@ -145,7 +149,7 @@ new class extends Component
                 </div>
 
                 {{-- ACTIVO oculto --}}
-                <input wire:model="activo" type="hidden" value="1">
+                <input wire:model="activo" type="hidden">
             </div>
 
 

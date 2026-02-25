@@ -85,7 +85,7 @@
                                 $horario = $dias[$dia] ?? null;
                                 $cursoMateria = $horario?->cursoMateria;
                                 $materia = $cursoMateria?->materia;
-                                $docente = $cursoMateria?->docente;
+                                $docente = $horario?->docenteVigente;
                                 @endphp
                                 <td wire:click="editarCelda({{ $bloque->id }}, {{ $dia }})" class="text-center align-middle" style="cursor: pointer;">
                                 @if($materia)

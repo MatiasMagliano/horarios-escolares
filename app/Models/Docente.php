@@ -25,7 +25,19 @@ class Docente extends Model
     // RELACIONES
     public function cursoMaterias()
     {
-        return $this->hasMany(CursoMateria::class);
+        return $this->belongsToMany(CursoMateria::class, 'cm_docente', 'docente_id', 'curso_materia_id')
+            ->withPivot(['vigente_desde', 'vigente_hasta', 'es_vigente'])
+            ->withTimestamps();
+    }
+
+    public function cmDocentes()
+    {
+        return $this->hasMany(CmDocente::class);
+    }
+
+    public function cmDocentesVigentes()
+    {
+        return $this->cmDocentes()->vigente();
     }
 
     public function horariosBase()
@@ -43,5 +55,15 @@ class Docente extends Model
     public function getEdadAttribute()
     {
         return $this->nacimiento->diffForHumans();
+    }
+
+    public function tieneAsignacionesVigentes(): bool
+    {
+        return $this->cmDocentesVigentes()->exists();
+    }
+
+    public function tieneHistorialAsignaciones(): bool
+    {
+        return $this->cmDocentes()->exists();
     }
 }
