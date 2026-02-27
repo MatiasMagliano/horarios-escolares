@@ -18,9 +18,17 @@ class CambioHorario extends Model
 
 
     protected $fillable = [
-        'tipo',
+        'numero_acta',
+        'anio_acta',
+        'duracion',
+        'tipo_cambio',
+        'docente_id',
+        'curso_id',
+        'materia_id',
+        'ciclo_lectivo',
+        'acta',
+        'path_acta',
         'estado',
-        'motivo',
         'fecha_desde',
         'fecha_hasta',
         'autorizado_por',
@@ -36,12 +44,16 @@ class CambioHorario extends Model
     ];
 
     protected $casts = [
+        'numero_acta' => 'integer',
+        'anio_acta' => 'integer',
+        'ciclo_lectivo' => 'integer',
         'fecha_desde' => 'date',
         'fecha_hasta' => 'date',
         'autorizado_en' => 'date',
         'firmado_en' => 'date',
         'activado_en' => 'date',
         'finalizado_en' => 'date',
+        'pedido_en' => 'date',
     ];
 
 
@@ -58,6 +70,21 @@ class CambioHorario extends Model
     public function solicitante()
     {
         return $this->belongsTo(User::class, 'pedido_por');
+    }
+
+    public function docente()
+    {
+        return $this->belongsTo(Docente::class);
+    }
+
+    public function curso()
+    {
+        return $this->belongsTo(Curso::class);
+    }
+
+    public function materia()
+    {
+        return $this->belongsTo(Materia::class);
     }
 
     public function puedeAutorizar(): bool
