@@ -14,21 +14,21 @@ new class extends Component {
     public function crear()
     {
         $this->cursoIdSeleccionado = null;
-        $this->dispatch('abrir-modal');
+        $this->dispatch('curso-abrir-modal');
     }
 
     // modal de edición de curso
     public function editar($id)
     {
         $this->cursoIdSeleccionado = $id;
-        $this->dispatch('abrir-modal');
+        $this->dispatch('curso-abrir-modal');
     }
 
     // eliminar curso
     public function confirmarEliminacion($id)
     {
         $this->cursoAEliminar = $id;
-        $this->dispatch('abrir-modal-eliminar');
+        $this->dispatch('curso-abrir-modal-eliminar');
     }
 
     public function eliminar()
@@ -39,7 +39,7 @@ new class extends Component {
 
         $this->cursoAEliminar = null;
 
-        $this->dispatch('cerrar-modal-eliminar');
+        $this->dispatch('curso-cerrar-modal-eliminar');
     }
 
 
@@ -177,3 +177,29 @@ new class extends Component {
     </div>
 </div>
 
+<script>
+    document.addEventListener('livewire:init', () => {
+        const cursoModalEl = document.getElementById('cursoModal');
+        const eliminarModalEl = document.getElementById('eliminarModal');
+
+        Livewire.on('curso-abrir-modal', () => {
+            if (!cursoModalEl || typeof bootstrap === 'undefined') return;
+            bootstrap.Modal.getOrCreateInstance(cursoModalEl).show();
+        });
+
+        Livewire.on('curso-guardado-y-cerrar', () => {
+            if (!cursoModalEl || typeof bootstrap === 'undefined') return;
+            bootstrap.Modal.getOrCreateInstance(cursoModalEl).hide();
+        });
+
+        Livewire.on('curso-abrir-modal-eliminar', () => {
+            if (!eliminarModalEl || typeof bootstrap === 'undefined') return;
+            bootstrap.Modal.getOrCreateInstance(eliminarModalEl).show();
+        });
+
+        Livewire.on('curso-cerrar-modal-eliminar', () => {
+            if (!eliminarModalEl || typeof bootstrap === 'undefined') return;
+            bootstrap.Modal.getOrCreateInstance(eliminarModalEl).hide();
+        });
+    });
+</script>

@@ -164,5 +164,19 @@ new class extends Component
                 }, 3000);
             }
         });
+
+        document.addEventListener('livewire:init', () => {
+            const docenteModalEl = document.getElementById('docenteModal');
+
+            Livewire.on('modal-crear-docente', () => {
+                if (!docenteModalEl || typeof bootstrap === 'undefined') return;
+                bootstrap.Modal.getOrCreateInstance(docenteModalEl).show();
+            });
+
+            Livewire.on('docente-guardado', () => {
+                if (!docenteModalEl || typeof bootstrap === 'undefined') return;
+                bootstrap.Modal.getOrCreateInstance(docenteModalEl).hide();
+            });
+        });
     </script>
 </div>

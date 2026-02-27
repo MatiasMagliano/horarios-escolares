@@ -159,3 +159,19 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('livewire:init', () => {
+        const editarCeldaModalEl = document.getElementById('editarCelda');
+
+        Livewire.on('abrir-modal-editar-celda', () => {
+            if (!editarCeldaModalEl || typeof bootstrap === 'undefined') return;
+            bootstrap.Modal.getOrCreateInstance(editarCeldaModalEl).show();
+        });
+
+        Livewire.on('cerrar-modal-editar-celda', () => {
+            if (!editarCeldaModalEl || typeof bootstrap === 'undefined') return;
+            bootstrap.Modal.getOrCreateInstance(editarCeldaModalEl).hide();
+        });
+    });
+</script>
