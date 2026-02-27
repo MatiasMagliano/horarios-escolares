@@ -9,21 +9,25 @@
     </div>
 
     @if (session()->has('success'))
-    <div class="alert alert-success">
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="successAlert">
         {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
 
     @if (session()->has('error'))
-    <div class="alert alert-danger">
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
         {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
 
     <table class="table table-bordered table-sm">
         <thead>
             <tr class="text-center">
-                <th>Tipo</th>
+                <th>Solicitud</th>
+                <th>Duración</th>
+                <th>Tipo de cambio</th>
                 <th>Desde</th>
                 <th>Hasta</th>
                 <th>Estado</th>
@@ -33,9 +37,11 @@
         <tbody>
             @foreach($cambios as $c)
             <tr>
-                <td class="text-center align-middle">{{ ucfirst($c->tipo_cambio) }}</td>
+                <td class="text-center align-middle">{{ $c->pedido_en->format('d/m/Y') }}</td>
+                <td class="text-center align-middle">{{ ucfirst($c->duracionBD) }}</td>
+                <td class="text-center align-middle">{{ ucfirst($c->tipo_cambioBD) }}</td>
                 <td class="text-center align-middle">{{ $c->fecha_desde->format('d/m/Y') }}</td>
-                <td class="text-center align-middle">{{ $c->fecha_hasta ? $c->fecha_hasta->format('d/m/Y') : '-' }}</td>
+                <td class="text-center align-middle">{{ $c->fecha_hasta ? $c->fecha_hasta->format('d/m/Y') : 'sin final' }}</td>
                 <td class="text-center align-middle">
                     <span class="badge bg-{{ match($c->estado) {
                     'borrador' => 'secondary',
@@ -292,7 +298,7 @@
                     <div class="col-md-4">
                         <div class="border rounded p-3 h-100">
                             <div class="text-muted small">Duración / Tipo</div>
-                            <div class="fw-semibold">{{ ucfirst($cambio->duracion) }} / {{ ucfirst($cambio->tipo_cambio) }}</div>
+                            <div class="fw-semibold">{{ ucfirst($cambio->duracionBD) }} / {{ ucfirst($cambio->tipo_cambioBD) }}</div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -314,7 +320,7 @@
                             <div>
                                 {{ $cambio->curso?->nombre_completo ?? '—' }}
                                 @if($cambio->materia)
-                                · {{ $cambio->materia->nombre }}
+                                / {{ $cambio->materia->nombre }}
                                 @endif
                             </div>
                         </div>
@@ -330,8 +336,12 @@
                                 → {{ $cambio->fecha_hasta?->format('d/m/Y') ?? '—' }}
                                 @endif
                             </div>
-                            <div class="text-muted small mt-2">Numeración institucional</div>
-                            <div>Pendiente de asignación al estado firmado.</div>
+                            <div class="text-muted small mt-2">Número de acta</div>
+                            @if($cambio->numero_acta && $cambio->anio_acta)
+                            <div>{{ $cambio->numero_acta }} / {{ $cambio->anio_acta }}</div>
+                            @else
+                            <div class="fw-semibold">Asignación al momento de firmar el acta.</div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -384,7 +394,7 @@
                 <hr>
 
                 <div>
-                    <h6 class="mb-2">Acta guardada (HTML)</h6>
+                    <h6 class="mb-2">Acta guardada generada</h6>
                     <div class="border rounded p-3 bg-light">
                         {!! $cambio->acta ?: '<em>No hay acta guardada.</em>' !!}
                     </div>

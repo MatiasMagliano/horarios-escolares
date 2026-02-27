@@ -221,4 +221,24 @@ class CambioHorario extends Model
             'cambio_id' => $detalle->cambio->id,
         ];
     }
+
+    // accesor para acceder correctamente al dato de "duracion"
+    public function getDuracionBDAttribute(): string
+    {
+        return match ($this->duracion) {
+            'temporal' => 'Temporal',
+            'permanente' => 'Permanente',
+            default => '—',
+        };
+    }
+
+    // accesor para acceder correctamente al dato de "tipo_cambio"
+    public function getTipoCambioBDAttribute(): string
+    {
+        return match ($this->tipo_cambio) {
+            'cambio' => 'Cambio de horario',
+            'permuta' => 'Permuta de horario',
+            default => '—',
+        };
+    }
 }
