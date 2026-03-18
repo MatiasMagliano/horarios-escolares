@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('materias', function (Blueprint $table) {
+        $espacios = ['aula', 'lab-informatica', 'lab-electronica', 'lab-taller', 'patio'];
+
+        Schema::create('materias', function (Blueprint $table) use ($espacios) {
             $table->id();
             $table->string('nombre');
-            $table->unsignedSmallInteger('horas_totales')->nullable();
+            $table->enum('espacio_requerido', $espacios)->default('aula');
             $table->timestamps();
         });
     }

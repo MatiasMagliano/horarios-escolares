@@ -6,10 +6,27 @@ use Illuminate\Database\Eloquent\Model;
 
 class Materia extends Model
 {
+    public const ESPACIO_AULA = 'aula';
+    public const ESPACIO_LAB_INFORMATICA = 'lab-informatica';
+    public const ESPACIO_LAB_ELECTRONICA = 'lab-electronica';
+    public const ESPACIO_LAB_TALLER = 'lab-taller';
+    public const ESPACIO_PATIO = 'patio';
+
     protected $fillable = [
         'nombre',
-        'horas_totales', // en módulos
+        'espacio_requerido',
     ];
+
+    public static function espaciosDisponibles(): array
+    {
+        return [
+            self::ESPACIO_AULA,
+            self::ESPACIO_LAB_INFORMATICA,
+            self::ESPACIO_LAB_ELECTRONICA,
+            self::ESPACIO_LAB_TALLER,
+            self::ESPACIO_PATIO,
+        ];
+    }
 
     // relaciones con tabla pivot curso_materia
     public function cursoMaterias()
@@ -27,21 +44,5 @@ class Materia extends Model
     public function horariosBase()
     {
         return $this->hasMany(HorarioBase::class);
-    }
-
-    /**
-     * Cantidad de módulos asignados en el horario base
-     */
-    public function modulosAsignados(): int
-    {
-        return $this->horariosBase()->count();
-    }
-
-    /**
-     * Indica si la materia cumple la carga horaria
-     */
-    public function cargaCompleta(): bool
-    {
-        return $this->modulosAsignados() === $this->horas_totales;
     }
 }

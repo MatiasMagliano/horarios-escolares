@@ -7,8 +7,13 @@ new class extends Component {
 
     public $cursoIdSeleccionado;
     public ?int $cursoAEliminar = null;
+    public ?int $cursoIdMaterias = null;
 
-    protected $listeners = ['curso-guardado' => '$refresh', 'curso-eliminado' => '$refresh'];
+    protected $listeners = [
+        'curso-guardado' => '$refresh',
+        'curso-eliminado' => '$refresh',
+        'curso-materias-cerrar' => 'cerrarMaterias',
+    ];
 
     // modal de creación de curso
     public function crear()
@@ -22,6 +27,16 @@ new class extends Component {
     {
         $this->cursoIdSeleccionado = $id;
         $this->dispatch('curso-abrir-modal');
+    }
+
+    public function administrarMaterias($id)
+    {
+        $this->cursoIdMaterias = (int) $id;
+    }
+
+    public function cerrarMaterias()
+    {
+        $this->cursoIdMaterias = null;
     }
 
     // eliminar curso
@@ -46,16 +61,26 @@ new class extends Component {
     // renderizar la vista
     public function render()
     {
+        $cursos = Curso::query()
+            ->withCount('cursoMaterias')
+            ->orderBy('anio')
+            ->orderBy('division')
+            ->get();
+
         return view('livewire.curso-index', [
-            'cursos' => Curso::orderBy('anio')
-                ->orderBy('division')
-                ->get(),
+            'cursos' => $cursos,
+            'cursosSinMaterias' => $cursos->filter(fn ($curso) => $curso->curso_materias_count === 0),
         ]);
     }
 };
 ?>
 
 <div>
+    @if($cursoIdMaterias)
+        <livewire:curso-materias-admin
+            :curso="Curso::findOrFail($cursoIdMaterias)"
+            :key="'curso-materias-admin-'.$cursoIdMaterias" />
+    @else
     {{-- HEADER --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="mb-0">Cursos</h3>
@@ -65,8 +90,20 @@ new class extends Component {
         </button>
     </div>
 
+    @if($cursosSinMaterias->isNotEmpty())
+    <div class="alert alert-warning d-flex justify-content-between align-items-center gap-3">
+        <div>
+            Hay {{ $cursosSinMaterias->count() }} curso/s sin materias cargadas.
+            <span class="small text-muted">
+                {{ $cursosSinMaterias->pluck('nombre_completo')->join(', ') }}
+            </span>
+        </div>
+    </div>
+    @endif
+
     {{-- TABLA --}}
-    <table class="table table-bordered table-hover table-sm align-middle">
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-sm align-middle">
         <thead class="table-light">
             <tr class="text-center">
                 <th style="width: 10%;">Año</th>
@@ -92,6 +129,9 @@ new class extends Component {
                         <span class="badge {{ $curso->ciclo === 'CB' ? 'bg-secondary' : 'bg-info' }}">
                             {{ $curso->ciclo }}
                         </span>
+                        @if($curso->curso_materias_count === 0)
+                        <span class="badge bg-warning text-dark me-2">Sin materias</span>
+                        @endif
                     </td>
 
                     <td class="text-center">
@@ -99,9 +139,14 @@ new class extends Component {
                     </td>
 
                     <td class="text-center">
+                        
                         {{-- Botón de editar --}}
                         <button wire:click="editar({{ $curso->id }})" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-pencil"></i>
+                        </button>
+
+                        <button wire:click="administrarMaterias({{ $curso->id }})" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-journal-text"></i>
                         </button>
 
                         {{-- Botón de eliminar --}}
@@ -119,6 +164,7 @@ new class extends Component {
             @endforelse
         </tbody>
     </table>
+    </div>
 
     {{-- MODAL NUEVO/EDITAR --}}
     <div wire:ignore.self class="modal fade" id="cursoModal" tabindex="-1">
@@ -175,6 +221,7 @@ new class extends Component {
             </div>
         </div>
     </div>
+    @endif
 </div>
 
 <script>

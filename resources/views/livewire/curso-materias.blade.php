@@ -18,12 +18,35 @@ new class extends Component {
     public $materia_id;
     public $docente_id;
     public $horas_totales;
+    public $espacio_requerido;
+
     public ?int $editandoId = null;
     public $docente_id_edicion;
+    public $horas_totales_edicion;
+    public $espacio_requerido_edicion;
 
     public function mount(Curso $curso)
     {
         $this->curso = $curso;
+    }
+
+    public function updatedMateriaId($value): void
+    {
+        if (!$value) {
+            $this->espacio_requerido = null;
+            return;
+        }
+
+        $this->espacio_requerido = Materia::find($value)?->espacio_requerido ?? Materia::ESPACIO_AULA;
+    }
+
+    public function getMateriaSeleccionadaProperty()
+    {
+        if (!$this->materia_id) {
+            return null;
+        }
+
+        return Materia::find($this->materia_id);
     }
 
     protected function rules()
@@ -33,12 +56,14 @@ new class extends Component {
                 'required',
                 'exists:materias,id',
                 Rule::unique('curso_materia')
-                    ->where(fn ($q) =>
+                    ->where(
+                        fn($q) =>
                         $q->where('curso_id', $this->curso->id)
                     )
             ],
             'docente_id' => 'required|exists:docentes,id',
-            'horas_totales' => 'required|integer|min:1'
+            'horas_totales' => 'required|integer|min:1',
+            'espacio_requerido' => ['required', Rule::in(Materia::espaciosDisponibles())],
         ];
     }
 
@@ -47,6 +72,11 @@ new class extends Component {
         $this->validate();
 
         DB::transaction(function () {
+            $materia = Materia::findOrFail($this->materia_id);
+            $materia->update([
+                'espacio_requerido' => $this->espacio_requerido,
+            ]);
+
             $cm = CursoMateria::create([
                 'curso_id' => $this->curso->id,
                 'materia_id' => $this->materia_id,
@@ -56,7 +86,7 @@ new class extends Component {
             $this->asignarDocenteVersionado($cm, (int) $this->docente_id);
         });
 
-        $this->reset(['materia_id','docente_id','horas_totales']);
+        $this->reset(['materia_id', 'docente_id', 'horas_totales', 'espacio_requerido']);
         $this->dispatch('curso-materias-actualizadas');
     }
 
@@ -68,33 +98,56 @@ new class extends Component {
 
         $this->editandoId = $cm->id;
         $this->docente_id_edicion = $cm->cmDocenteVigente?->docente_id;
+        $this->horas_totales_edicion = $cm->horas_totales;
+        $this->espacio_requerido_edicion = $cm->materia->espacio_requerido;
+
+        $this->dispatch('abrir-modal-editar-materia');
     }
 
     public function cancelarEdicion()
     {
-        $this->reset(['editandoId', 'docente_id_edicion']);
+        $this->reset([
+            'editandoId',
+            'docente_id_edicion',
+            'horas_totales_edicion',
+            'espacio_requerido_edicion',
+        ]);
+
+        $this->dispatch('cerrar-modal-editar-materia');
     }
 
-    public function actualizar($id)
+    public function actualizar()
     {
         $this->validate([
             'docente_id_edicion' => 'required|exists:docentes,id',
+            'horas_totales_edicion' => 'required|integer|min:1',
+            'espacio_requerido_edicion' => ['required', Rule::in(Materia::espaciosDisponibles())],
         ]);
 
-        $cm = CursoMateria::where('curso_id', $this->curso->id)
+        if (!$this->editandoId) {
+            return;
+        }
+
+        $cm = CursoMateria::query()
+            ->where('curso_id', $this->curso->id)
             ->with('cmDocenteVigente')
-            ->findOrFail($id);
+            ->findOrFail($this->editandoId);
 
         $docenteNuevoId = (int) $this->docente_id_edicion;
         $docenteActualId = $cm->cmDocenteVigente?->docente_id;
 
-        if ($docenteActualId === $docenteNuevoId) {
-            $this->cancelarEdicion();
-            return;
-        }
+        DB::transaction(function () use ($cm, $docenteNuevoId, $docenteActualId) {
+            $cm->update([
+                'horas_totales' => $this->horas_totales_edicion,
+            ]);
 
-        DB::transaction(function () use ($cm, $docenteNuevoId) {
-            $this->asignarDocenteVersionado($cm, $docenteNuevoId);
+            $cm->materia()->update([
+                'espacio_requerido' => $this->espacio_requerido_edicion,
+            ]);
+
+            if ($docenteActualId !== $docenteNuevoId) {
+                $this->asignarDocenteVersionado($cm, $docenteNuevoId);
+            }
         });
 
         $this->cancelarEdicion();
@@ -136,14 +189,29 @@ new class extends Component {
                         $query->vigente();
                     }
                 ])
+                ->orderBy('materia_id')
                 ->get(),
-            'materias' => Materia::orderBy('horas_totales','desc')->get(),
+            'materias' => Materia::orderBy('nombre')->get(),
             'docentes' => Docente::query()
                 ->where('activo', true)
                 ->orWhereIn('id', $docentesAsignados)
                 ->orderBy('nombre')
                 ->get(),
+            'espaciosDisponibles' => collect(Materia::espaciosDisponibles())
+                ->mapWithKeys(fn($espacio) => [$espacio => $this->etiquetaEspacio($espacio)]),
         ]);
+    }
+
+    private function etiquetaEspacio(string $espacio): string
+    {
+        return match ($espacio) {
+            Materia::ESPACIO_AULA => 'Aula',
+            Materia::ESPACIO_LAB_INFORMATICA => 'Laboratorio de Informática',
+            Materia::ESPACIO_LAB_ELECTRONICA => 'Laboratorio de Electrónica',
+            Materia::ESPACIO_LAB_TALLER => 'Laboratorio / Taller',
+            Materia::ESPACIO_PATIO => 'Patio',
+            default => $espacio,
+        };
     }
 
     private function asignarDocenteVersionado(CursoMateria $cm, int $docenteId): void
@@ -194,115 +262,209 @@ new class extends Component {
 };
 ?>
 
-<div class="mt-4">
-
-    <h5 class="mb-3">Materias del Curso</h5>
-
-    {{-- FORM INLINE --}}
-    <div class="row g-2 mb-3">
-
-        <div class="col-md-4">
-            <select wire:model="materia_id" class="form-select">
-                <option value="">Materia...</option>
-                @foreach($materias as $m)
-                    <option value="{{ $m->id }}">{{ $m->nombre }}</option>
-                @endforeach
-            </select>
-            @error('materia_id') <small class="text-danger">{{ $message }}</small> @enderror
-        </div>
-
-        <div class="col-md-4">
-            <select wire:model="docente_id" class="form-select">
-                <option value="">Docente...</option>
-                @foreach($docentes as $d)
-                    <option value="{{ $d->id }}">{{ $d->nombre }}</option>
-                @endforeach
-            </select>
-            @error('docente_id') <small class="text-danger">{{ $message }}</small> @enderror
-        </div>
-
-        <div class="col-md-2">
-            <input type="number" wire:model="horas_totales" class="form-control" placeholder="Hs">
-            @error('horas_totales') <small class="text-danger">{{ $message }}</small> @enderror
-        </div>
-
-        <div class="col-md-2">
-            <button type="button" wire:click="guardar" class="btn btn-primary w-100">
-                Agregar
-            </button>
-        </div>
-
-    </div>
-
-    {{-- TABLA --}}
-    <table class="table table-sm table-bordered align-middle">
-        <thead class="table-light text-center">
-            <tr>
-                <th>Materia</th>
-                <th>Docente</th>
-                <th>Carga horaria</th>
-                <th>Hs cargadas</th>
-                <th></th>
-            </tr>
-        </thead>
-
-        <tbody>
-        @foreach($materiasCurso as $cm)
-            <tr>
-                <td>{{ $cm->materia->nombre }}</td>
-                <td>
-                    @if($editandoId === $cm->id)
-                        <select wire:model="docente_id_edicion" class="form-select form-select-sm">
-                            <option value="">Docente...</option>
-                            @foreach($docentes as $d)
-                                <option value="{{ $d->id }}">{{ $d->nombre }}</option>
+<div>
+    <div class="row g-4 mt-1">
+        <div class="col-xl-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-1">Agregar materia al curso</h5>
+                    <p class="text-muted small mb-0">
+                        Cargá la materia, el docente responsable y la carga horaria semanal.
+                    </p>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Materia</label>
+                        <select wire:model.live="materia_id" class="form-select">
+                            <option value="">Seleccione una materia...</option>
+                            @foreach($materias as $m)
+                            <option value="{{ $m->id }}">{{ $m->nombre }}</option>
                             @endforeach
                         </select>
-                        @error('docente_id_edicion') <small class="text-danger">{{ $message }}</small> @enderror
-                    @else
-                        {{ $cm->cmDocenteVigente?->docente?->nombre ?? '—' }}
-                    @endif
-                </td>
-                <td class="text-center">{{ $cm->horas_totales }}</td>
-                <td class="text-center">{{ $cm->horario_base_count }}</td>
-                <td class="text-center">
-                    @if($editandoId === $cm->id)
-                        <button
-                            type="button"
-                            wire:click="actualizar({{ $cm->id }})"
-                            class="btn btn-sm btn-outline-success"
-                        >
-                            <i class="bi bi-check-square"></i>
-                        </button>
-                        <button
-                            type="button"
-                            wire:click="cancelarEdicion"
-                            class="btn btn-sm btn-outline-secondary"
-                        >
-                            <i class="bi bi-x-square"></i>
-                        </button>
-                    @else
-                        <button
-                            type="button"
-                            wire:click="editar({{ $cm->id }})"
-                            class="btn btn-sm btn-outline-primary"
-                        >
-                            <i class="bi bi-pencil-square"></i>
-                        </button>
-                        <button
-                            type="button"
-                            wire:click="eliminar({{ $cm->id }})"
-                            class="btn btn-sm btn-outline-danger"
-                            data-bs-toggle="tooltip" data-bs-placement="right" title="Eliminación no disponible si la materia tiene horarios cargados"
-                            @disabled($cm->horario_base_count > 0)
-                        >
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    @endif
-                </td>
-            </tr>
-        @endforeach
-        </tbody>
-    </table>
+                        @error('materia_id') <small class="text-danger">{{ $message }}</small> @enderror
+                    </div>
 
+                    <div class="mb-3">
+                        <label class="form-label">Docente</label>
+                        <select wire:model="docente_id" class="form-select">
+                            <option value="">Seleccione un docente...</option>
+                            @foreach($docentes as $d)
+                            <option value="{{ $d->id }}">{{ $d->nombre }}</option>
+                            @endforeach
+                        </select>
+                        @error('docente_id') <small class="text-danger">{{ $message }}</small> @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Carga horaria</label>
+                        <input type="number" wire:model="horas_totales" class="form-control" placeholder="Cantidad de horas">
+                        @error('horas_totales') <small class="text-danger">{{ $message }}</small> @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Espacio requerido</label>
+                        <select wire:model="espacio_requerido" class="form-select" @disabled(!$materia_id)>
+                            <option value="">Seleccione un espacio...</option>
+                            @foreach($espaciosDisponibles as $valor => $etiqueta)
+                            <option value="{{ $valor }}">{{ $etiqueta }}</option>
+                            @endforeach
+                        </select>
+                        @error('espacio_requerido') <small class="text-danger">{{ $message }}</small> @enderror
+                        <div class="form-text">
+                            Se preselecciona desde la materia y podés ajustarlo antes de guardar.
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-top-0">
+                    <button type="button" wire:click="guardar" class="btn btn-primary w-100">
+                        Agregar materia
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">Materias asignadas</h5>
+                        <p class="text-muted small mb-0">
+                            Administrá docentes y verificá la carga horaria ya distribuida.
+                        </p>
+                    </div>
+                    <span class="badge bg-secondary">{{ $materiasCurso->count() }} registradas</span>
+                </div>
+
+                <div class="card-body p-0">
+                    @if($materiasCurso->isEmpty())
+                    <div class="p-4 text-muted">
+                        Este curso todavía no tiene materias cargadas.
+                    </div>
+                    @else
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle mb-0">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th>Materia</th>
+                                    <th>Espacio</th>
+                                    <th>Docente</th>
+                                    <th>Carga horaria</th>
+                                    <th>Hs cargadas</th>
+                                    <th style="width: 12%;">Acciones</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach($materiasCurso as $cm)
+                                <tr>
+                                    <td class="fw-semibold">{{ $cm->materia->nombre }}</td>
+                                    <td class="text-center">
+                                        <span class="badge text-bg-light border">
+                                            {{ $espaciosDisponibles[$cm->materia->espacio_requerido] ?? $cm->materia->espacio_requerido }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $cm->cmDocenteVigente?->docente?->nombre ?? '—' }}</td>
+                                    <td class="text-center">{{ $cm->horas_totales }}</td>
+                                    <td class="text-center">
+                                        <span class="fw-semibold">{{ $cm->horario_base_count }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <button
+                                            type="button"
+                                            wire:click="editar({{ $cm->id }})"
+                                            class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            wire:click="eliminar({{ $cm->id }})"
+                                            class="btn btn-sm btn-outline-danger"
+                                            data-bs-toggle="tooltip" data-bs-placement="right" title="Eliminación no disponible si la materia tiene horarios cargados"
+                                            @disabled($cm->horario_base_count > 0)
+                                            >
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div wire:ignore.self class="modal fade" id="editarMateriaCursoModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar materia del curso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" wire:click="cancelarEdicion"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 col-md-4 mb-3">
+                            <label class="form-label">Docente</label>
+                            <select wire:model="docente_id_edicion" class="form-select">
+                                <option value="">Seleccione un docente...</option>
+                                @foreach($docentes as $d)
+                                <option value="{{ $d->id }}">{{ $d->nombre }}</option>
+                                @endforeach
+                            </select>
+                            @error('docente_id_edicion') <small class="text-danger">{{ $message }}</small> @enderror
+                        </div>
+
+                        <div class="col-12 col-md-4 mb-3">
+                            <label class="form-label">Carga horaria</label>
+                            <input type="number" wire:model="horas_totales_edicion" class="form-control" placeholder="Cantidad de horas">
+                            @error('horas_totales_edicion') <small class="text-danger">{{ $message }}</small> @enderror
+                        </div>
+
+                        <div class="col-12 col-md-4 mb-3">
+                            <label class="form-label">Espacio requerido</label>
+                            <select wire:model="espacio_requerido_edicion" class="form-select">
+                                <option value="">Seleccione un espacio...</option>
+                                @foreach($espaciosDisponibles as $valor => $etiqueta)
+                                <option value="{{ $valor }}">{{ $etiqueta }}</option>
+                                @endforeach
+                            </select>
+                            @error('espacio_requerido_edicion') <small class="text-danger">{{ $message }}</small> @enderror
+                        </div>
+                    </div>
+
+                    <div class="alert alert-secondary mb-0">
+                        El cambio de docente se versiona con SCD2. La carga horaria y el espacio se actualizan sobre los registros actuales.
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" wire:click="cancelarEdicion">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn btn-primary" wire:click="actualizar">
+                        Guardar cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@script
+<script>
+    const editarMateriaCursoModalEl = document.getElementById('editarMateriaCursoModal');
+
+    Livewire.on('abrir-modal-editar-materia', () => {
+        if (!editarMateriaCursoModalEl || typeof bootstrap === 'undefined') return;
+        bootstrap.Modal.getOrCreateInstance(editarMateriaCursoModalEl).show();
+    });
+
+    Livewire.on('cerrar-modal-editar-materia', () => {
+        if (!editarMateriaCursoModalEl || typeof bootstrap === 'undefined') return;
+        bootstrap.Modal.getOrCreateInstance(editarMateriaCursoModalEl).hide();
+    });
+</script>
+@endscript
