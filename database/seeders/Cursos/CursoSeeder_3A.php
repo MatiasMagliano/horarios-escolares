@@ -18,17 +18,17 @@ class CursoSeeder_3A extends BaseCursoSeeder
     protected function materias(): array
     {
         return [
-            ['nombre' => 'Lengua y Literatura', 'horas_totales' => 5, 'docente' => 'Marisa Morales'], 
-            ['nombre' => 'Matemática', 'horas_totales' => 5, 'docente' => 'Martín Andrada'], 
-            ['nombre' => 'Física', 'horas_totales' => 3, 'docente' => 'Natacha Marangón'], 
-            ['nombre' => 'Química', 'horas_totales' => 3, 'docente' => 'Yanina Funes'], 
-            ['nombre' => 'Geografía', 'horas_totales' => 4, 'docente' => 'Belén Ramos'], 
-            ['nombre' => 'Historia', 'horas_totales' => 4, 'docente' => 'Erick Zaccagnini'], 
-            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3, 'docente' => 'Carina Chialva'], 
-            ['nombre' => 'Ed. Art. - Música/Teatro', 'horas_totales' => 3, 'docente' => 'Bruno/Morano'], 
-            ['nombre' => 'Ed. Tecnológica', 'horas_totales' => 4, 'docente' => 'Brenda Quiroga'], 
-            ['nombre' => 'F.V.T', 'horas_totales' => 4, 'docente' => 'Yolanda Sucheyre'],
-            ['nombre' => 'Dib. Técnico', 'horas_totales' => 4, 'docente' => 'Ivana Ribodino']
+            ['nombre' => 'Lengua y Literatura', 'horas_totales' => 5, 'docente' => 'Marisa Morales', 'espacio' => 'Aula 4'],
+            ['nombre' => 'Matemática', 'horas_totales' => 5, 'docente' => 'Martín Andrada', 'espacio' => 'Aula 4'],
+            ['nombre' => 'Física', 'horas_totales' => 3, 'docente' => 'Natacha Marangón', 'espacio' => 'Aula 4'],
+            ['nombre' => 'Química', 'horas_totales' => 3, 'docente' => 'Yanina Funes', 'espacio' => 'Aula 4'],
+            ['nombre' => 'Geografía', 'horas_totales' => 4, 'docente' => 'Belén Ramos', 'espacio' => 'Aula 4'],
+            ['nombre' => 'Historia', 'horas_totales' => 4, 'docente' => 'Erick Zaccagnini', 'espacio' => 'Aula 4'],
+            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3, 'docente' => 'Carina Chialva', 'espacio' => 'Aula 4'],
+            ['nombre' => 'Ed. Art. - Música/Teatro', 'horas_totales' => 3, 'docente' => 'Bruno/Morano', 'espacio' => 'Aula 4'], 
+            ['nombre' => 'Ed. Tecnológica', 'horas_totales' => 4, 'docente' => 'Brenda Quiroga', 'espacio' => 'Aula 4'], 
+            ['nombre' => 'F.V.T', 'horas_totales' => 4, 'docente' => 'Yolanda Sucheyre', 'espacio' => 'Aula 4'],
+            ['nombre' => 'Dib. Técnico', 'horas_totales' => 4, 'docente' => 'Ivana Ribodino', 'espacio' => 'Aula 4']
         ];
     }
 

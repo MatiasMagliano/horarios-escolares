@@ -11,6 +11,7 @@ use App\Models\CursoMateria;
 use App\Models\CmDocente;
 use App\Models\BloqueHorario;
 use App\Models\HorarioBase;
+use App\Models\EspacioFisico;
 use Exception;
 
 abstract class BaseCursoSeeder extends Seeder
@@ -61,9 +62,15 @@ abstract class BaseCursoSeeder extends Seeder
         $vigenteDesde = $this->vigenteDesde();
 
         foreach ($this->materias() as $data) {
+            if (!array_key_exists('espacio', $data) || !$data['espacio']) {
+                throw new Exception("La materia {$data['nombre']} del curso {$curso->nombre_completo} no tiene espacio definido en el seeder.");
+            }
 
             $materia = Materia::where('nombre', $data['nombre'])->firstOrFail();
             $docente = Docente::where('nombre', $data['docente'])->firstOrFail();
+            $espacio = EspacioFisico::query()
+                ->where('nombre', $data['espacio'])
+                ->firstOrFail();
 
             $cm = CursoMateria::updateOrCreate(
                 [
@@ -72,6 +79,7 @@ abstract class BaseCursoSeeder extends Seeder
                 ],
                 [
                     'horas_totales' => $data['horas_totales'],
+                    'espacio_fisico_id' => $espacio->id,
                 ]
             );
 
@@ -172,7 +180,8 @@ abstract class BaseCursoSeeder extends Seeder
                     . PHP_EOL;
             }
 
-            throw new Exception("Carga horaria inconsistente en {$curso->nombreCompleto()}");
+            // llamar al accesor del modelo Curso para mostrar el nombre completo del curso en el mensaje de error
+            throw new Exception("Carga horaria inconsistente en {$curso->getNombreCompletoAttribute()}");
         }
     }
 

@@ -6,6 +6,7 @@ use App\Models\Materia;
 use App\Models\Docente;
 use App\Models\CmDocente;
 use App\Models\CursoMateria;
+use App\Models\EspacioFisico;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -13,17 +14,22 @@ use Illuminate\Validation\Rule;
 new class extends Component {
     protected const FECHA_VIGENCIA_INICIAL = '2026-01-01';
 
+    protected $listeners = [
+        'espacios-fisicos-actualizados' => '$refresh',
+    ];
+
     public Curso $curso;
 
     public $materia_id;
     public $docente_id;
     public $horas_totales;
-    public $espacio_requerido;
+    public $espacio_fisico_id;
+    public ?string $mensajeError = null;
 
     public ?int $editandoId = null;
     public $docente_id_edicion;
     public $horas_totales_edicion;
-    public $espacio_requerido_edicion;
+    public $espacio_fisico_id_edicion;
 
     public function mount(Curso $curso)
     {
@@ -33,11 +39,16 @@ new class extends Component {
     public function updatedMateriaId($value): void
     {
         if (!$value) {
-            $this->espacio_requerido = null;
+            $this->espacio_fisico_id = null;
             return;
         }
 
-        $this->espacio_requerido = Materia::find($value)?->espacio_requerido ?? Materia::ESPACIO_AULA;
+        $cursoMateriaExistente = CursoMateria::query()
+            ->where('curso_id', $this->curso->id)
+            ->where('materia_id', $value)
+            ->first();
+
+        $this->espacio_fisico_id = $cursoMateriaExistente?->espacio_fisico_id;
     }
 
     public function getMateriaSeleccionadaProperty()
@@ -63,35 +74,35 @@ new class extends Component {
             ],
             'docente_id' => 'required|exists:docentes,id',
             'horas_totales' => 'required|integer|min:1',
-            'espacio_requerido' => ['required', Rule::in(Materia::espaciosDisponibles())],
+            'espacio_fisico_id' => 'required|exists:espacios_fisicos,id',
         ];
     }
 
     public function guardar()
     {
+        $this->mensajeError = null;
         $this->validate();
 
         DB::transaction(function () {
-            $materia = Materia::findOrFail($this->materia_id);
-            $materia->update([
-                'espacio_requerido' => $this->espacio_requerido,
-            ]);
+            $espacio = EspacioFisico::findOrFail((int) $this->espacio_fisico_id);
 
             $cm = CursoMateria::create([
                 'curso_id' => $this->curso->id,
                 'materia_id' => $this->materia_id,
                 'horas_totales' => $this->horas_totales,
+                'espacio_fisico_id' => $espacio->id,
             ]);
 
             $this->asignarDocenteVersionado($cm, (int) $this->docente_id);
         });
 
-        $this->reset(['materia_id', 'docente_id', 'horas_totales', 'espacio_requerido']);
+        $this->reset(['materia_id', 'docente_id', 'horas_totales', 'espacio_fisico_id']);
         $this->dispatch('curso-materias-actualizadas');
     }
 
     public function editar($id)
     {
+        $this->mensajeError = null;
         $cm = CursoMateria::where('curso_id', $this->curso->id)
             ->with('cmDocenteVigente')
             ->findOrFail($id);
@@ -99,7 +110,7 @@ new class extends Component {
         $this->editandoId = $cm->id;
         $this->docente_id_edicion = $cm->cmDocenteVigente?->docente_id;
         $this->horas_totales_edicion = $cm->horas_totales;
-        $this->espacio_requerido_edicion = $cm->materia->espacio_requerido;
+        $this->espacio_fisico_id_edicion = $cm->espacio_fisico_id;
 
         $this->dispatch('abrir-modal-editar-materia');
     }
@@ -110,7 +121,7 @@ new class extends Component {
             'editandoId',
             'docente_id_edicion',
             'horas_totales_edicion',
-            'espacio_requerido_edicion',
+            'espacio_fisico_id_edicion',
         ]);
 
         $this->dispatch('cerrar-modal-editar-materia');
@@ -118,10 +129,11 @@ new class extends Component {
 
     public function actualizar()
     {
+        $this->mensajeError = null;
         $this->validate([
             'docente_id_edicion' => 'required|exists:docentes,id',
             'horas_totales_edicion' => 'required|integer|min:1',
-            'espacio_requerido_edicion' => ['required', Rule::in(Materia::espaciosDisponibles())],
+            'espacio_fisico_id_edicion' => 'required|exists:espacios_fisicos,id',
         ]);
 
         if (!$this->editandoId) {
@@ -135,14 +147,12 @@ new class extends Component {
 
         $docenteNuevoId = (int) $this->docente_id_edicion;
         $docenteActualId = $cm->cmDocenteVigente?->docente_id;
+        $espacio = EspacioFisico::findOrFail((int) $this->espacio_fisico_id_edicion);
 
-        DB::transaction(function () use ($cm, $docenteNuevoId, $docenteActualId) {
+        DB::transaction(function () use ($cm, $docenteNuevoId, $docenteActualId, $espacio) {
             $cm->update([
                 'horas_totales' => $this->horas_totales_edicion,
-            ]);
-
-            $cm->materia()->update([
-                'espacio_requerido' => $this->espacio_requerido_edicion,
+                'espacio_fisico_id' => $espacio->id,
             ]);
 
             if ($docenteActualId !== $docenteNuevoId) {
@@ -156,6 +166,8 @@ new class extends Component {
 
     public function eliminar($id)
     {
+        $this->mensajeError = null;
+
         $cm = CursoMateria::where('curso_id', $this->curso->id)
             ->withCount([
                 'horarioBase as horario_base_count' => function ($query) {
@@ -164,7 +176,10 @@ new class extends Component {
             ])
             ->findOrFail($id);
 
-        if ($cm->horario_base_count > 0) return;
+        if ($cm->horario_base_count > 0) {
+            $this->mensajeError = 'No se puede eliminar la materia porque tiene módulos cargados en la grilla horaria.';
+            return;
+        }
 
         $cm->delete();
         $this->dispatch('curso-materias-actualizadas');
@@ -183,7 +198,7 @@ new class extends Component {
         return view('livewire.curso-materias', [
             'materiasCurso' => $this->curso
                 ->cursoMaterias()
-                ->with(['materia', 'cmDocenteVigente.docente'])
+                ->with(['materia', 'cmDocenteVigente.docente', 'espacioFisico'])
                 ->withCount([
                     'horarioBase as horario_base_count' => function ($query) {
                         $query->vigente();
@@ -197,21 +212,11 @@ new class extends Component {
                 ->orWhereIn('id', $docentesAsignados)
                 ->orderBy('nombre')
                 ->get(),
-            'espaciosDisponibles' => collect(Materia::espaciosDisponibles())
-                ->mapWithKeys(fn($espacio) => [$espacio => $this->etiquetaEspacio($espacio)]),
+            'espaciosFisicos' => EspacioFisico::query()
+                ->where('activo', true)
+                ->orderBy('nombre')
+                ->get(),
         ]);
-    }
-
-    private function etiquetaEspacio(string $espacio): string
-    {
-        return match ($espacio) {
-            Materia::ESPACIO_AULA => 'Aula',
-            Materia::ESPACIO_LAB_INFORMATICA => 'Laboratorio de Informática',
-            Materia::ESPACIO_LAB_ELECTRONICA => 'Laboratorio de Electrónica',
-            Materia::ESPACIO_LAB_TALLER => 'Laboratorio / Taller',
-            Materia::ESPACIO_PATIO => 'Patio',
-            default => $espacio,
-        };
     }
 
     private function asignarDocenteVersionado(CursoMateria $cm, int $docenteId): void
@@ -263,6 +268,13 @@ new class extends Component {
 ?>
 
 <div>
+    @if($mensajeError)
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {{ $mensajeError }}
+        <button type="button" class="btn-close" wire:click="$set('mensajeError', null)"></button>
+    </div>
+    @endif
+
     <div class="row g-4 mt-1">
         <div class="col-xl-4">
             <div class="card h-100 shadow-sm">
@@ -302,16 +314,16 @@ new class extends Component {
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Espacio requerido</label>
-                        <select wire:model="espacio_requerido" class="form-select" @disabled(!$materia_id)>
+                        <label class="form-label">Espacio físico</label>
+                        <select wire:model="espacio_fisico_id" class="form-select" @disabled(!$materia_id)>
                             <option value="">Seleccione un espacio...</option>
-                            @foreach($espaciosDisponibles as $valor => $etiqueta)
-                            <option value="{{ $valor }}">{{ $etiqueta }}</option>
+                            @foreach($espaciosFisicos as $espacio)
+                            <option value="{{ $espacio->id }}">{{ $espacio->nombre }}</option>
                             @endforeach
                         </select>
-                        @error('espacio_requerido') <small class="text-danger">{{ $message }}</small> @enderror
+                        @error('espacio_fisico_id') <small class="text-danger">{{ $message }}</small> @enderror
                         <div class="form-text">
-                            Se preselecciona desde la materia y podés ajustarlo antes de guardar.
+                            Se guarda el espacio físico puntual asignado a esta materia dentro del curso.
                         </div>
                     </div>
                 </div>
@@ -360,7 +372,7 @@ new class extends Component {
                                     <td class="fw-semibold">{{ $cm->materia->nombre }}</td>
                                     <td class="text-center">
                                         <span class="badge text-bg-light border">
-                                            {{ $espaciosDisponibles[$cm->materia->espacio_requerido] ?? $cm->materia->espacio_requerido }}
+                                            {{ $cm->espacioFisico?->nombre ?? '—' }}
                                         </span>
                                     </td>
                                     <td>{{ $cm->cmDocenteVigente?->docente?->nombre ?? '—' }}</td>
@@ -380,7 +392,6 @@ new class extends Component {
                                             wire:click="eliminar({{ $cm->id }})"
                                             class="btn btn-sm btn-outline-danger"
                                             data-bs-toggle="tooltip" data-bs-placement="right" title="Eliminación no disponible si la materia tiene horarios cargados"
-                                            @disabled($cm->horario_base_count > 0)
                                             >
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -396,7 +407,7 @@ new class extends Component {
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="editarMateriaCursoModal" tabindex="-1">
+    <div wire:ignore.self class="modal fade" id="editarMateriaCursoModal-{{ $this->getId() }}" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
             <div class="modal-content">
                 <div class="modal-header">
@@ -424,14 +435,14 @@ new class extends Component {
                         </div>
 
                         <div class="col-12 col-md-4 mb-3">
-                            <label class="form-label">Espacio requerido</label>
-                            <select wire:model="espacio_requerido_edicion" class="form-select">
+                            <label class="form-label">Espacio físico</label>
+                            <select wire:model="espacio_fisico_id_edicion" class="form-select">
                                 <option value="">Seleccione un espacio...</option>
-                                @foreach($espaciosDisponibles as $valor => $etiqueta)
-                                <option value="{{ $valor }}">{{ $etiqueta }}</option>
+                                @foreach($espaciosFisicos as $espacio)
+                                <option value="{{ $espacio->id }}">{{ $espacio->nombre }}</option>
                                 @endforeach
                             </select>
-                            @error('espacio_requerido_edicion') <small class="text-danger">{{ $message }}</small> @enderror
+                            @error('espacio_fisico_id_edicion') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
                     </div>
 
@@ -455,14 +466,14 @@ new class extends Component {
 
 @script
 <script>
-    const editarMateriaCursoModalEl = document.getElementById('editarMateriaCursoModal');
+    const editarMateriaCursoModalEl = document.getElementById('editarMateriaCursoModal-{{ $this->getId() }}');
 
-    Livewire.on('abrir-modal-editar-materia', () => {
+    $wire.on('abrir-modal-editar-materia', () => {
         if (!editarMateriaCursoModalEl || typeof bootstrap === 'undefined') return;
         bootstrap.Modal.getOrCreateInstance(editarMateriaCursoModalEl).show();
     });
 
-    Livewire.on('cerrar-modal-editar-materia', () => {
+    $wire.on('cerrar-modal-editar-materia', () => {
         if (!editarMateriaCursoModalEl || typeof bootstrap === 'undefined') return;
         bootstrap.Modal.getOrCreateInstance(editarMateriaCursoModalEl).hide();
     });

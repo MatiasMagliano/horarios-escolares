@@ -12,30 +12,20 @@ class CursoMateria extends Model
         'curso_id',
         'materia_id',
         'horas_totales',
+        'espacio_fisico_id',
     ];
 
     public function curso() { return $this->belongsTo(Curso::class); }
 
     public function materia() { return $this->belongsTo(Materia::class); }
 
+    public function espacioFisico() { return $this->belongsTo(EspacioFisico::class); }
+
     public function cmDocentes() { return $this->hasMany(CmDocente::class); }
 
     public function cmDocenteVigente()
     {
         return $this->hasOne(CmDocente::class)->vigente();
-    }
-
-    // Compatibilidad temporal para vistas/componentes que aún usan $cursoMateria->docente
-    public function docente()
-    {
-        return $this->hasOneThrough(
-            Docente::class,
-            CmDocente::class,
-            'curso_materia_id',
-            'id',
-            'id',
-            'docente_id'
-        )->where('cm_docente.es_vigente', true)->whereNull('cm_docente.vigente_hasta');
     }
 
     public function horarioBase() { return $this->hasMany(HorarioBase::class); }

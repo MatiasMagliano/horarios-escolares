@@ -18,16 +18,16 @@ class CursoSeeder_1A extends BaseCursoSeeder
     protected function materias(): array
     {
         return [
-            ['nombre' => 'Cs. Ss. - Geografía', 'horas_totales' => 5, 'docente' => 'Marcos Morales'],
-            ['nombre' => 'Lengua y Literatura', 'horas_totales' => 5, 'docente' => 'Noelia Martinez Villegas'],
-            ['nombre' => 'Matemática', 'horas_totales' => 5, 'docente' => 'Ivana Ribodino'],
-            ['nombre' => 'Cs. Ns. - Biología', 'horas_totales' => 3, 'docente' => 'Soledad González'],
-            ['nombre' => 'Ed. Tecnológica', 'horas_totales' => 4, 'docente' => 'Sofía Rodriguez'],
-            ['nombre' => 'Ed. Art. - Art. Visuales', 'horas_totales' => 3, 'docente' => 'M. Elena Mansilla'],
-            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3, 'docente' => 'Claudia Ramadán'],
-            ['nombre' => 'Cs. Ns. - Física', 'horas_totales' => 3, 'docente' => 'Yanina Funes'],
-            ['nombre' => 'Ciud. y Participación', 'horas_totales' => 3, 'docente' => 'Ariel Ardiles'],
-            ['nombre' => 'Dib. Técnico', 'horas_totales' => 2, 'docente' => 'Nadia Llarrull']
+            ['nombre' => 'Cs. Ss. - Geografía', 'horas_totales' => 5, 'docente' => 'Marcos Morales', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Lengua y Literatura', 'horas_totales' => 5, 'docente' => 'Noelia Martinez Villegas', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Matemática', 'horas_totales' => 5, 'docente' => 'Ivana Ribodino', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Cs. Ns. - Biología', 'horas_totales' => 3, 'docente' => 'Soledad González', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Ed. Tecnológica', 'horas_totales' => 4, 'docente' => 'Sofía Rodriguez', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Ed. Art. - Art. Visuales', 'horas_totales' => 3, 'docente' => 'M. Elena Mansilla', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3, 'docente' => 'Claudia Ramadán', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Cs. Ns. - Física', 'horas_totales' => 3, 'docente' => 'Yanina Funes', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Ciud. y Participación', 'horas_totales' => 3, 'docente' => 'Ariel Ardiles', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Dib. Técnico', 'horas_totales' => 2, 'docente' => 'Nadia Llarrull', 'espacio' => 'Aula 2']
         ];
     }
 

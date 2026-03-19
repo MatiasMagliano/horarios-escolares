@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             CursosSeeder::class,
             BloquesHorariosSeeder::class,
             MateriasSeeder::class,
+            EspaciosFisicosSeeder::class,
             HorariosSeeder::class,
             RoleSeeder::class,
             UserSeeder::class,

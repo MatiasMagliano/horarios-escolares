@@ -21,6 +21,11 @@
         </button>
     </li>
     <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#espacios">
+            Espacios
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#cambios">
             Cambios horarios
         </button>
@@ -39,6 +44,10 @@
 
     <div class="tab-pane fade" id="docentes">
         <livewire:docente-index />
+    </div>
+
+    <div class="tab-pane fade" id="espacios">
+        <livewire:espacios-panel />
     </div>
 
     <div class="tab-pane fade" id="cambios">

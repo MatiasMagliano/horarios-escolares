@@ -18,16 +18,16 @@ class CursoSeeder_2B extends BaseCursoSeeder
     protected function materias(): array
     {
         return [
-            ['nombre' => 'Lengua y Literatura', 'horas_totales' => 5, 'docente' => 'Noelia Martinez Villegas'],
-            ['nombre' => 'Matemática', 'horas_totales' => 5, 'docente' => 'Micaela Acuña'],
-            ['nombre' => 'Biología', 'horas_totales' => 3, 'docente' => 'Soledad González'],
-            ['nombre' => 'Cs. Ns. - Química', 'horas_totales' => 3, 'docente' => 'Soledad González'],
-            ['nombre' => 'Cs. Ss. - Historia', 'horas_totales' => 5, 'docente' => 'Verónica Gizzi'],
-            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3, 'docente' => 'Carina Chialva'],
-            ['nombre' => 'Ed. Art. - Música', 'horas_totales' => 3, 'docente' => 'Franco Morano'],
-            ['nombre' => 'Ed. Tecnológica', 'horas_totales' => 4, 'docente' => 'Patricia Solís'],
-            ['nombre' => 'Ciud. y Participación', 'horas_totales' => 3, 'docente' => 'Flavia Eberhardt'],
-            ['nombre' => 'Dib. Técnico', 'horas_totales' => 2, 'docente' => 'Florentina Arinci']
+            ['nombre' => 'Lengua y Literatura', 'horas_totales' => 5, 'docente' => 'Noelia Martinez Villegas', 'espacio' => 'Aula 9'],
+            ['nombre' => 'Matemática', 'horas_totales' => 5, 'docente' => 'Micaela Acuña', 'espacio' => 'Aula 9'],
+            ['nombre' => 'Biología', 'horas_totales' => 3, 'docente' => 'Soledad González', 'espacio' => 'Aula 9'],
+            ['nombre' => 'Cs. Ns. - Química', 'horas_totales' => 3, 'docente' => 'Soledad González', 'espacio' => 'Aula 9'],
+            ['nombre' => 'Cs. Ss. - Historia', 'horas_totales' => 5, 'docente' => 'Verónica Gizzi', 'espacio' => 'Aula 9'],
+            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3, 'docente' => 'Carina Chialva', 'espacio' => 'Aula 9'],
+            ['nombre' => 'Ed. Art. - Música', 'horas_totales' => 3, 'docente' => 'Franco Morano', 'espacio' => 'Aula 9'],
+            ['nombre' => 'Ed. Tecnológica', 'horas_totales' => 4, 'docente' => 'Patricia Solís', 'espacio' => 'Aula 9'],
+            ['nombre' => 'Ciud. y Participación', 'horas_totales' => 3, 'docente' => 'Flavia Eberhardt', 'espacio' => 'Aula 9'],
+            ['nombre' => 'Dib. Técnico', 'horas_totales' => 2, 'docente' => 'Florentina Arinci', 'espacio' => 'Aula 9']
         ];
     }
 

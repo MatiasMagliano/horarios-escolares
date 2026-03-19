@@ -18,16 +18,16 @@ class CursoSeeder_1B extends BaseCursoSeeder
     protected function materias(): array
     {
         return [
-            ['nombre' => 'Cs. Ss. - Geografía', 'horas_totales' => 5, 'docente' => 'Miriam Porcel'],
-            ['nombre' => 'Lengua y Literatura', 'horas_totales' => 5, 'docente' => 'Marisa Morales'],
-            ['nombre' => 'Matemática', 'horas_totales' => 5, 'docente' => 'Martín Andrada'],
-            ['nombre' => 'Cs. Ns. - Biología', 'horas_totales' => 3, 'docente' => 'Yanina Lerda'],
-            ['nombre' => 'Ed. Tecnológica', 'horas_totales' => 4, 'docente' => 'Nicolás Coria'],
-            ['nombre' => 'Ed. Art. - Art. Visuales', 'horas_totales' => 3, 'docente' => 'M. Elena Mansilla'],
-            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3, 'docente' => 'Sandra Occhipinti'],
-            ['nombre' => 'Cs. Ns. - Física', 'horas_totales' => 3, 'docente' => 'Marianela Pecorari'],
-            ['nombre' => 'Ciud. y Participación', 'horas_totales' => 3, 'docente' => 'Flavia Eberhardt'],
-            ['nombre' => 'Dib. Técnico', 'horas_totales' => 2, 'docente' => 'Nadia Llarrull']
+            ['nombre' => 'Cs. Ss. - Geografía', 'horas_totales' => 5, 'docente' => 'Miriam Porcel', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Lengua y Literatura', 'horas_totales' => 5, 'docente' => 'Marisa Morales', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Matemática', 'horas_totales' => 5, 'docente' => 'Martín Andrada', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Cs. Ns. - Biología', 'horas_totales' => 3, 'docente' => 'Yanina Lerda', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Ed. Tecnológica', 'horas_totales' => 4, 'docente' => 'Nicolás Coria', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Ed. Art. - Art. Visuales', 'horas_totales' => 3, 'docente' => 'M. Elena Mansilla', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3, 'docente' => 'Sandra Occhipinti', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Cs. Ns. - Física', 'horas_totales' => 3, 'docente' => 'Marianela Pecorari', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Ciud. y Participación', 'horas_totales' => 3, 'docente' => 'Flavia Eberhardt', 'espacio' => 'Aula 2'],
+            ['nombre' => 'Dib. Técnico', 'horas_totales' => 2, 'docente' => 'Nadia Llarrull', 'espacio' => 'Aula 2']
         ];
     }
 

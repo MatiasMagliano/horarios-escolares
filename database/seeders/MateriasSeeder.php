@@ -13,7 +13,6 @@ class MateriasSeeder extends Seeder
      */
     public function run(): void
     {
-        /* TO-DO: implementar campo "espacio_requerido" --> 'nombre' => 'Lengua y Literatura', 'espacio_requerido' => 'aula' */
         $materias = [
             'Lengua y Literatura',
             'Matemática',
@@ -83,11 +82,10 @@ class MateriasSeeder extends Seeder
             'Aplic. de Nuevas Tec.',
         ];
 
-        /* TO-DO: implementar campo "espacio_requerido" */
         foreach ($materias as $nombre) {
             Materia::updateOrCreate(
                 ['nombre' => $nombre],
-                ['espacio_requerido' => Materia::ESPACIO_AULA]
+                []
             );
         }
     }

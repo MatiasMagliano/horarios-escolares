@@ -27,7 +27,7 @@ class Curso extends Model
     public function materias()
     {
         return $this->belongsToMany(Materia::class, 'curso_materia')
-            ->withPivot('horas_totales')
+            ->withPivot('horas_totales', 'espacio_fisico_id')
             ->withTimestamps();
     }
 

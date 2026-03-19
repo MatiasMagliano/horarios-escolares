@@ -18,17 +18,17 @@ class CursoSeeder_3B extends BaseCursoSeeder
     protected function materias(): array
     {
         return [
-            ['nombre' => 'Lengua y Literatura', 'horas_totales' => 5, 'docente' => 'Carolina Rojas'], 
-            ['nombre' => 'Matemática', 'horas_totales' => 5, 'docente' => 'Vanesa Farías'], 
-            ['nombre' => 'Física', 'horas_totales' => 3, 'docente' => 'Marianela Pecorari'], 
-            ['nombre' => 'Química', 'horas_totales' => 3, 'docente' => 'Natacha Marangón'], 
-            ['nombre' => 'Geografía', 'horas_totales' => 4, 'docente' => 'Marianela Gatti'], 
-            ['nombre' => 'Historia', 'horas_totales' => 4, 'docente' => 'Facundo Zurita'], 
-            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3, 'docente' => 'Monica Rosso'], 
-            ['nombre' => 'Ed. Art. - Música/Teatro', 'horas_totales' => 3, 'docente' => 'Bruno/Morano'], 
-            ['nombre' => 'Ed. Tecnológica', 'horas_totales' => 4, 'docente' => 'Patricia Solís'], 
-            ['nombre' => 'F.V.T', 'horas_totales' => 4, 'docente' => 'Yolanda Sucheyre'],
-            ['nombre' => 'Dib. Técnico', 'horas_totales' => 4, 'docente' => 'Florentina Arinci']
+            ['nombre' => 'Lengua y Literatura', 'horas_totales' => 5, 'docente' => 'Carolina Rojas', 'espacio' => 'Aula 6'], 
+            ['nombre' => 'Matemática', 'horas_totales' => 5, 'docente' => 'Vanesa Farías', 'espacio' => 'Aula 6'], 
+            ['nombre' => 'Física', 'horas_totales' => 3, 'docente' => 'Marianela Pecorari', 'espacio' => 'Aula 6'], 
+            ['nombre' => 'Química', 'horas_totales' => 3, 'docente' => 'Natacha Marangón', 'espacio' => 'Aula 6'], 
+            ['nombre' => 'Geografía', 'horas_totales' => 4, 'docente' => 'Marianela Gatti', 'espacio' => 'Aula 6'], 
+            ['nombre' => 'Historia', 'horas_totales' => 4, 'docente' => 'Facundo Zurita', 'espacio' => 'Aula 6'], 
+            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3, 'docente' => 'Monica Rosso', 'espacio' => 'Aula 6'], 
+            ['nombre' => 'Ed. Art. - Música/Teatro', 'horas_totales' => 3, 'docente' => 'Bruno/Morano', 'espacio' => 'Aula 6'], 
+            ['nombre' => 'Ed. Tecnológica', 'horas_totales' => 4, 'docente' => 'Patricia Solís', 'espacio' => 'Aula 6'], 
+            ['nombre' => 'F.V.T', 'horas_totales' => 4, 'docente' => 'Yolanda Sucheyre', 'espacio' => 'Aula 6'],
+            ['nombre' => 'Dib. Técnico', 'horas_totales' => 4, 'docente' => 'Florentina Arinci', 'espacio' => 'Aula 6']
         ];
     }
 
@@ -136,21 +136,21 @@ class CursoSeeder_3B extends BaseCursoSeeder
                 8 => [ // M6
                     1 => [null, null],  // LUNES
                     2 => [null, null],  // MARTES
-                    3 => ['Física', 'Marianela Pecorari'],  // MIÉRCOLES
+                    3 => ['Física'],  // MIÉRCOLES
                     4 => [null, null],  // JUEVES
                     5 => [null, null],  // VIERNES
                 ],
                 9 => [ // M7
                     1 => [null, null],  // LUNES
                     2 => [null, null],  // MARTES
-                    3 => ['Física', 'Marianela Pecorari'],  // MIÉRCOLES
+                    3 => ['Física'],  // MIÉRCOLES
                     4 => [null, null],  // JUEVES
                     5 => [null, null],  // VIERNES
                 ],
                 10 => [ // M8
                     1 => [null, null],  // LUNES
                     2 => [null, null],  // MARTES
-                    3 => ['Física', 'Marianela Pecorari'],  // MIÉRCOLES
+                    3 => ['Física'],  // MIÉRCOLES
                     4 => [null, null],  // JUEVES
                     5 => [null, null],  // VIERNES
                 ],

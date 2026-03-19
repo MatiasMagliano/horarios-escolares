@@ -306,7 +306,7 @@ class HorarioCurso extends Component
                     $query->vigente();
                 }
             ])
-            ->with(['materia', 'docente'])
+            ->with(['materia', 'cmDocenteVigente.docente'])
             ->get();
     }
 

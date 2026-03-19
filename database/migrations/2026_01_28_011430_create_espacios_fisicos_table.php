@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('materias', function (Blueprint $table) {
+        Schema::create('espacios_fisicos', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
+            $table->string('nombre')->unique();
+            $table->string('tipo', 50)->nullable();
+            $table->boolean('activo')->default(true);
             $table->timestamps();
         });
     }
@@ -23,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('materias');
+        Schema::dropIfExists('espacios_fisicos');
     }
 };

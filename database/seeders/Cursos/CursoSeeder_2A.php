@@ -18,16 +18,16 @@ class CursoSeeder_2A extends BaseCursoSeeder
     protected function materias(): array
     {
         return [
-            ['nombre' => 'Lengua y Literatura', 'horas_totales' => 5, 'docente' => 'Noelia Martinez Villegas'],
-            ['nombre' => 'Matemática', 'horas_totales' => 5, 'docente' => 'Ivana Ribodino'],
-            ['nombre' => 'Biología', 'horas_totales' => 3, 'docente' => 'Marianela Pecorari'],
-            ['nombre' => 'Cs. Ns. - Química', 'horas_totales' => 3, 'docente' => 'Yanina Funes'],
-            ['nombre' => 'Cs. Ss. - Historia', 'horas_totales' => 5, 'docente' => 'Verónica Gizzi'],
-            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3, 'docente' => 'Carina Chialva'],
-            ['nombre' => 'Ed. Art. - Música', 'horas_totales' => 3, 'docente' => 'Franco Morano'],
-            ['nombre' => 'Ed. Tecnológica', 'horas_totales' => 4, 'docente' => 'Vanesa Farías'],
-            ['nombre' => 'Ciud. y Participación', 'horas_totales' => 3, 'docente' => 'Luciana Sosa Grión'],
-            ['nombre' => 'Dib. Técnico', 'horas_totales' => 2, 'docente' => 'Nadia Llarrull']
+            ['nombre' => 'Lengua y Literatura', 'horas_totales' => 5, 'docente' => 'Noelia Martinez Villegas', 'espacio' => 'Aula 3'],
+            ['nombre' => 'Matemática', 'horas_totales' => 5, 'docente' => 'Ivana Ribodino', 'espacio' => 'Aula 3'],
+            ['nombre' => 'Biología', 'horas_totales' => 3, 'docente' => 'Marianela Pecorari', 'espacio' => 'Aula 3'],
+            ['nombre' => 'Cs. Ns. - Química', 'horas_totales' => 3, 'docente' => 'Yanina Funes', 'espacio' => 'Aula 3'],
+            ['nombre' => 'Cs. Ss. - Historia', 'horas_totales' => 5, 'docente' => 'Verónica Gizzi', 'espacio' => 'Aula 3'],
+            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3, 'docente' => 'Carina Chialva', 'espacio' => 'Aula 3'],
+            ['nombre' => 'Ed. Art. - Música', 'horas_totales' => 3, 'docente' => 'Franco Morano', 'espacio' => 'Aula 3'],
+            ['nombre' => 'Ed. Tecnológica', 'horas_totales' => 4, 'docente' => 'Vanesa Farías', 'espacio' => 'Aula 3'],
+            ['nombre' => 'Ciud. y Participación', 'horas_totales' => 3, 'docente' => 'Luciana Sosa Grión', 'espacio' => 'Aula 3'],
+            ['nombre' => 'Dib. Técnico', 'horas_totales' => 2, 'docente' => 'Nadia Llarrull', 'espacio' => 'Aula 3']
         ];
     }
 
