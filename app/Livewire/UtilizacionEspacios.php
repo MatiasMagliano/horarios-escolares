@@ -86,15 +86,16 @@ class UtilizacionEspacios extends Component
             return collect();
         }
 
-        $turnos = $horarios
+        $franjas = $horarios
             ->pluck('bloque.turno')
+            ->map(fn ($turno) => $this->franjaDeTurno($turno))
             ->unique()
             ->values()
             ->all();
 
-        $bloques = $this->getBloquesForTurnos($turnos);
+        $bloques = $this->getBloquesForFranjas($franjas);
         $horariosAgrupados = $horarios
-            ->groupBy(fn ($horario) => $horario->bloque->turno)
+            ->groupBy(fn ($horario) => $this->franjaDeTurno($horario->bloque->turno))
             ->map(function ($items) {
                 return $items->groupBy(fn ($horario) => $horario->bloque->orden)
                     ->map(function ($porBloque) {
@@ -110,38 +111,45 @@ class UtilizacionEspacios extends Component
                     });
             });
 
-        return collect($turnos)
-            ->mapWithKeys(function ($turno) use ($bloques, $horariosAgrupados) {
-                $grilla = $bloques->get($turno, collect())
-                    ->mapWithKeys(function ($bloque) use ($horariosAgrupados, $turno) {
+        return collect($franjas)
+            ->mapWithKeys(function ($franja) use ($bloques, $horariosAgrupados) {
+                $grilla = $bloques->get($franja, collect())
+                    ->mapWithKeys(function ($bloque) use ($horariosAgrupados, $franja) {
                         return [
                             $bloque->orden => collect([
                                 'bloque' => $bloque,
-                                'dias' => $horariosAgrupados->get($turno)?->get($bloque->orden) ?? collect(),
+                                'dias' => $horariosAgrupados->get($franja)?->get($bloque->orden) ?? collect(),
                             ]),
                         ];
                     });
 
-                return [$turno => $grilla];
+                return [$franja => $grilla];
             });
     }
 
-    private function getBloquesForTurnos(array $turnos): Collection
+    private function getBloquesForFranjas(array $franjas): Collection
     {
         return BloqueHorario::query()
-            ->whereIn('turno', $turnos)
+            ->whereIn('turno', $franjas)
             ->orderBy('orden')
             ->get()
             ->groupBy('turno');
     }
 
-    public function designacionTurno(string $turno): string
+    private function franjaDeTurno(string $turno): string
     {
         return match ($turno) {
+            'maniana', 'contraturno_tarde' => 'maniana',
+            'tarde', 'contraturno_maniana' => 'tarde',
+            default => $turno,
+        };
+    }
+
+    public function designacionTurno(string $franja): string
+    {
+        return match ($franja) {
             'maniana' => 'Mañana',
             'tarde' => 'Tarde',
-            'contraturno_maniana' => 'Contraturno Mañana',
-            'contraturno_tarde' => 'Contraturno Tarde',
             default => 'Turno',
         };
     }
