@@ -53,7 +53,7 @@ class DocentesSeeder extends Seeder
             ['nombre' => 'Ian Concepción', 'nombre_completo' => 'Concepción Alvarado, Ian Erik', 'dni' => '24778586', 'nacimiento' => '1971-10-25'],
             ['nombre' => 'Lorena Vera', 'nombre_completo' => 'Vera, Lorena Silvana', 'dni' => '25401078', 'nacimiento' => '1976-09-29'],
             ['nombre' => 'Matías Magliano', 'nombre_completo' => 'Magliano, Matías José', 'dni' => '29714640', 'nacimiento' => '1982-10-28'],
-            ['nombre' => 'Piscila Calizaya', 'nombre_completo' => 'Martinez Calizaya, Ana Piscila', 'dni' => '43134003', 'nacimiento' => '2000-11-07'],
+            ['nombre' => 'Priscila Calizaya', 'nombre_completo' => 'Martinez Calizaya, Ana Priscila', 'dni' => '43134003', 'nacimiento' => '2000-11-07'],
             ['nombre' => 'Carolina Molina', 'nombre_completo' => 'Molina, Ana Carolina', 'dni' => '27296688', 'nacimiento' => '1979-10-24'],
             ['nombre' => 'Greca Colazo', 'nombre_completo' => 'Colazo, Greca Ibis', 'dni' => '27748174', 'nacimiento' => '1978-12-02'],
             ['nombre' => 'Laura Perez', 'nombre_completo' => 'Perez, Laura Inés', 'dni' => '30124411', 'nacimiento' => '1983-04-05'],
@@ -74,6 +74,10 @@ class DocentesSeeder extends Seeder
             ['nombre' => 'Mónica Rosso', 'nombre_completo' => 'Rosso, Mónica Marta', 'dni' => '24799608', 'nacimiento' => '1978-01-01'],
             ['nombre' => 'Carolina Rojas', 'nombre_completo' => 'Rojas, Daiana Carolina', 'dni' => '37095367', 'nacimiento' => '1992-11-09'],
             ['nombre' => 'Miguel Sosa', 'nombre_completo' => 'Sosa, Miguel Ángel', 'dni' => '21039313', 'nacimiento' => '1969-10-23'],
+            ['nombre' => 'Jimena Godoy', 'nombre_completo' => 'Godoy Buslaiman', 'dni' => '31691281', 'nacimiento' => '1984-9-19'],
+            ['nombre' => 'Ana Bertezzolo', 'nombre_completo' => 'Bertezzolo, Ana Silvia', 'dni' => '20622895', 'nacimiento' => '1969-3-4'],
+            ['nombre' => 'Kajna Gamin', 'nombre_completo' => 'Gamin, Kajna Nadir', 'dni' => '31332840', 'nacimiento' => '1985-1-5'],
+            ['nombre' => 'Carla Rava', 'nombre_completo' => 'Rava, Carla Marisel', 'dni' => '36714931', 'nacimiento' => '1993-6-23'],
         ];
 
         foreach ($docentes as $docente) {
