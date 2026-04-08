@@ -21,8 +21,11 @@ class HorariosSeeder extends Seeder
             Cursos\CursoSeeder_2B::class,
             Cursos\CursoSeeder_3A::class,
             Cursos\CursoSeeder_3B::class,
+            Cursos\CursoSeeder_4A::class,
             Cursos\CursoSeeder_4B::class,
+            Cursos\CursoSeeder_5A::class,
             Cursos\CursoSeeder_5B::class,
+            Cursos\CursoSeeder_6A::class,
             Cursos\CursoSeeder_6B::class,
         ]);
     }
