@@ -214,7 +214,7 @@ new class extends Component {
                 ->get(),
             'espaciosFisicos' => EspacioFisico::query()
                 ->where('activo', true)
-                ->orderBy('nombre')
+                ->orderBy('id')
                 ->get(),
         ]);
     }
