@@ -4,7 +4,6 @@ namespace App\Livewire;
 
 use App\Models\BloqueHorario;
 use App\Models\Curso;
-use App\Models\CursoMateria;
 use App\Models\EspacioFisico;
 use App\Models\HorarioBase;
 use Illuminate\Support\Collection;
@@ -57,30 +56,7 @@ class UtilizacionEspacios extends Component
 
     public function getGrillasProperty(): Collection
     {
-        if (!$this->espacioSeleccionado || empty($this->cursoIdsVisibles)) {
-            return collect();
-        }
-
-        $cursoIds = collect($this->cursoIdsVisibles)
-            ->map(fn ($id) => (int) $id)
-            ->filter()
-            ->values()
-            ->all();
-
-        if ($cursoIds === []) {
-            return collect();
-        }
-
-        $horarios = HorarioBase::query()
-            ->conDocenteVigente()
-            ->with('curso')
-            ->vigente()
-            ->whereIn('curso_id', $cursoIds)
-            ->whereBetween('dia_semana', [1, 5])
-            ->whereHas('cursoMateria', function ($query) {
-                $query->where('espacio_fisico_id', $this->espacioSeleccionado);
-            })
-            ->get();
+        $horarios = $this->getHorariosVisibles();
 
         if ($horarios->isEmpty()) {
             return collect();
@@ -127,6 +103,51 @@ class UtilizacionEspacios extends Component
             });
     }
 
+    public function getAdvertenciasProperty(): array
+    {
+        $horarios = $this->getHorariosVisibles();
+
+        if ($horarios->isEmpty()) {
+            return [];
+        }
+
+        $espacio = $this->espacios->firstWhere('id', $this->espacioSeleccionado);
+        $advertencias = [];
+
+        $conflictos = $horarios
+            ->groupBy(fn ($horario) => implode('-', [
+                $this->franjaDeTurno($horario->bloque->turno),
+                $horario->bloque->orden,
+                $horario->dia_semana,
+            ]))
+            ->filter(fn ($grupo) => $grupo->count() > 1);
+
+        foreach ($conflictos as $grupo) {
+            $primerHorario = $grupo->first();
+            $bloque = $primerHorario->bloque;
+            $franja = $this->designacionTurno($this->franjaDeTurno($bloque->turno));
+            $dia = $this->designacionDia((int) $primerHorario->dia_semana);
+            $cursos = $grupo
+                ->map(fn ($horario) => $horario->curso->anio . 'º ' . $horario->curso->division)
+                ->unique()
+                ->values()
+                ->implode(', ');
+
+            $advertencias[] = sprintf(
+                '%s tiene %d cursos superpuestos el %s de %s (%s - %s): %s.',
+                $espacio?->nombre ?? 'El espacio seleccionado',
+                $grupo->count(),
+                $dia,
+                $franja,
+                $bloque->hora_inicio->format('H:i'),
+                $bloque->hora_fin->format('H:i'),
+                $cursos
+            );
+        }
+
+        return $advertencias;
+    }
+
     private function getBloquesForFranjas(array $franjas): Collection
     {
         return BloqueHorario::query()
@@ -153,6 +174,47 @@ class UtilizacionEspacios extends Component
             default => 'Turno',
         };
     }
+
+    private function getHorariosVisibles(): Collection
+    {
+        if (!$this->espacioSeleccionado) {
+            return collect();
+        }
+
+        $cursoIds = collect($this->cursoIdsVisibles)
+            ->map(fn ($id) => (int) $id)
+            ->filter()
+            ->values()
+            ->all();
+
+        if ($cursoIds === []) {
+            return collect();
+        }
+
+        return HorarioBase::query()
+            ->conDocenteVigente()
+            ->with(['curso', 'bloque', 'cursoMateria.materia'])
+            ->vigente()
+            ->whereIn('curso_id', $cursoIds)
+            ->whereBetween('dia_semana', [1, 5])
+            ->whereHas('cursoMateria', function ($query) {
+                $query->where('espacio_fisico_id', $this->espacioSeleccionado);
+            })
+            ->get();
+    }
+
+    private function designacionDia(int $dia): string
+    {
+        return match ($dia) {
+            1 => 'lunes',
+            2 => 'martes',
+            3 => 'miércoles',
+            4 => 'jueves',
+            5 => 'viernes',
+            default => 'día no definido',
+        };
+    }
+
     public function render()
     {
         return view('livewire.utilizacion-espacios');

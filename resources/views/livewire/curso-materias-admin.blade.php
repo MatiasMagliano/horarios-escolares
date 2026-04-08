@@ -2,11 +2,10 @@
     <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
         <div>
             <h3 class="mb-1">Materias del curso</h3>
+            <div class="text-muted small">
+                Configurá la relación entre el curso, sus materias, docentes y espacios físicos.
+            </div>
         </div>
-
-        <button type="button" wire:click="volver" class="btn btn-outline-secondary">
-            Volver a cursos
-        </button>
     </div>
 
     <div class="card mb-4 shadow-sm">

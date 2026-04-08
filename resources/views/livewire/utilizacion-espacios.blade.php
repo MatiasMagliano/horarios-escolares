@@ -57,7 +57,18 @@
             <div class="alert alert-secondary mb-0">
                 Seleccioná un espacio para visualizar su utilización.
             </div>
-            @elseif($this->grillas->isEmpty())
+            @else
+            @if($this->advertencias)
+            <div class="alert alert-warning" role="alert">
+                <h4 class="alert-heading">Atención</h4>
+                <hr>
+                @foreach($this->advertencias as $advertencia)
+                <p class="mb-0">{{ $advertencia }}</p>
+                @endforeach
+            </div>
+            @endif
+
+            @if($this->grillas->isEmpty())
             <div class="alert alert-secondary mb-0">
                 No hay módulos vigentes para los cursos visibles en este espacio.
             </div>
@@ -129,6 +140,7 @@
                 </table>
             </div>
             @endforeach
+            @endif
             @endif
         </div>
     </div>

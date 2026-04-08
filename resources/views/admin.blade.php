@@ -39,7 +39,7 @@
     </div>
 
     <div class="tab-pane fade" id="cursos">
-        <livewire:curso-index />
+        <livewire:cursos-panel />
     </div>
 
     <div class="tab-pane fade" id="docentes">

@@ -7,12 +7,10 @@ new class extends Component {
 
     public $cursoIdSeleccionado;
     public ?int $cursoAEliminar = null;
-    public ?int $cursoIdMaterias = null;
 
     protected $listeners = [
         'curso-guardado' => '$refresh',
         'curso-eliminado' => '$refresh',
-        'curso-materias-cerrar' => 'cerrarMaterias',
     ];
 
     // modal de creación de curso
@@ -27,16 +25,6 @@ new class extends Component {
     {
         $this->cursoIdSeleccionado = $id;
         $this->dispatch('curso-abrir-modal');
-    }
-
-    public function administrarMaterias($id)
-    {
-        $this->cursoIdMaterias = (int) $id;
-    }
-
-    public function cerrarMaterias()
-    {
-        $this->cursoIdMaterias = null;
     }
 
     // eliminar curso
@@ -76,11 +64,6 @@ new class extends Component {
 ?>
 
 <div>
-    @if($cursoIdMaterias)
-        <livewire:curso-materias-admin
-            :curso="Curso::findOrFail($cursoIdMaterias)"
-            :key="'curso-materias-admin-'.$cursoIdMaterias" />
-    @else
     {{-- HEADER --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="mb-0">Cursos</h3>
@@ -108,9 +91,10 @@ new class extends Component {
             <tr class="text-center">
                 <th style="width: 10%;">Año</th>
                 <th style="width: 10%;">División</th>
-                <th style="width: 15%;">Ciclo</th>
+                <th style="width: 12%;">Ciclo</th>
+                <th style="width: 18%;">Estado</th>
                 <th style="width: 20%;">Turno</th>
-                <th style="width: 25%;">Herramientas</th>
+                <th style="width: 14%;">Herramientas</th>
             </tr>
         </thead>
 
@@ -129,8 +113,13 @@ new class extends Component {
                         <span class="badge {{ $curso->ciclo === 'CB' ? 'bg-secondary' : 'bg-info' }}">
                             {{ $curso->ciclo }}
                         </span>
+                    </td>
+
+                    <td class="text-center">
                         @if($curso->curso_materias_count === 0)
-                        <span class="badge bg-warning text-dark me-2">Sin materias</span>
+                        <span class="badge bg-warning text-dark">Sin materias</span>
+                        @else
+                        <span class="text-muted">—</span>
                         @endif
                     </td>
 
@@ -144,11 +133,6 @@ new class extends Component {
                         <button wire:click="editar({{ $curso->id }})" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-pencil"></i>
                         </button>
-
-                        <button wire:click="administrarMaterias({{ $curso->id }})" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-journal-text"></i>
-                        </button>
-
                         {{-- Botón de eliminar --}}
                         <button wire:click="confirmarEliminacion({{ $curso->id }})" class="btn btn-sm btn-outline-danger">
                             <i class="bi bi-trash"></i>
@@ -157,7 +141,7 @@ new class extends Component {
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="text-center text-muted">
+                    <td colspan="6" class="text-center text-muted">
                         No hay cursos cargados
                     </td>
                 </tr>
@@ -221,7 +205,6 @@ new class extends Component {
             </div>
         </div>
     </div>
-    @endif
 </div>
 
 <script>

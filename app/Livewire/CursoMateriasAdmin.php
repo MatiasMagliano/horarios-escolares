@@ -14,11 +14,6 @@ class CursoMateriasAdmin extends Component
         $this->curso = $curso;
     }
 
-    public function volver(): void
-    {
-        $this->dispatch('curso-materias-cerrar');
-    }
-
     public function render()
     {
         return view('livewire.curso-materias-admin');
