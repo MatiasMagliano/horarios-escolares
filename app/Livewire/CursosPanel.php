@@ -10,14 +10,11 @@ class CursosPanel extends Component
     public string $vista = 'listado';
     public ?int $cursoIdSeleccionado = null;
 
-    public function mostrarListado(): void
+    public function mount(string $vista = 'listado'): void
     {
-        $this->vista = 'listado';
-    }
-
-    public function mostrarMaterias(): void
-    {
-        $this->vista = 'materias';
+        $this->vista = in_array($vista, ['listado', 'materias'], true)
+            ? $vista
+            : 'listado';
     }
 
     public function getCursoSeleccionadoProperty(): ?Curso

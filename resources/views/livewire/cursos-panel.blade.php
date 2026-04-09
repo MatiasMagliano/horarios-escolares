@@ -15,20 +15,18 @@
             </div>
 
             <div class="btn-group" role="group" aria-label="Herramientas de cursos">
-                <button
-                    type="button"
-                    wire:click="mostrarListado"
+                <a
+                    href="{{ route('admin.cursos.listado') }}"
                     class="btn {{ $vista === 'listado' ? 'btn-primary' : 'btn-outline-primary' }}"
                 >
                     Listado de cursos
-                </button>
-                <button
-                    type="button"
-                    wire:click="mostrarMaterias"
+                </a>
+                <a
+                    href="{{ route('admin.cursos.materias') }}"
                     class="btn {{ $vista === 'materias' ? 'btn-primary' : 'btn-outline-primary' }}"
                 >
                     Materias del curso
-                </button>
+                </a>
             </div>
         </div>
     </div>

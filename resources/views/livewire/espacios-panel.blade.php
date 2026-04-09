@@ -9,20 +9,18 @@
             </div>
 
             <div class="btn-group" role="group" aria-label="Herramientas de espacios">
-                <button
-                    type="button"
-                    wire:click="mostrarUtilizacion"
+                <a
+                    href="{{ route('admin.espacios.utilizacion') }}"
                     class="btn {{ $vista === 'utilizacion' ? 'btn-primary' : 'btn-outline-primary' }}"
                 >
                     Utilización
-                </button>
-                <button
-                    type="button"
-                    wire:click="mostrarAdministracion"
+                </a>
+                <a
+                    href="{{ route('admin.espacios.administracion') }}"
                     class="btn {{ $vista === 'administracion' ? 'btn-primary' : 'btn-outline-primary' }}"
                 >
                     Administrar espacios
-                </button>
+                </a>
             </div>
         </div>
     </div>

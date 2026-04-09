@@ -8,8 +8,44 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', function () {
-        return view('admin');
+        return view('dashboard');
     })->name('dashboard');
+
+    Route::get('/admin/horarios', function () {
+        return view('admin.horarios');
+    })->name('admin.horarios');
+
+    Route::get('/admin/cursos', function () {
+        return redirect()->route('admin.cursos.listado');
+    })->name('admin.cursos');
+
+    Route::get('/admin/cursos/listado', function () {
+        return view('admin.cursos-listado');
+    })->name('admin.cursos.listado');
+
+    Route::get('/admin/cursos/materias', function () {
+        return view('admin.cursos-materias');
+    })->name('admin.cursos.materias');
+
+    Route::get('/admin/docentes', function () {
+        return view('admin.docentes');
+    })->name('admin.docentes');
+
+    Route::get('/admin/espacios', function () {
+        return redirect()->route('admin.espacios.utilizacion');
+    })->name('admin.espacios');
+
+    Route::get('/admin/espacios/utilizacion', function () {
+        return view('admin.espacios-utilizacion');
+    })->name('admin.espacios.utilizacion');
+
+    Route::get('/admin/espacios/administracion', function () {
+        return view('admin.espacios-administracion');
+    })->name('admin.espacios.administracion');
+
+    Route::get('/admin/cambios-horario', function () {
+        return view('admin.cambios-horario');
+    })->name('admin.cambios-horario');
 
     Route::get('/pdf/horario-curso/{curso}', [PdfController::class, 'horarioCurso'])
         ->name('pdf.horario-curso');

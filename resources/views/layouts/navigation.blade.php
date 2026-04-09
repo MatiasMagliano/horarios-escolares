@@ -2,7 +2,7 @@
     <div class="container-fluid">
 
         {{-- Marca --}}
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="{{ route('admin.horarios') }}">
             Horarios Escolares
         </a>
 
@@ -12,6 +12,56 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarMain">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a
+                        class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
+                        href="{{ route('dashboard') }}"
+                    >
+                        Inicio
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a
+                        class="nav-link {{ request()->routeIs('admin.horarios') ? 'active' : '' }}"
+                        href="{{ route('admin.horarios') }}"
+                    >
+                        Horarios
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a
+                        class="nav-link {{ request()->routeIs('admin.cursos') || request()->routeIs('admin.cursos.*') ? 'active' : '' }}"
+                        href="{{ route('admin.cursos.listado') }}"
+                    >
+                        Cursos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a
+                        class="nav-link {{ request()->routeIs('admin.docentes') ? 'active' : '' }}"
+                        href="{{ route('admin.docentes') }}"
+                    >
+                        Docentes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a
+                        class="nav-link {{ request()->routeIs('admin.espacios') || request()->routeIs('admin.espacios.*') ? 'active' : '' }}"
+                        href="{{ route('admin.espacios.utilizacion') }}"
+                    >
+                        Espacios
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a
+                        class="nav-link {{ request()->routeIs('admin.cambios-horario') ? 'active' : '' }}"
+                        href="{{ route('admin.cambios-horario') }}"
+                    >
+                        Cambios
+                    </a>
+                </li>
+            </ul>
 
             {{-- Espaciador para empujar a la derecha --}}
             <ul class="navbar-nav ms-auto align-items-lg-center">

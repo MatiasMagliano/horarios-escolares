@@ -8,14 +8,11 @@ class EspaciosPanel extends Component
 {
     public string $vista = 'utilizacion';
 
-    public function mostrarUtilizacion(): void
+    public function mount(string $vista = 'utilizacion'): void
     {
-        $this->vista = 'utilizacion';
-    }
-
-    public function mostrarAdministracion(): void
-    {
-        $this->vista = 'administracion';
+        $this->vista = in_array($vista, ['utilizacion', 'administracion'], true)
+            ? $vista
+            : 'utilizacion';
     }
 
     public function render()
