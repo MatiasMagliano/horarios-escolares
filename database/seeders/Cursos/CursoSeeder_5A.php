@@ -18,19 +18,19 @@ class CursoSeeder_5A extends BaseCursoSeeder
     protected function materias(): array
     {
         return [
-            ['nombre' => 'Lengua y Literatura', 'horas_totales' => 3, 'docente' => 'Noelia Martinez Villegas', 'espacio' => 'Aula 8'], 
+            ['nombre' => 'Lengua y Literatura', 'horas_totales' => 3, 'docente' => 'Marisa Morales', 'espacio' => 'Aula 8'], 
             ['nombre' => 'Psicología', 'horas_totales' => 3, 'docente' => 'Yolanda Sucheyre', 'espacio' => 'Aula 8'], 
-            ['nombre' => 'Geografía', 'horas_totales' => 3, 'docente' => 'Marianela Gatti', 'espacio' => 'Aula 8'], 
-            ['nombre' => 'Historia', 'horas_totales' => 3, 'docente' => 'Facundo Zurita', 'espacio' => 'Aula 8'],
-            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3, 'docente' => 'Carina Chialva', 'espacio' => 'Aula 8'],
-            ['nombre' => 'Ed. Art. - Música', 'horas_totales' => 2, 'docente' => 'Sonia Bruno', 'espacio' => 'Aula 8'], 
+            ['nombre' => 'Geografía', 'horas_totales' => 3, 'docente' => 'Belén Ramos', 'espacio' => 'Aula 8'], 
+            ['nombre' => 'Historia', 'horas_totales' => 3, 'docente' => 'Ariel Ardiles', 'espacio' => 'Aula 8'],
+            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3, 'docente' => 'Sandra Occhipinti', 'espacio' => 'Aula 8'],
+            ['nombre' => 'Ed. Art. - Música', 'horas_totales' => 2, 'docente' => 'Franco Morano', 'espacio' => 'Aula 8'], 
             ['nombre' => 'Matemática', 'horas_totales' => 5, 'docente' => 'Ivana Ribodino', 'espacio' => 'Aula 8'], 
-            ['nombre' => 'Física', 'horas_totales' => 4, 'docente' => 'Natacha Marangón', 'espacio' => 'Aula 8'], 
-            ['nombre' => 'Química', 'horas_totales' => 3, 'docente' => 'Natacha Marangón', 'espacio' => 'Aula 8'], 
-            ['nombre' => 'Elect. Digital II', 'horas_totales' => 4, 'docente' => 'Pablo Bulacio', 'espacio' => 'Aula 8'], 
-            ['nombre' => 'Elect. Analógica II', 'horas_totales' => 6, 'docente' => 'Pablo Bulacio', 'espacio' => 'Aula 8'],
-            ['nombre' => 'Electrotecnia II', 'horas_totales' => 6, 'docente' => 'Pablo Bulacio', 'espacio' => 'Laboratorio de Electrónica'],
-            ['nombre' => 'Inf. Electrónica II', 'horas_totales' => 5, 'docente' => 'Andrea Chiappori', 'espacio' => 'Aula 8'], 
+            ['nombre' => 'Física', 'horas_totales' => 4, 'docente' => 'Martín Andrada', 'espacio' => 'Aula 8'], 
+            ['nombre' => 'Química', 'horas_totales' => 3, 'docente' => 'Yanina Funes', 'espacio' => 'Aula 8'], 
+            ['nombre' => 'Elect. Digital II', 'horas_totales' => 4, 'docente' => 'Ian Concepción', 'espacio' => 'Aula 8'], 
+            ['nombre' => 'Elect. Analógica II', 'horas_totales' => 6, 'docente' => 'Javier Berra', 'espacio' => 'Aula 8'],
+            ['nombre' => 'Electrotecnia II', 'horas_totales' => 6, 'docente' => 'Pablo Barac', 'espacio' => 'Laboratorio de Electrónica'],
+            ['nombre' => 'Inf. Electrónica II', 'horas_totales' => 5, 'docente' => 'Yanina Sanchez', 'espacio' => 'Aula 8'], 
         ];
     }
 

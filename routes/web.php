@@ -2,11 +2,16 @@
 
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\ProfileController;
+use App\Support\Dashboard\DocenteSuperposicionDetector;
 use Illuminate\Support\Facades\Route;
 
 // RUTA PRINCIPAL
 Route::middleware(['auth'])->group(function () {
 
+    Route::get('/', function () {
+        return redirect()->route('dashboard');
+    });
+    
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
@@ -47,6 +52,12 @@ Route::middleware(['auth'])->group(function () {
         return view('admin.cambios-horario');
     })->name('admin.cambios-horario');
 
+    Route::get('/admin/alertas/superposiciones-docentes', function (DocenteSuperposicionDetector $detector) {
+        return view('admin.alertas-superposiciones-docentes', [
+            'conflictos' => $detector->detect(),
+        ]);
+    })->name('admin.alertas.superposiciones-docentes');
+
     Route::get('/pdf/horario-curso/{curso}', [PdfController::class, 'horarioCurso'])
         ->name('pdf.horario-curso');
 
@@ -55,10 +66,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/pdf/cambio-horario/{cambio}/acta', [PdfController::class, 'cambioHorarioActa'])
         ->name('pdf.cambio-horario-acta');
-
-    Route::get('/', function () {
-        return redirect()->route('dashboard');
-    });
 });
 
 Route::middleware('auth')->group(function () {
@@ -67,4 +74,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

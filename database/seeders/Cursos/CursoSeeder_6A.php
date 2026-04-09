@@ -20,15 +20,15 @@ class CursoSeeder_6A extends BaseCursoSeeder
         return [
             ['nombre' => 'Lengua y Literatura', 'horas_totales' => 3, 'docente' => 'Noelia Martinez Villegas', 'espacio' => 'Aula 7'], 
             ['nombre' => 'Filosofía', 'horas_totales' => 3, 'docente' => 'Yolanda Sucheyre', 'espacio' => 'Aula 7'], 
-            ['nombre' => 'Ciud. y Política', 'horas_totales' => 3, 'docente' => 'Marianela Gatti', 'espacio' => 'Aula 7'], 
-            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3, 'docente' => 'Carina Chialva', 'espacio' => 'Aula 7'],
-            ['nombre' => 'Ed. Art. - Teatro', 'horas_totales' => 2, 'docente' => 'Sonia Bruno', 'espacio' => 'Aula 7'], 
-            ['nombre' => 'An. Matemático', 'horas_totales' => 5, 'docente' => 'Ivana Ribodino', 'espacio' => 'Aula 7'], 
-            ['nombre' => 'Econ. y Gest. de la Prod. Ind.', 'horas_totales' => 4, 'docente' => 'Natacha Marangón', 'espacio' => 'Aula 7'], 
+            ['nombre' => 'Ciud. y Política', 'horas_totales' => 3, 'docente' => 'Greca Colazo', 'espacio' => 'Aula 7'], 
+            ['nombre' => 'Leng. Ext. - Inglés', 'horas_totales' => 3, 'docente' => 'Sandra Occhipinti', 'espacio' => 'Aula 7'],
+            ['nombre' => 'Ed. Art. - Teatro', 'horas_totales' => 2, 'docente' => 'Laura Díaz', 'espacio' => 'Aula 7'], 
+            ['nombre' => 'An. Matemático', 'horas_totales' => 5, 'docente' => 'Claudia Farías', 'espacio' => 'Aula 7'], 
+            ['nombre' => 'Econ. y Gest. de la Prod. Ind.', 'horas_totales' => 4, 'docente' => 'Laura Perez', 'espacio' => 'Aula 7'], 
             ['nombre' => 'Elect. Digital III', 'horas_totales' => 6, 'docente' => 'Ian Concepción', 'espacio' => 'Aula 7'], 
-            ['nombre' => 'Elect. Industrial I', 'horas_totales' => 6, 'docente' => 'Pablo Bulacio', 'espacio' => 'Aula 7'],
-            ['nombre' => 'Telecomunicaciones I', 'horas_totales' => 6, 'docente' => 'Pablo Bulacio', 'espacio' => 'Laboratorio de Electrónica'],
-            ['nombre' => 'Inst. Industriales', 'horas_totales' => 7, 'docente' => 'Andrea Chiappori', 'espacio' => 'Aula 7'], 
+            ['nombre' => 'Elect. Industrial I', 'horas_totales' => 6, 'docente' => 'Ian Concepción', 'espacio' => 'Aula 7'],
+            ['nombre' => 'Telecomunicaciones I', 'horas_totales' => 6, 'docente' => 'Martín Franch', 'espacio' => 'Laboratorio de Electrónica'],
+            ['nombre' => 'Inst. Industriales', 'horas_totales' => 7, 'docente' => 'Nancy Scipioni', 'espacio' => 'Aula 7'], 
         ];
     }
 

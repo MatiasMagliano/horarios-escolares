@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Curso;
 use Livewire\Component;
+use Illuminate\Support\Facades\Request;
 
 class CursosPanel extends Component
 {
@@ -15,6 +16,12 @@ class CursosPanel extends Component
         $this->vista = in_array($vista, ['listado', 'materias'], true)
             ? $vista
             : 'listado';
+
+        // Detectar si viene un parámetro de curso en la URL
+        $cursoIdDesdeUrl = Request::query('curso');
+        if ($cursoIdDesdeUrl && is_numeric($cursoIdDesdeUrl)) {
+            $this->cursoIdSeleccionado = (int) $cursoIdDesdeUrl;
+        }
     }
 
     public function getCursoSeleccionadoProperty(): ?Curso
