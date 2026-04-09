@@ -62,6 +62,17 @@
                             Ver detalles
                         </button>
 
+                        @if($c->acta)
+                        <a
+                            href="{{ route('pdf.cambio-horario-acta', ['cambio' => $c->id]) }}"
+                            class="btn btn-sm btn-outline-danger"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            PDF acta
+                        </a>
+                        @endif
+
                         @if($c->puedeAutorizar())
                         <button wire:click="autorizar({{ $c->id }})"
                             type="button"

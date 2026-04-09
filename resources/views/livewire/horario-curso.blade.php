@@ -30,6 +30,18 @@
         </div>
 
         <div class="card-body">
+            @if($cursoId)
+                <div class="form-group justify-content-end d-flex">
+                    <a
+                        href="{{ route('pdf.horario-curso', ['curso' => $cursoId]) }}"
+                        class="btn btn-outline-danger"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Descargar PDF
+                    </a>
+                </div>
+                @endif
             {{-- GRILLA --}}
             @if(!$cursoId)
             <div class="alert alert-secondary">

@@ -14,9 +14,20 @@
 
                 <div class="col-lg-8">
                     @if($espacioSeleccionado)
-                    <div class="small text-muted">
-                        Cursos afectados por {{ $this->espacios->firstWhere('id', $espacioSeleccionado)?->nombre ?? 'espacio seleccionado' }}.
-                        Desmarcá los cursos que quieras ocultar de la grilla.
+                    <div class="d-flex justify-content-between align-items-start gap-3">
+                        <div class="small text-muted">
+                            Cursos afectados por {{ $this->espacios->firstWhere('id', $espacioSeleccionado)?->nombre ?? 'espacio seleccionado' }}.
+                            Desmarcá los cursos que quieras ocultar de la grilla.
+                        </div>
+
+                        <a
+                            href="{{ route('pdf.utilizacion-espacios', ['espacio' => $espacioSeleccionado, 'cursos' => $cursoIdsVisibles]) }}"
+                            class="btn btn-outline-danger btn-sm flex-shrink-0"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Descargar PDF
+                        </a>
                     </div>
                     @endif
                 </div>

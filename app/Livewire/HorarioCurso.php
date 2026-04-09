@@ -2,12 +2,13 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use App\Models\Curso;
-use App\Models\BloqueHorario;
-use App\Models\HorarioBase;
 use App\Models\CursoMateria;
+use App\Models\Curso;
+use App\Models\HorarioBase;
+use App\Support\Horarios\HorarioCursoGridBuilder;
+use App\Support\Horarios\TurnoHelper;
 use Illuminate\Support\Carbon;
+use Livewire\Component;
 
 class HorarioCurso extends Component
 {
@@ -31,68 +32,9 @@ class HorarioCurso extends Component
         return Curso::orderBy('anio')->orderBy('division')->get();
     }
 
-    // RECONSTRUCCIÓN DE LA GRILLA
     public function getGrillasProperty()
     {
-        if (!$this->cursoId) {
-            return collect();
-        }
-
-        $curso = $this->cursoSeleccionado;
-        if (!$curso) {
-            return collect();
-        }
-
-        $turnos = [$curso->turno, $this->contraturnoDe($curso->turno)];
-
-        // Helper methods simplify the main logic and help type inference
-        $bloques = $this->getBloquesForTurnos($turnos);
-        $horarios = $this->getHorariosForCursoAndTurnos($this->cursoId, $turnos);
-
-        return collect($turnos)
-            ->mapWithKeys(function ($turno) use ($bloques, $horarios) {
-                $bloquesDelTurno = $bloques->get($turno, collect());
-
-                $grilla = $bloquesDelTurno->mapWithKeys(function ($bloque) use ($horarios, $turno) {
-                    return [
-                        $bloque->orden => collect([
-                            'bloque' => $bloque,
-                            'dias' => $horarios->get($turno)?->get($bloque->orden) ?? collect(),
-                        ])
-                    ];
-                });
-
-                return [$turno => $grilla];
-            });
-    }
-
-    // HELPER DE getGrillasProperty
-    private function getBloquesForTurnos(array $turnos)
-    {
-        return BloqueHorario::whereIn('turno', $turnos)
-            ->orderBy('orden')
-            ->get()
-            ->groupBy('turno');
-    }
-
-    // HELPER DE getGrillasProperty
-    private function getHorariosForCursoAndTurnos($cursoId, array $turnos)
-    {
-        return HorarioBase::query()
-            ->conDocenteVigente()
-            ->where('curso_id', $cursoId)
-            ->vigente()
-            ->whereHas(
-                'bloque',
-                fn($q) => $q->whereIn('turno', $turnos)
-            )
-            ->get()
-            ->groupBy(fn($h) => $h->bloque->turno)
-            ->map(
-                fn($items) =>
-                $items->groupBy(fn($h) => $h->bloque->orden)
-                    ->map(fn($i) => $i->keyBy('dia_semana'))
-            );
+        return $this->gridBuilder()->build($this->cursoId ? (int) $this->cursoId : null);
     }
 
     // EDICIÓN DE CELDAS (2 funciones)
@@ -227,87 +169,24 @@ class HorarioCurso extends Component
             });
     }
 
-    protected function contraturnoDe(string $turnoCurso): string
-    {
-        return match ($turnoCurso) {
-            'maniana' => 'contraturno_maniana',
-            'tarde' => 'contraturno_tarde',
-            default => throw new \LogicException("Turno inválido: $turnoCurso"),
-        };
-    }
-
-    // accesor designacion de turno
     public function designacionTurno(string $turno): string
     {
-        return match ($turno) {
-            'maniana' => 'Mañana',
-            'tarde' => 'Tarde',
-            'contraturno_maniana' => 'Contraturno Mañana',
-            'contraturno_tarde' => 'Contraturno Tarde',
-            default => 'Contraturno',
-        };
+        return TurnoHelper::designacionTurno($turno);
     }
 
     public function getAdvertenciasProperty()
     {
-        if (!$this->cursoId) {
-            return [];
-        }
-
-        $advertencias = [];
-
-        // 1. Validar Carga Horaria Incompleta
-        $materias = $this->cursoMateriasConCarga;
-
-        if ($materias->isEmpty()) {
-            return ['El curso no tiene materias asignadas.'];
-        }
-
-        foreach ($materias as $km) {
-            if ($km->horario_base_count < $km->horas_totales) {
-                $faltantes = $km->horas_totales - $km->horario_base_count;
-                $advertencias[] = "Faltan asignar {$faltantes} horas de {$km->materia->nombre}.";
-            }
-
-            if ($km->horario_base_count > $km->horas_totales) {
-                $excedente = $km->horario_base_count - $km->horas_totales;
-                $advertencias[] = "La materia {$km->materia->nombre} tiene {$excedente} horas de más.";
-            }
-
-            if ($km->horario_base_count == 0) {
-                $advertencias[] = "La materia {$km->materia->nombre} no tiene ninguna hora asignada.";
-                continue;
-            }
-        }
-        return $advertencias;
+        return $this->gridBuilder()->warnings($this->cursoId ? (int) $this->cursoId : null);
     }
 
     public function getCursoSeleccionadoProperty()
     {
-        if (!$this->cursoId) {
-            return null;
-        }
-
-        return Curso::query()
-            ->select(['id', 'turno'])
-            ->find($this->cursoId);
+        return $this->gridBuilder()->getCursoSeleccionado($this->cursoId ? (int) $this->cursoId : null);
     }
 
     public function getCursoMateriasConCargaProperty()
     {
-        if (!$this->cursoId) {
-            return collect();
-        }
-
-        return CursoMateria::query()
-            ->where('curso_id', $this->cursoId)
-            ->withCount([
-                'horarioBase as horario_base_count' => function ($query) {
-                    $query->vigente();
-                }
-            ])
-            ->with(['materia', 'cmDocenteVigente.docente'])
-            ->get();
+        return $this->gridBuilder()->getCursoMateriasConCarga($this->cursoId ? (int) $this->cursoId : null);
     }
 
     private function fechaVigencia(): string
@@ -321,5 +200,10 @@ class HorarioCurso extends Component
     public function render()
     {
         return view('livewire.horario-curso');
+    }
+
+    private function gridBuilder(): HorarioCursoGridBuilder
+    {
+        return app(HorarioCursoGridBuilder::class);
     }
 }
