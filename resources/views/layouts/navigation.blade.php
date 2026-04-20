@@ -3,7 +3,7 @@
 
         {{-- Marca --}}
         <a class="navbar-brand" href="{{ route('admin.horarios') }}">
-            Horarios Escolares
+            <i class="bi bi-backpack2 me-2"></i>Horarios Escolares
         </a>
 
         {{-- Botón hamburguesa (responsive) --}}
@@ -11,14 +11,14 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarMain">
+        <div class="collapse navbar-collapse justify-content-end" id="navbarMain">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a
                         class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
                         href="{{ route('dashboard') }}"
                     >
-                        Inicio
+                        <i class="bi bi-house me-2"></i>Inicio
                     </a>
                 </li>
                 <li class="nav-item">
@@ -26,7 +26,7 @@
                         class="nav-link {{ request()->routeIs('admin.horarios') ? 'active' : '' }}"
                         href="{{ route('admin.horarios') }}"
                     >
-                        Horarios
+                        <i class="bi bi-calendar-check me-2"></i>Horarios
                     </a>
                 </li>
                 <li class="nav-item">
@@ -34,7 +34,7 @@
                         class="nav-link {{ request()->routeIs('admin.cursos') || request()->routeIs('admin.cursos.*') ? 'active' : '' }}"
                         href="{{ route('admin.cursos.listado') }}"
                     >
-                        Cursos
+                        <i class="bi bi-mortarboard me-2"></i></i>Cursos
                     </a>
                 </li>
                 <li class="nav-item">
@@ -42,7 +42,7 @@
                         class="nav-link {{ request()->routeIs('admin.docentes') ? 'active' : '' }}"
                         href="{{ route('admin.docentes') }}"
                     >
-                        Docentes
+                        <i class="bi bi-person-badge me-2"></i>Docentes
                     </a>
                 </li>
                 <li class="nav-item">
@@ -50,7 +50,7 @@
                         class="nav-link {{ request()->routeIs('admin.espacios') || request()->routeIs('admin.espacios.*') ? 'active' : '' }}"
                         href="{{ route('admin.espacios.utilizacion') }}"
                     >
-                        Espacios
+                        <i class="bi bi-building me-2"></i>Espacios
                     </a>
                 </li>
                 <li class="nav-item">
@@ -58,7 +58,7 @@
                         class="nav-link {{ request()->routeIs('admin.cambios-horario') ? 'active' : '' }}"
                         href="{{ route('admin.cambios-horario') }}"
                     >
-                        Cambios
+                        <i class="bi bi-repeat me-2"></i>Cambios
                     </a>
                 </li>
             </ul>
@@ -116,3 +116,5 @@
         </div>
     </div>
 </nav>
+
+
