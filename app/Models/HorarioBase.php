@@ -2,14 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\BelongsToInstitucion;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class HorarioBase extends Model
 {
+    use BelongsToInstitucion;
+
     protected $table = 'horarios_base';
 
     protected $fillable = [
+        'institucion_id',
         'curso_id',
         'curso_materia_id',
         'bloque_id',

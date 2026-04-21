@@ -3,6 +3,7 @@
 namespace App\Support\Dashboard;
 
 use App\Models\Curso;
+use App\Support\Instituciones\InstitucionContext;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -58,20 +59,29 @@ class CursoAsignacionDetector
 
     public function obtenerEstadoPorCurso(): Collection
     {
+        $institucionId = app(InstitucionContext::class)->id();
+
+        if (!$institucionId) {
+            return collect();
+        }
+
         return DB::table('cursos as c')
             ->select('c.id', 'c.anio', 'c.division', 'c.turno')
             ->selectSub(function ($query) {
                 $query->selectRaw('COUNT(*)')
                       ->from('curso_materia as cm')
-                      ->whereColumn('cm.curso_id', 'c.id');
+                      ->whereColumn('cm.curso_id', 'c.id')
+                      ->whereColumn('cm.institucion_id', 'c.institucion_id');
             }, 'curso_materias_count')
             ->selectSub(function ($query) {
                 $query->selectRaw('COUNT(*)')
                       ->from('horarios_base as hb')
                       ->whereColumn('hb.curso_id', 'c.id')
+                      ->whereColumn('hb.institucion_id', 'c.institucion_id')
                       ->where('hb.es_vigente', true)
                       ->whereNull('hb.vigente_hasta');
             }, 'horarios_base_count')
+            ->where('c.institucion_id', $institucionId)
             ->orderBy('c.anio')
             ->orderBy('c.division')
             ->get()

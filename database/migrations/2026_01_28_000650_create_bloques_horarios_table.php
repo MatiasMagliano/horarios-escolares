@@ -13,15 +13,17 @@ return new class extends Migration
     {
         Schema::create('bloques_horarios', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('institucion_id')->constrained('datos_institucionales')->cascadeOnDelete();
             $table->string('nombre');
             $table->enum('turno', ['maniana', 'tarde', 'contraturno_maniana', 'contraturno_tarde']);
             $table->unsignedTinyInteger('orden');
             $table->time('hora_inicio');
             $table->time('hora_fin');
             $table->unsignedSmallInteger('duracion_minutos');
-            $table->enum('tipo', ['clase', 'recreo', 'ef', 'taller']);
+            $table->string('tipo', 30)->default('clase');
+            $table->boolean('es_editable')->default(true);
             $table->timestamps();
-            $table->unique(['turno', 'orden']);
+            $table->unique(['institucion_id', 'turno', 'orden'], 'bloques_horarios_institucion_turno_orden_unique');
         });
     }
 

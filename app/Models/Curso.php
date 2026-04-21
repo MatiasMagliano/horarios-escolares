@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToInstitucion;
 use Illuminate\Database\Eloquent\Model;
 
 class Curso extends Model
 {
+    use BelongsToInstitucion;
+
     protected $fillable = [
+        'institucion_id',
         'anio',
         'division',
         'ciclo',
@@ -48,7 +52,7 @@ class Curso extends Model
     }
 
     // accesor designacion de ciclo
-    public function getCicloAttribute(): string
+    public function getCicloCalculadoAttribute(): string
     {
         return $this->anio <= 3 ? 'CB' : 'CE';
     }

@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('curso_materia', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('institucion_id')->constrained('datos_institucionales')->cascadeOnDelete();
             $table->foreignId('curso_id')->constrained()->cascadeOnDelete();
             $table->foreignId('materia_id')->constrained()->cascadeOnDelete();
             $table->unsignedTinyInteger('horas_totales');
             $table->foreignId('espacio_fisico_id')->nullable()->constrained('espacios_fisicos')->nullOnDelete();
             $table->timestamps();
 
-            $table->unique(['curso_id', 'materia_id']);
+            $table->unique(['institucion_id', 'curso_id', 'materia_id'], 'curso_materia_institucion_curso_materia_unique');
         });
     }
 

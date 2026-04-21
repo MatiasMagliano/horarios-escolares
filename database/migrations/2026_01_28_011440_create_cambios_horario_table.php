@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('cambios_horario', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('institucion_id')->constrained('datos_institucionales')->cascadeOnDelete();
 
             // Numeración institucional
             $table->unsignedInteger('numero_acta')->nullable();
@@ -44,6 +45,8 @@ return new class extends Migration
             $table->date('pedido_en')->nullable();
 
             $table->timestamps();
+
+            $table->unique(['institucion_id', 'anio_acta', 'numero_acta'], 'cambios_horario_institucion_anio_numero_unique');
         });
     }
 

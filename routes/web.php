@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InstitucionSeleccionController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\ProfileController;
 use App\Support\Dashboard\DocenteSuperposicionDetector;
@@ -7,6 +8,14 @@ use Illuminate\Support\Facades\Route;
 
 // RUTA PRINCIPAL
 Route::middleware(['auth'])->group(function () {
+    Route::get('/instituciones/seleccionar', [InstitucionSeleccionController::class, 'index'])
+        ->name('instituciones.select');
+
+    Route::post('/instituciones/seleccionar', [InstitucionSeleccionController::class, 'store'])
+        ->name('instituciones.store');
+});
+
+Route::middleware(['auth', 'institucion.activa'])->group(function () {
 
     Route::get('/', function () {
         return redirect()->route('dashboard');
@@ -68,7 +77,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('pdf.cambio-horario-acta');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'institucion.activa'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

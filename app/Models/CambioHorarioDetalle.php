@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToInstitucion;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class CambioHorarioDetalle extends Model
 {
+    use BelongsToInstitucion;
+
     protected $fillable = [
+        'institucion_id',
         'cambio_horario_id',
         'horario_base_id',
         'docente_nuevo_id',

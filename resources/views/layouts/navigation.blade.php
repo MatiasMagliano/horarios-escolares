@@ -65,6 +65,13 @@
 
             {{-- Espaciador para empujar a la derecha --}}
             <ul class="navbar-nav ms-auto align-items-lg-center">
+                @if (auth()->check())
+                    <li class="nav-item me-lg-3">
+                        <span class="navbar-text small text-white-50">
+                            {{ auth()->user()?->institucionActiva?->nombre_institucion ?? 'Sin escuela activa' }}
+                        </span>
+                    </li>
+                @endif
 
                 {{-- Usuario Dropdown --}}
                 <li class="nav-item dropdown">
@@ -101,6 +108,16 @@
 
                         <li><hr class="dropdown-divider"></li>
 
+                        @if (auth()->user()?->isSuperAdmin() || auth()->user()?->instituciones_disponibles->count() > 1)
+                            <li>
+                                <a class="dropdown-item" href="{{ route('instituciones.select') }}">
+                                    Cambiar escuela
+                                </a>
+                            </li>
+
+                            <li><hr class="dropdown-divider"></li>
+                        @endif
+
                         <li>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -116,5 +133,4 @@
         </div>
     </div>
 </nav>
-
 

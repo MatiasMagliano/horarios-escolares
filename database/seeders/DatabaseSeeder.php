@@ -15,13 +15,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            datosInstitucionalesSeeder::class,
-            DocentesSeeder::class,
-            CursosSeeder::class,
-            BloquesHorariosSeeder::class,
-            MateriasSeeder::class,
-            EspaciosFisicosSeeder::class,
-            HorariosSeeder::class,
+            InstitucionSeeder::class,
             RoleSeeder::class,
             UserSeeder::class,
         ]);

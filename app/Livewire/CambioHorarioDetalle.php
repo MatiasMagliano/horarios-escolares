@@ -2,11 +2,14 @@
 
 namespace App\Livewire;
 
+use App\Models\CambioHorario as CambioHorarioModel;
+use App\Support\Instituciones\InstitucionContext;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class CambioHorarioDetalle extends Component
 {
-    public CambioHorario $cambio;
+    public CambioHorarioModel $cambio;
 
     public $horario_base_id;
     public $nuevo_docente_id;
@@ -15,15 +18,20 @@ class CambioHorarioDetalle extends Component
     public $dia_nuevo;
     public $observaciones;
 
-    public function mount(CambioHorario $cambio)
+    public function mount(CambioHorarioModel $cambio)
     {
         $this->cambio = $cambio;
     }
 
     protected function rules()
     {
+        $institucionId = app(InstitucionContext::class)->id();
+
         return [
-            'horario_base_id' => 'required|exists:horarios_base,id',
+            'horario_base_id' => [
+                'required',
+                Rule::exists('horarios_base', 'id')->where('institucion_id', $institucionId),
+            ],
             'dia_nuevo' => 'nullable|integer|min:1|max:5',
         ];
     }

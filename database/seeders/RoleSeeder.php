@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Institucion;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
@@ -13,9 +14,16 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        Role::firstOrCreate(['name' => 'admin']);
-        Role::firstOrCreate(['name' => 'solicitante']);
-        Role::firstOrCreate(['name' => 'aprobador']);
-        Role::firstOrCreate(['name' => 'secretario']);
+        $instituciones = Institucion::query()->pluck('id');
+
+        foreach ($instituciones as $institucionId) {
+            foreach (['admin', 'solicitante', 'aprobador', 'secretario'] as $roleName) {
+                Role::query()->firstOrCreate([
+                    'name' => $roleName,
+                    'guard_name' => 'web',
+                    'team_id' => $institucionId,
+                ]);
+            }
+        }
     }
 }

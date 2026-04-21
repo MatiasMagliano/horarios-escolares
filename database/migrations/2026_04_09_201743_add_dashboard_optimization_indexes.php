@@ -3,8 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
-
 return new class extends Migration
 {
     /**
@@ -15,44 +13,32 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // ========================================
-        // FASE 1 - Máximo Impacto (50-60% mejora)
-        // ========================================
+        Schema::table('cambios_horario', function (Blueprint $table) {
+            $table->index(['institucion_id', 'estado'], 'idx_cambios_horario_institucion_estado');
+            $table->index(['institucion_id', 'estado', 'created_at'], 'idx_cambios_horario_institucion_estado_created');
+        });
 
-        // Agrupamiento por estado en cambios de horario
-        DB::statement('ALTER TABLE cambios_horario ADD INDEX IF NOT EXISTS idx_estado (estado)');
+        Schema::table('horarios_base', function (Blueprint $table) {
+            $table->index(['institucion_id', 'es_vigente', 'vigente_hasta'], 'idx_horarios_base_institucion_vigente');
+            $table->index(['institucion_id', 'dia_semana', 'bloque_id'], 'idx_horarios_base_institucion_dia_bloque');
+        });
 
-        // Búsqueda de horarios vigentes
-        DB::statement('ALTER TABLE horarios_base ADD INDEX IF NOT EXISTS idx_vigente (es_vigente, vigente_hasta)');
+        Schema::table('cm_docente', function (Blueprint $table) {
+            $table->index(['institucion_id', 'es_vigente', 'vigente_hasta'], 'idx_cm_docente_institucion_vigente');
+            $table->index(['institucion_id', 'curso_materia_id', 'es_vigente'], 'idx_cm_docente_institucion_curso_materia_vigente');
+        });
 
-        // Búsqueda de docentes vigentes (crítico para relaciones)
-        DB::statement('ALTER TABLE cm_docente ADD INDEX IF NOT EXISTS idx_vigente (es_vigente, vigente_hasta)');
+        Schema::table('cursos', function (Blueprint $table) {
+            $table->index(['institucion_id', 'anio', 'division'], 'idx_cursos_institucion_anio_division');
+        });
 
-        // ========================================
-        // FASE 2 - Soporte (20-30% mejora adicional)
-        // ========================================
+        Schema::table('docentes', function (Blueprint $table) {
+            $table->index(['institucion_id', 'activo'], 'idx_docentes_institucion_activo');
+        });
 
-        // Cambios ordenados por estado y fecha
-        DB::statement('ALTER TABLE cambios_horario ADD INDEX IF NOT EXISTS idx_estado_created (estado, created_at DESC)');
-
-        // Búsqueda y orden de cursos
-        DB::statement('ALTER TABLE cursos ADD INDEX IF NOT EXISTS idx_anio_division (anio, division)');
-
-        // ========================================
-        // FASE 3 - Optimización Fina (10-15% mejora)
-        // ========================================
-
-        // Agrupamiento por día/bloque para búsquedas de superposiciones
-        DB::statement('ALTER TABLE horarios_base ADD INDEX IF NOT EXISTS idx_dia_bloque (dia_semana, bloque_id)');
-
-        // Búsqueda de docentes vigentes por materia
-        DB::statement('ALTER TABLE cm_docente ADD INDEX IF NOT EXISTS idx_curso_materia_vigente (curso_materia_id, es_vigente)');
-
-        // Filtrado de docentes activos
-        DB::statement('ALTER TABLE docentes ADD INDEX IF NOT EXISTS idx_activo (activo)');
-
-        // Búsqueda de materias por curso
-        DB::statement('ALTER TABLE curso_materia ADD INDEX IF NOT EXISTS idx_materia_id (materia_id)');
+        Schema::table('curso_materia', function (Blueprint $table) {
+            $table->index(['institucion_id', 'materia_id'], 'idx_curso_materia_institucion_materia_id');
+        });
     }
 
     /**
@@ -60,35 +46,31 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Limpiar índices si existen (idempotente)
         Schema::table('cambios_horario', function (Blueprint $table) {
-            // Usar dropIndexIfExists pero como no está disponible en todas versiones,
-            // usamos raw queries para ser seguros
-            DB::statement('ALTER TABLE cambios_horario DROP INDEX IF EXISTS cambios_horario_estado_index');
-            DB::statement('ALTER TABLE cambios_horario DROP INDEX IF EXISTS cambios_horario_estado_created_at_index');
+            $table->dropIndex('idx_cambios_horario_institucion_estado');
+            $table->dropIndex('idx_cambios_horario_institucion_estado_created');
         });
 
         Schema::table('horarios_base', function (Blueprint $table) {
-            DB::statement('ALTER TABLE horarios_base DROP INDEX IF EXISTS horarios_base_es_vigente_vigente_hasta_index');
-            DB::statement('ALTER TABLE horarios_base DROP INDEX IF EXISTS horarios_base_dia_semana_bloque_id_index');
+            $table->dropIndex('idx_horarios_base_institucion_vigente');
+            $table->dropIndex('idx_horarios_base_institucion_dia_bloque');
         });
 
         Schema::table('cm_docente', function (Blueprint $table) {
-            DB::statement('ALTER TABLE cm_docente DROP INDEX IF EXISTS cm_docente_es_vigente_vigente_hasta_index');
-            DB::statement('ALTER TABLE cm_docente DROP INDEX IF EXISTS cm_docente_curso_materia_id_es_vigente_index');
+            $table->dropIndex('idx_cm_docente_institucion_vigente');
+            $table->dropIndex('idx_cm_docente_institucion_curso_materia_vigente');
         });
 
         Schema::table('cursos', function (Blueprint $table) {
-            DB::statement('ALTER TABLE cursos DROP INDEX IF EXISTS cursos_anio_division_index');
+            $table->dropIndex('idx_cursos_institucion_anio_division');
         });
 
         Schema::table('docentes', function (Blueprint $table) {
-            DB::statement('ALTER TABLE docentes DROP INDEX IF EXISTS docentes_activo_index');
+            $table->dropIndex('idx_docentes_institucion_activo');
         });
 
         Schema::table('curso_materia', function (Blueprint $table) {
-            DB::statement('ALTER TABLE curso_materia DROP INDEX IF EXISTS curso_materia_materia_id_index');
+            $table->dropIndex('idx_curso_materia_institucion_materia_id');
         });
     }
 };
-

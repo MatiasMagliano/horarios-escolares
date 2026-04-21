@@ -27,19 +27,14 @@ return new class extends Migration
             $table->boolean('tiene_turno_tarde')->default(true);
             $table->boolean('tiene_contraturno_maniana')->default(false);
             $table->boolean('tiene_contraturno_tarde')->default(false);
-
-            // Datos de contacto del director
             $table->enum('genero_director', ['masculino', 'femenino'])->nullable();
             $table->string('nombre_director')->nullable();
             $table->string('telefono_director')->nullable();
             $table->string('email_director')->nullable();
-
-            // Datos de contacto del vicedirector
             $table->enum('genero_vicedirector', ['masculino', 'femenino'])->nullable();
             $table->string('nombre_vicedirector')->nullable();
             $table->string('telefono_vicedirector')->nullable();
             $table->string('email_vicedirector')->nullable();
-
             $table->boolean('activo')->default(true);
             $table->timestamps();
         });
@@ -50,10 +45,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (!Schema::hasTable('datos_institucionales')) {
-            return;
-        }
-
         Schema::dropIfExists('datos_institucionales');
     }
 };

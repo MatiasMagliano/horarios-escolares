@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('horarios_base', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('institucion_id')->constrained('datos_institucionales')->cascadeOnDelete();
 
             // anclaje en la Grilla
             $table->foreignId('curso_id')->constrained('cursos')->cascadeOnDelete();
@@ -31,7 +32,7 @@ return new class extends Migration
             $table->timestamps();
 
             // El unique ahora incluye la versión temporal
-            $table->unique(['curso_id', 'bloque_id', 'dia_semana', 'vigente_desde'], 'curso_bloque_dia_version_unique');
+            $table->unique(['institucion_id', 'curso_id', 'bloque_id', 'dia_semana', 'vigente_desde'], 'curso_bloque_dia_institucion_version_unique');
         });
     }
 

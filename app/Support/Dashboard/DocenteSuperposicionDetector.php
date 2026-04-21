@@ -3,6 +3,7 @@
 namespace App\Support\Dashboard;
 
 use App\Models\HorarioBase;
+use App\Support\Instituciones\InstitucionContext;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -10,9 +11,17 @@ class DocenteSuperposicionDetector
 {
     public function detect(): Collection
     {
+        $institucionId = app(InstitucionContext::class)->id();
+
+        if (!$institucionId) {
+            return collect();
+        }
+
         // 1. Encontrar agrupamientos que colisionan usando SQL puro
         $superposicionesBaseQ = DB::table('horarios_base as hb')
             ->join('cm_docente as d', 'd.curso_materia_id', '=', 'hb.curso_materia_id')
+            ->where('hb.institucion_id', $institucionId)
+            ->where('d.institucion_id', $institucionId)
             ->where('hb.es_vigente', true)
             ->whereNull('hb.vigente_hasta')
             ->where('d.es_vigente', true)
@@ -30,6 +39,8 @@ class DocenteSuperposicionDetector
         // 2. Extraer los IDs de horarios_base exactos que forman coincidencia
         $horariosConflictivosIds = DB::table('horarios_base as hb')
             ->join('cm_docente as d', 'd.curso_materia_id', '=', 'hb.curso_materia_id')
+            ->where('hb.institucion_id', $institucionId)
+            ->where('d.institucion_id', $institucionId)
             ->where('hb.es_vigente', true)
             ->whereNull('hb.vigente_hasta')
             ->where('d.es_vigente', true)

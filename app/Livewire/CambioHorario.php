@@ -4,14 +4,14 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\CambioHorario as CambioHorarioModel;
-use App\Models\DatosInstitucionales;
-use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\View;
 use App\Models\Docente;
 use App\Models\Curso;
 use App\Models\Materia;
 use App\Models\CursoMateria;
+use App\Support\Instituciones\InstitucionContext;
+use Illuminate\Validation\Rule;
 
 class CambioHorario extends Component
 {
@@ -39,18 +39,23 @@ class CambioHorario extends Component
     {
         $this->fecha_desde = today()->format('Y-m-d');
         $this->ciclo_lectivo = (int) now()->format('Y');
-        $this->institucion = DatosInstitucionales::where('vigente', true)->first();
+        $this->institucion = auth()->user()?->institucionActiva;
     }
 
     protected function rules()
     {
+        $institucionId = app(InstitucionContext::class)->id();
+
         return [
             'duracion' => 'required|in:temporal,permanente',
             'tipo_cambio' => 'required|in:cambio,permuta',
-            'docente_id' => 'required|exists:docentes,id',
+            'docente_id' => [
+                'required',
+                Rule::exists('docentes', 'id')->where('institucion_id', $institucionId),
+            ],
             'curso_id' => [
                 'required',
-                'exists:cursos,id',
+                Rule::exists('cursos', 'id')->where('institucion_id', $institucionId),
                 function ($attribute, $value, $fail) {
                     $asignado = CursoMateria::query()
                         ->where('curso_id', $value)
@@ -66,7 +71,7 @@ class CambioHorario extends Component
             ],
             'materia_id' => [
                 'required',
-                'exists:materias,id',
+                Rule::exists('materias', 'id')->where('institucion_id', $institucionId),
                 function ($attribute, $value, $fail) {
                     $asignado = CursoMateria::query()
                         ->where('curso_id', $this->curso_id)
@@ -96,7 +101,7 @@ class CambioHorario extends Component
     public function nuevo()
     {
         $this->resetExcept('modo');
-        $this->institucion = DatosInstitucionales::where('vigente', true)->first();
+        $this->institucion = auth()->user()?->institucionActiva;
         $this->modo = 'formulario';
         $this->duracion = 'temporal';
         $this->tipo_cambio = 'cambio';

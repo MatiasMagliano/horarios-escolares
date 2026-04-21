@@ -13,10 +13,13 @@ return new class extends Migration
     {
         Schema::create('espacios_fisicos', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre')->unique();
+            $table->foreignId('institucion_id')->constrained('datos_institucionales')->cascadeOnDelete();
+            $table->string('nombre');
             $table->string('tipo', 50)->nullable();
             $table->boolean('activo')->default(true);
             $table->timestamps();
+
+            $table->unique(['institucion_id', 'nombre'], 'espacios_fisicos_institucion_nombre_unique');
         });
     }
 

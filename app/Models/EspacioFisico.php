@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToInstitucion;
 use Illuminate\Database\Eloquent\Model;
 
 class EspacioFisico extends Model
 {
+    use BelongsToInstitucion;
+
     public const TIPO_AULA = 'aula';
     public const TIPO_LAB_INFORMATICA = 'lab-informatica';
     public const TIPO_LAB_ELECTRONICA = 'lab-electronica';
@@ -15,6 +18,7 @@ class EspacioFisico extends Model
     protected $table = 'espacios_fisicos';
 
     protected $fillable = [
+        'institucion_id',
         'nombre',
         'tipo',
         'activo',

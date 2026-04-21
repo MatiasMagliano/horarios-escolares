@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Institucion;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -40,5 +41,25 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    public function withInstitution(): static
+    {
+        return $this->afterCreating(function (\App\Models\User $user) {
+            $institucion = Institucion::query()->create([
+                'nombre_institucion' => fake()->company(),
+                'slug' => fake()->unique()->slug(),
+                'direccion' => fake()->address(),
+                'anio_maximo' => 7,
+                'tiene_turno_maniana' => true,
+                'tiene_turno_tarde' => true,
+                'tiene_contraturno_maniana' => false,
+                'tiene_contraturno_tarde' => false,
+                'activo' => true,
+            ]);
+
+            $user->instituciones()->attach($institucion->id, ['activo' => true]);
+            $user->forceFill(['institucion_activa_id' => $institucion->id])->save();
+        });
     }
 }

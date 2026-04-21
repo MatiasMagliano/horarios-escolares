@@ -2,14 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToInstitucion;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class CmDocente extends Model
 {
+    use BelongsToInstitucion;
+
     protected $table = 'cm_docente';
 
     protected $fillable = [
+        'institucion_id',
         'curso_materia_id',
         'docente_id',
         'vigente_desde',

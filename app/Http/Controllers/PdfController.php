@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\CambioHorario;
 use App\Models\Curso;
-use App\Models\DatosInstitucionales;
 use App\Models\EspacioFisico;
 use App\Support\Horarios\HorarioCursoGridBuilder;
 use App\Support\Horarios\UtilizacionEspaciosGridBuilder;
@@ -18,7 +17,7 @@ class PdfController extends Controller
     {
         $grillas = $builder->build($curso->id);
         $advertencias = $builder->warnings($curso->id);
-        $institucion = DatosInstitucionales::query()->where('vigente', true)->first();
+        $institucion = request()->user()?->institucionActiva;
 
         return Pdf::loadView('pdf.horario-curso', [
             'curso' => $curso,
@@ -38,7 +37,7 @@ class PdfController extends Controller
         $cursoIdsVisibles = $this->resolveCursoIdsVisibles($request, $espacio);
         $grillas = $builder->build($espacio->id, $cursoIdsVisibles);
         $advertencias = $builder->warnings($espacio->id, $cursoIdsVisibles);
-        $institucion = DatosInstitucionales::query()->where('vigente', true)->first();
+        $institucion = $request->user()?->institucionActiva;
 
         return Pdf::loadView('pdf.utilizacion-espacios', [
             'espacio' => $espacio,
@@ -54,7 +53,7 @@ class PdfController extends Controller
     {
         $cambio->loadMissing(['docente', 'curso', 'materia', 'solicitante']);
 
-        $institucion = DatosInstitucionales::query()->where('vigente', true)->first();
+        $institucion = request()->user()?->institucionActiva;
         Carbon::setLocale('es');
 
         return Pdf::loadView('pdf.cambio-horario-acta', [

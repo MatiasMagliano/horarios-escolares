@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('cambio_horario_detalles', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('institucion_id')->constrained('datos_institucionales')->cascadeOnDelete();
             $table->foreignId('cambio_horario_id')->constrained('cambios_horario')->cascadeOnDelete();
             $table->foreignId('horario_base_id')->constrained('horarios_base')->cascadeOnDelete();
             $table->foreignId('docente_nuevo_id')->nullable()->constrained('docentes');
@@ -30,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cambios_horario_detalle');
+        Schema::dropIfExists('cambio_horario_detalles');
     }
 };

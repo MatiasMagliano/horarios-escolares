@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToInstitucion;
 use Illuminate\Database\Eloquent\Model;
 
 class CambioHorario extends Model
 {
+    use BelongsToInstitucion;
+
     protected $table = 'cambios_horario';
 
     const ESTADOS = [
@@ -18,6 +21,7 @@ class CambioHorario extends Model
 
 
     protected $fillable = [
+        'institucion_id',
         'numero_acta',
         'anio_acta',
         'duracion',

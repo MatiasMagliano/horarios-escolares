@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('cm_docente', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('institucion_id')->constrained('datos_institucionales')->cascadeOnDelete();
             $table->foreignId('curso_materia_id')->constrained('curso_materia')->cascadeOnDelete();
             $table->foreignId('docente_id')->constrained()->cascadeOnDelete();
 
@@ -24,7 +25,7 @@ return new class extends Migration
 
             $table->timestamps();
 
-            $table->unique(['curso_materia_id', 'vigente_desde'], 'cmd_version_unique');
+            $table->unique(['institucion_id', 'curso_materia_id', 'vigente_desde'], 'cmd_institucion_version_unique');
         });
     }
 

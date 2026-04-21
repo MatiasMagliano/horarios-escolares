@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToInstitucion;
 use Illuminate\Database\Eloquent\Model;
 
 class CursoMateria extends Model
 {
+    use BelongsToInstitucion;
+
     protected $table = 'curso_materia';
 
     protected $fillable = [
+        'institucion_id',
         'curso_id',
         'materia_id',
         'horas_totales',

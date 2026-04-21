@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('docentes', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('institucion_id')->constrained('datos_institucionales')->cascadeOnDelete();
             $table->string('nombre');
             $table->string('nombre_completo');
             $table->string('dni');
@@ -21,6 +22,8 @@ return new class extends Migration
             $table->date('nacimiento');
             $table->boolean('activo')->default(true);
             $table->timestamps();
+
+            $table->unique(['institucion_id', 'dni'], 'docentes_institucion_dni_unique');
         });
     }
 

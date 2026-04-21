@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\EspacioFisico;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class EspaciosFisicosAdmin extends Component
@@ -19,7 +20,13 @@ class EspaciosFisicosAdmin extends Component
     protected function rules(): array
     {
         return [
-            'nombre' => ['required', 'string', 'max:100', 'unique:espacios_fisicos,nombre'],
+            'nombre' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('espacios_fisicos', 'nombre')
+                    ->where('institucion_id', auth()->user()?->institucion_activa_id),
+            ],
             'tipo' => ['required', 'in:' . implode(',', EspacioFisico::tiposDisponibles())],
             'activo' => ['boolean'],
         ];
@@ -27,14 +34,15 @@ class EspaciosFisicosAdmin extends Component
 
     protected function rulesEdicion(): array
     {
-        $uniqueRule = 'unique:espacios_fisicos,nombre';
-
-        if ($this->editandoId) {
-            $uniqueRule .= ',' . $this->editandoId;
-        }
-
         return [
-            'nombre_edicion' => ['required', 'string', 'max:100', $uniqueRule],
+            'nombre_edicion' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('espacios_fisicos', 'nombre')
+                    ->where('institucion_id', auth()->user()?->institucion_activa_id)
+                    ->ignore($this->editandoId),
+            ],
             'tipo_edicion' => ['required', 'in:' . implode(',', EspacioFisico::tiposDisponibles())],
             'activo_edicion' => ['boolean'],
         ];

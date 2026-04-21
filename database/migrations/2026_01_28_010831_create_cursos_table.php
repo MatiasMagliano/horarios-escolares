@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('cursos', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('institucion_id')->constrained('datos_institucionales')->cascadeOnDelete();
             $table->unsignedTinyInteger('anio');
             $table->string('division', 5);
             $table->enum('ciclo', ['CB', 'CE']);
-            $table->enum('turno', ['maniana', 'tarde', 'contraturno']);
+            $table->enum('turno', ['maniana', 'tarde']);
             $table->timestamps();
+
+            $table->unique(['institucion_id', 'anio', 'division', 'turno'], 'cursos_institucion_anio_division_turno_unique');
         });
     }
 
