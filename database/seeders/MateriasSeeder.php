@@ -2,12 +2,14 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Materia;
+use Database\Seeders\Concerns\InteractsWithInstitucion;
+use Illuminate\Database\Seeder;
 
 class MateriasSeeder extends Seeder
 {
+    use InteractsWithInstitucion;
+
     /**
      * Run the database seeds.
      */
@@ -83,8 +85,11 @@ class MateriasSeeder extends Seeder
         ];
 
         foreach ($materias as $nombre) {
-            Materia::updateOrCreate(
-                ['nombre' => $nombre],
+            Materia::query()->updateOrCreate(
+                [
+                    'institucion_id' => $this->institucionId(),
+                    'nombre' => $nombre,
+                ],
                 []
             );
         }

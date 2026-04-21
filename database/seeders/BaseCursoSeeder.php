@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Database\Seeders\Concerns\InteractsWithInstitucion;
 use App\Models\Curso;
 use App\Models\Materia;
 use App\Models\Docente;
@@ -16,6 +17,8 @@ use Exception;
 
 abstract class BaseCursoSeeder extends Seeder
 {
+    use InteractsWithInstitucion;
+
     protected const FECHA_VIGENCIA_INICIAL = '2026-01-01';
 
     public function run(): void
@@ -54,7 +57,10 @@ abstract class BaseCursoSeeder extends Seeder
 
     protected function getCurso(): Curso
     {
-        return Curso::where($this->cursoData())->firstOrFail();
+        return Curso::query()
+            ->where('institucion_id', $this->institucionId())
+            ->where($this->cursoData())
+            ->firstOrFail();
     }
 
     protected function seedMaterias(Curso $curso): void
@@ -66,14 +72,22 @@ abstract class BaseCursoSeeder extends Seeder
                 throw new Exception("La materia {$data['nombre']} del curso {$curso->nombre_completo} no tiene espacio definido en el seeder.");
             }
 
-            $materia = Materia::where('nombre', $data['nombre'])->firstOrFail();
-            $docente = Docente::where('nombre', $data['docente'])->firstOrFail();
+            $docente = Docente::query()
+                ->where('institucion_id', $this->institucionId())
+                ->where('nombre', $data['docente'])
+                ->firstOrFail();
+            $materia = Materia::query()
+                ->where('institucion_id', $this->institucionId())
+                ->where('nombre', $data['nombre'])
+                ->firstOrFail();
             $espacio = EspacioFisico::query()
+                ->where('institucion_id', $this->institucionId())
                 ->where('nombre', $data['espacio'])
                 ->firstOrFail();
 
             $cm = CursoMateria::updateOrCreate(
                 [
+                    'institucion_id' => $this->institucionId(),
                     'curso_id' => $curso->id,
                     'materia_id' => $materia->id,
                 ],
@@ -85,6 +99,7 @@ abstract class BaseCursoSeeder extends Seeder
 
             $cmDocenteVigente = CmDocente::updateOrCreate(
                 [
+                    'institucion_id' => $this->institucionId(),
                     'curso_materia_id' => $cm->id,
                     'vigente_desde' => $vigenteDesde,
                 ],
@@ -96,6 +111,7 @@ abstract class BaseCursoSeeder extends Seeder
             );
 
             CmDocente::where('curso_materia_id', $cm->id)
+                ->where('institucion_id', $this->institucionId())
                 ->where('id', '!=', $cmDocenteVigente->id)
                 ->where('es_vigente', true)
                 ->update([
@@ -108,6 +124,7 @@ abstract class BaseCursoSeeder extends Seeder
     protected function getCursoMateriasMap(Curso $curso)
     {
         return CursoMateria::with('materia')
+            ->where('institucion_id', $this->institucionId())
             ->where('curso_id', $curso->id)
             ->get()
             ->keyBy(fn ($cm) => $cm->materia->nombre);
@@ -117,7 +134,9 @@ abstract class BaseCursoSeeder extends Seeder
     {
         $vigenteDesde = $this->vigenteDesde();
 
-        $bloques = BloqueHorario::where('turno', $turnoBloque)
+        $bloques = BloqueHorario::query()
+            ->where('institucion_id', $this->institucionId())
+            ->where('turno', $turnoBloque)
             ->get()
             ->keyBy('orden');
 
@@ -143,6 +162,7 @@ abstract class BaseCursoSeeder extends Seeder
 
                 HorarioBase::updateOrCreate(
                     [
+                        'institucion_id' => $this->institucionId(),
                         'curso_id'   => $curso->id,
                         'dia_semana' => $dia,
                         'bloque_id'  => $bloque->id,
@@ -163,6 +183,7 @@ abstract class BaseCursoSeeder extends Seeder
     protected function validarCargaHoraria(Curso $curso): void
     {
         $inconsistencias = CursoMateria::where('curso_id', $curso->id)
+            ->where('institucion_id', $this->institucionId())
             ->with('materia')
             ->withCount([
                 'horarioBase as horario_base_count' => function ($query) {

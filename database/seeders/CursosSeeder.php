@@ -2,12 +2,14 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Curso;
+use Database\Seeders\Concerns\InteractsWithInstitucion;
+use Illuminate\Database\Seeder;
 
 class CursosSeeder extends Seeder
 {
+    use InteractsWithInstitucion;
+
     /**
      * Run the database seeds.
      */
@@ -48,14 +50,15 @@ class CursosSeeder extends Seeder
         ];
 
         foreach ($cursos as [$anio, $division, $ciclo, $turno]) {
-            Curso::updateOrCreate(
+            Curso::query()->updateOrCreate(
                 [
+                    'institucion_id' => $this->institucionId(),
                     'anio' => $anio,
                     'division' => $division,
+                    'turno' => $turno,
                 ],
                 [
                     'ciclo' => $ciclo,
-                    'turno' => $turno,
                 ]
             );
         }

@@ -3,10 +3,13 @@
 namespace Database\Seeders;
 
 use App\Models\EspacioFisico;
+use Database\Seeders\Concerns\InteractsWithInstitucion;
 use Illuminate\Database\Seeder;
 
 class EspaciosFisicosSeeder extends Seeder
 {
+    use InteractsWithInstitucion;
+
     public function run(): void
     {
         $espacios = [
@@ -28,8 +31,11 @@ class EspaciosFisicosSeeder extends Seeder
         ];
 
         foreach ($espacios as $espacio) {
-            EspacioFisico::updateOrCreate(
-                ['nombre' => $espacio['nombre']],
+            EspacioFisico::query()->updateOrCreate(
+                [
+                    'institucion_id' => $this->institucionId(),
+                    'nombre' => $espacio['nombre'],
+                ],
                 [
                     'tipo' => $espacio['tipo'],
                     'activo' => true,

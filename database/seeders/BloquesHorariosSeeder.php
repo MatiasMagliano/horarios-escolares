@@ -2,12 +2,14 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\BloqueHorario;
+use Database\Seeders\Concerns\InteractsWithInstitucion;
+use Illuminate\Database\Seeder;
 
 class BloquesHorariosSeeder extends Seeder
 {
+    use InteractsWithInstitucion;
+
     /**
      * Run the database seeds.
      */
@@ -81,8 +83,11 @@ class BloquesHorariosSeeder extends Seeder
         ];
 
         foreach ($bloques as $bloque) {
-            BloqueHorario::updateOrCreate(
+            $esRecreo = str_starts_with($bloque['nombre'], 'R');
+
+            BloqueHorario::query()->updateOrCreate(
                 [
+                    'institucion_id' => $this->institucionId(),
                     'turno' => $bloque['turno'],
                     'orden' => $bloque['orden'],
                 ],
@@ -91,7 +96,8 @@ class BloquesHorariosSeeder extends Seeder
                     'hora_inicio' => $bloque['hora_inicio'],
                     'hora_fin' => $bloque['hora_fin'],
                     'duracion_minutos' => 40,
-                    'tipo' => str_starts_with($bloque['nombre'], 'R') ? 'recreo' : 'clase',
+                    'tipo' => $esRecreo ? 'recreo' : 'clase',
+                    'es_editable' => !$esRecreo,
                 ]
             );
         }

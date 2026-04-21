@@ -2,13 +2,15 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Docente;
+use Database\Seeders\Concerns\InteractsWithInstitucion;
+use Illuminate\Database\Seeder;
 
 
 class DocentesSeeder extends Seeder
 {
+    use InteractsWithInstitucion;
+
     /**
      * Run the database seeds
      */
@@ -50,7 +52,7 @@ class DocentesSeeder extends Seeder
             ['nombre' => 'Sandra Occhipinti', 'nombre_completo' => 'Occhipinti, Sandra Irene', 'dni' => '16684042', 'nacimiento' => '1963-12-09'],
             ['nombre' => 'Esteban Menti', 'nombre_completo' => 'Menti, Esteban Sergio', 'dni' => '30967959', 'nacimiento' => '1984-05-11'],
             ['nombre' => 'Javier Berra', 'nombre_completo' => 'Berra, Javier Eduardo', 'dni' => '25858654', 'nacimiento' => '1977-08-13'],
-            ['nombre' => 'Ian Concepción', 'nombre_completo' => 'Concepción Alvarado, Ian Erik', 'dni' => '24778586', 'nacimiento' => '1971-10-25'],
+            ['nombre' => 'Ian Concepción', 'nombre_completo' => 'Concepción Alvarado, Ian Erik', 'dni' => '24778587', 'nacimiento' => '1971-10-25'],
             ['nombre' => 'Lorena Vera', 'nombre_completo' => 'Vera, Lorena Silvana', 'dni' => '25401078', 'nacimiento' => '1976-09-29'],
             ['nombre' => 'Matías Magliano', 'nombre_completo' => 'Magliano, Matías José', 'dni' => '29714640', 'nacimiento' => '1982-10-28'],
             ['nombre' => 'Priscila Calizaya', 'nombre_completo' => 'Martinez Calizaya, Ana Priscila', 'dni' => '43134003', 'nacimiento' => '2000-11-07'],
@@ -81,13 +83,17 @@ class DocentesSeeder extends Seeder
         ];
 
         foreach ($docentes as $docente) {
-            Docente::updateOrCreate(
-                ['nombre' => $docente['nombre']],
+            Docente::query()->updateOrCreate(
+                [
+                    'institucion_id' => $this->institucionId(),
+                    'nombre' => $docente['nombre'],
+                ],
                 [
                     'nombre_completo' => $docente['nombre_completo'],
                     'dni' => $docente['dni'],
                     'nacimiento' => $docente['nacimiento'],
-                    'telefono' => '351' . fake()->numberBetween(4000000, 4999999)
+                    'telefono' => '351' . fake()->numberBetween(4000000, 4999999),
+                    'activo' => true,
                 ]
             );
         }
