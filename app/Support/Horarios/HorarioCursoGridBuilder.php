@@ -12,7 +12,8 @@ use Illuminate\Support\Collection;
 class HorarioCursoGridBuilder
 {
     public function __construct(
-        private readonly InstitucionContext $institucionContext
+        private readonly InstitucionContext $institucionContext,
+        private readonly BloqueHorarioTemplateManager $bloqueHorarioTemplateManager
     ) {
     }
 
@@ -114,6 +115,23 @@ class HorarioCursoGridBuilder
 
     private function getBloquesForTurnos(array $turnos): Collection
     {
+        $bloques = BloqueHorario::query()
+            ->whereIn('turno', $turnos)
+            ->orderBy('orden')
+            ->get()
+            ->groupBy('turno');
+
+        if ($bloques->isNotEmpty()) {
+            return $bloques;
+        }
+
+        $institucion = $this->institucionContext->institucion();
+        if (!$institucion) {
+            return $bloques;
+        }
+
+        $this->bloqueHorarioTemplateManager->ensureForInstitucion($institucion);
+
         return BloqueHorario::query()
             ->whereIn('turno', $turnos)
             ->orderBy('orden')

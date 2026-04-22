@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Institucion;
+use App\Support\Horarios\BloqueHorarioTemplateManager;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 
@@ -68,10 +69,13 @@ class InstitucionesAdmin extends Component
 
         $data = $this->getFormData();
         if ($this->editandoId) {
-            Institucion::findOrFail($this->editandoId)->update($data);
+            $institucion = Institucion::findOrFail($this->editandoId);
+            $institucion->update($data);
         } else {
-            Institucion::create($data);
+            $institucion = Institucion::create($data);
         }
+
+        app(BloqueHorarioTemplateManager::class)->ensureForInstitucion($institucion);
 
         $this->cancelar();
         $this->dispatch('instituciones-actualizadas');

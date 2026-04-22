@@ -89,4 +89,16 @@ class Institucion extends Model
 
         return $turnos;
     }
+
+    public function turnosConfigurados(): array
+    {
+        return collect([
+            'maniana',
+            'tarde',
+            'contraturno_maniana',
+            'contraturno_tarde',
+        ])->filter(fn (string $turno) => $this->tieneTurno($turno))
+            ->values()
+            ->all();
+    }
 }
