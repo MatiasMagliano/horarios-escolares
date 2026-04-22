@@ -13,6 +13,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/instituciones/seleccionar', [InstitucionSeleccionController::class, 'store'])
         ->name('instituciones.store');
+
+    Route::get('/admin/instituciones', function () {
+        return view('admin.instituciones');
+    })->name('admin.instituciones');
 });
 
 Route::middleware(['auth', 'institucion.activa'])->group(function () {

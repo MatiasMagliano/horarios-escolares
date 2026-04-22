@@ -16,6 +16,7 @@ class InstitucionSeleccionController extends Controller
         $instituciones = $user->instituciones_disponibles;
 
         if ($instituciones->count() === 1) {
+            $request->session()->flash('info', 'Actualmente cuentas con una sola escuela asignada, por lo que fue seleccionada automáticamente.');
             return $this->activate($request, $instituciones->first());
         }
 
