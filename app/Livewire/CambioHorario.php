@@ -71,7 +71,7 @@ class CambioHorario extends Component
             ],
             'materia_id' => [
                 'required',
-                Rule::exists('materias', 'id')->where('institucion_id', $institucionId),
+                Rule::exists('materias', 'id'),
                 function ($attribute, $value, $fail) {
                     $asignado = CursoMateria::query()
                         ->where('curso_id', $this->curso_id)

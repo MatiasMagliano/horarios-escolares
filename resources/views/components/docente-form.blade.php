@@ -2,6 +2,8 @@
 
 use Livewire\Component;
 use App\Models\Docente;
+use App\Support\Instituciones\InstitucionContext;
+use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 
 new class extends Component
@@ -11,6 +13,7 @@ new class extends Component
     public string $dni = '';
     public string $nombre_completo = '';
     public string $nombre = '';
+    public string $nacimiento = '';
     public ?string $email = null;
     public ?string $telefono = null;
     public bool $activo = true;
@@ -26,6 +29,7 @@ new class extends Component
             $this->nombre = $docente->nombre;
             $this->nombre_completo = $docente->nombre_completo;
             $this->dni = $docente->dni;
+            $this->nacimiento = $docente->nacimiento?->format('Y-m-d') ?? '';
             $this->telefono = $docente->telefono;
             $this->email = $docente->email;
             $this->activo = $docente->activo;
@@ -34,13 +38,33 @@ new class extends Component
 
     protected function rules()
     {
+        $institucionId = app(InstitucionContext::class)->id();
+
         return [
             'nombre' => 'required|string|max:100',
+            'nombre_completo' => 'required|string|max:150',
+            'dni' => [
+                'required',
+                'string',
+                'max:20',
+                'regex:/^[0-9A-Za-z]+$/',
+                Rule::unique('docentes', 'dni')
+                    ->where('institucion_id', $institucionId)
+                    ->ignore($this->docente?->id),
+            ],
+            'nacimiento' => [
+                'required',
+                'date',
+                'before_or_equal:' . Carbon::today()->toDateString(),
+            ],
             'email' => [
                 'nullable',
                 'email',
-                Rule::unique('docentes')->ignore($this->docente?->id),
+                Rule::unique('docentes', 'email')
+                    ->where('institucion_id', $institucionId)
+                    ->ignore($this->docente?->id),
             ],
+            'telefono' => 'nullable|string|max:20',
             'activo' => 'boolean',
         ];
     }
@@ -50,11 +74,12 @@ new class extends Component
         $this->validate();
 
         $data = [
-            'documento' => $this->dni,
-            'nombre' => $this->nombre,
-            'nombre_completo' => $this->nombre_completo,
-            'telefono' => $this->telefono,
-            'email' => $this->email,
+            'dni' => trim($this->dni),
+            'nombre' => trim($this->nombre),
+            'nombre_completo' => trim($this->nombre_completo),
+            'nacimiento' => $this->nacimiento,
+            'telefono' => filled($this->telefono) ? trim($this->telefono) : null,
+            'email' => filled($this->email) ? mb_strtolower(trim($this->email)) : null,
             'activo' => $this->activo,
         ];
 
@@ -64,7 +89,7 @@ new class extends Component
         } else {
             Docente::create($data);
             session()->flash('success', 'Docente creado correctamente.');
-            $this->reset(['nombre', 'email', 'activo']);
+            $this->reset(['dni', 'nombre', 'nombre_completo', 'nacimiento', 'telefono', 'email', 'activo']);
             $this->activo = true;
         }
 
@@ -127,6 +152,14 @@ new class extends Component
                         <label class="form-label">Nombre completo</label>
                         <input wire:model="nombre_completo" type="text" class="form-control" maxlength="100">
                         @error('nombre_completo') <div class="text-danger small">{{ $message }}</div> @enderror
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    {{-- NACIMIENTO --}}
+                    <div class="mb-3">
+                        <label class="form-label">Fecha de nacimiento</label>
+                        <input wire:model="nacimiento" type="date" class="form-control">
+                        @error('nacimiento') <div class="text-danger small">{{ $message }}</div> @enderror
                     </div>
                 </div>
             </div>

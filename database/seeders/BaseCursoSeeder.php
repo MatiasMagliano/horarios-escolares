@@ -77,7 +77,6 @@ abstract class BaseCursoSeeder extends Seeder
                 ->where('nombre', $data['docente'])
                 ->firstOrFail();
             $materia = Materia::query()
-                ->where('institucion_id', $this->institucionId())
                 ->where('nombre', $data['nombre'])
                 ->firstOrFail();
             $espacio = EspacioFisico::query()

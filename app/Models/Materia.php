@@ -2,15 +2,11 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToInstitucion;
 use Illuminate\Database\Eloquent\Model;
 
 class Materia extends Model
 {
-    use BelongsToInstitucion;
-
     protected $fillable = [
-        'institucion_id',
         'nombre',
     ];
 

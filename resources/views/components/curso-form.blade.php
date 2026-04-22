@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use App\Models\Curso;
+use App\Support\Instituciones\InstitucionContext;
 use Illuminate\Validation\Rule;
 
 new class extends Component
@@ -34,6 +35,8 @@ new class extends Component
 
     protected function rules()
     {
+        $institucionId = app(InstitucionContext::class)->id();
+
         return [
             'anio' => ['required', 'integer', 'between:1,7'],
 
@@ -43,7 +46,11 @@ new class extends Component
                 'max:5',
                 'regex:/^[A-Za-z]{1,5}$/',
                 Rule::unique('cursos')
-                    ->where(fn($q) => $q->where('anio', $this->anio))
+                    ->where(fn ($q) => $q
+                        ->where('institucion_id', $institucionId)
+                        ->where('anio', $this->anio)
+                        ->where('turno', $this->turno)
+                    )
                     ->ignore($this->curso?->id),
             ],
 

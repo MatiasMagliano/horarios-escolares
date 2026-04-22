@@ -91,9 +91,9 @@ new class extends Component {
             <tr class="text-center">
                 <th style="width: 10%;">Año</th>
                 <th style="width: 10%;">División</th>
+                <th style="width: 10%;">Turno</th>
                 <th style="width: 12%;">Ciclo</th>
                 <th style="width: 18%;">Estado</th>
-                <th style="width: 20%;">Turno</th>
                 <th style="width: 14%;">Herramientas</th>
             </tr>
         </thead>
@@ -109,6 +109,11 @@ new class extends Component {
                         {{ $curso->division }}
                     </td>
 
+
+                    <td class="text-center">
+                        {{ $curso->turno_designacion }}
+                    </td>
+
                     <td class="text-center">
                         <span class="badge {{ $curso->ciclo === 'CB' ? 'bg-secondary' : 'bg-info' }}">
                             {{ $curso->ciclo }}
@@ -121,10 +126,6 @@ new class extends Component {
                         @else
                         <span class="text-muted">—</span>
                         @endif
-                    </td>
-
-                    <td class="text-center">
-                        {{ $curso->turno_designacion }}
                     </td>
 
                     <td class="text-center">

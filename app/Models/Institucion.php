@@ -57,4 +57,36 @@ class Institucion extends Model
     {
         return $this->hasMany(User::class, 'institucion_activa_id');
     }
+
+    public function tieneTurno(string $turno): bool
+    {
+        return match ($turno) {
+            'maniana' => $this->tiene_turno_maniana,
+            'tarde' => $this->tiene_turno_tarde,
+            'contraturno_maniana' => $this->tiene_contraturno_maniana,
+            'contraturno_tarde' => $this->tiene_contraturno_tarde,
+            default => false,
+        };
+    }
+
+    public function turnosVisiblesParaCurso(string $turnoBase): array
+    {
+        $turnos = [];
+
+        if ($this->tieneTurno($turnoBase)) {
+            $turnos[] = $turnoBase;
+        }
+
+        $contraturno = match ($turnoBase) {
+            'maniana' => 'contraturno_maniana',
+            'tarde' => 'contraturno_tarde',
+            default => null,
+        };
+
+        if ($contraturno && $this->tieneTurno($contraturno)) {
+            $turnos[] = $contraturno;
+        }
+
+        return $turnos;
+    }
 }

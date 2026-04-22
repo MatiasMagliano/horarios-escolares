@@ -86,6 +86,11 @@ class HorarioCurso extends Component
             ? (int) $this->cursoMateriaSeleccionada
             : null;
 
+        if ($cursoMateriaId === null && !$horarioVigente && !$versionHoy) {
+            $this->dispatch('cerrar-modal-editar-celda');
+            return;
+        }
+
         if ($cursoMateriaId !== null) {
             $materiaEsValida = CursoMateria::whereKey($cursoMateriaId)
                 ->where('curso_id', $this->cursoId)
@@ -96,55 +101,41 @@ class HorarioCurso extends Component
             }
         }
 
-        if ($cursoMateriaId === null) {
-            if ($horarioVigente) {
-                $horarioVigente->update([
-                    'es_vigente' => false,
-                    'vigente_hasta' => $vigenteDesde,
-                    'cambio_horario_id' => null,
-                ]);
+        if (
+            $horarioVigente
+            && (string) $horarioVigente->vigente_desde === $vigenteDesde
+            && (int) $horarioVigente->curso_materia_id === $cursoMateriaId
+        ) {
+            $this->dispatch('cerrar-modal-editar-celda');
+            return;
+        }
+
+        if ($versionHoy) {
+            $versionHoy->update([
+                'curso_materia_id' => $cursoMateriaId,
+                'vigente_hasta' => null,
+                'es_vigente' => true,
+                'cambio_horario_id' => null,
+            ]);
+
+            if ($horarioVigente && $horarioVigente->id !== $versionHoy->id) {
+                $this->cerrarHorarioVigente($horarioVigente, $vigenteDesde);
             }
         } else {
-            if ($horarioVigente && (int) $horarioVigente->curso_materia_id === $cursoMateriaId) {
-                $this->dispatch('cerrar-modal-editar-celda');
-                return;
+            if ($horarioVigente) {
+                $this->cerrarHorarioVigente($horarioVigente, $vigenteDesde);
             }
 
-            if ($versionHoy) {
-                $versionHoy->update([
-                    'curso_materia_id' => $cursoMateriaId,
-                    'vigente_hasta' => null,
-                    'es_vigente' => true,
-                    'cambio_horario_id' => null,
-                ]);
-
-                if ($horarioVigente && $horarioVigente->id !== $versionHoy->id) {
-                    $horarioVigente->update([
-                        'es_vigente' => false,
-                        'vigente_hasta' => Carbon::parse($vigenteDesde)->subDay()->toDateString(),
-                        'cambio_horario_id' => null,
-                    ]);
-                }
-            } else {
-                if ($horarioVigente) {
-                    $horarioVigente->update([
-                        'es_vigente' => false,
-                        'vigente_hasta' => Carbon::parse($vigenteDesde)->subDay()->toDateString(),
-                        'cambio_horario_id' => null,
-                    ]);
-                }
-
-                HorarioBase::create([
-                    'curso_id' => $this->cursoId,
-                    'bloque_id' => $bloqueId,
-                    'dia_semana' => $dia,
-                    'curso_materia_id' => $cursoMateriaId,
-                    'vigente_desde' => $vigenteDesde,
-                    'vigente_hasta' => null,
-                    'es_vigente' => true,
-                    'cambio_horario_id' => null,
-                ]);
-            }
+            HorarioBase::create([
+                'curso_id' => $this->cursoId,
+                'bloque_id' => $bloqueId,
+                'dia_semana' => $dia,
+                'curso_materia_id' => $cursoMateriaId,
+                'vigente_desde' => $vigenteDesde,
+                'vigente_hasta' => null,
+                'es_vigente' => true,
+                'cambio_horario_id' => null,
+            ]);
         }
 
         $this->dispatch('cerrar-modal-editar-celda');
@@ -195,6 +186,15 @@ class HorarioCurso extends Component
         $inicio = Carbon::parse(static::FECHA_VIGENCIA_INICIAL);
 
         return $hoy->lessThan($inicio) ? $inicio->toDateString() : $hoy->toDateString();
+    }
+
+    private function cerrarHorarioVigente(HorarioBase $horario, string $vigenteDesde): void
+    {
+        $horario->update([
+            'es_vigente' => false,
+            'vigente_hasta' => Carbon::parse($vigenteDesde)->subDay()->toDateString(),
+            'cambio_horario_id' => null,
+        ]);
     }
 
     public function render()

@@ -14,53 +14,70 @@
         <div class="collapse navbar-collapse justify-content-end" id="navbarMain">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a
-                        class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
-                        href="{{ route('dashboard') }}"
-                    >
+                    <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
+                        href="{{ route('dashboard') }}">
                         <i class="bi bi-house me-2"></i>Inicio
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a
-                        class="nav-link {{ request()->routeIs('admin.horarios') ? 'active' : '' }}"
-                        href="{{ route('admin.horarios') }}"
-                    >
+                    <a class="nav-link {{ request()->routeIs('admin.horarios') ? 'active' : '' }}"
+                        href="{{ route('admin.horarios') }}">
                         <i class="bi bi-calendar-check me-2"></i>Horarios
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a
-                        class="nav-link {{ request()->routeIs('admin.cursos') || request()->routeIs('admin.cursos.*') ? 'active' : '' }}"
-                        href="{{ route('admin.cursos.listado') }}"
-                    >
+                    <a class="nav-link {{ request()->routeIs('admin.cursos') || request()->routeIs('admin.cursos.*') ? 'active' : '' }}"
+                        href="{{ route('admin.cursos.listado') }}">
                         <i class="bi bi-mortarboard me-2"></i></i>Cursos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a
-                        class="nav-link {{ request()->routeIs('admin.docentes') ? 'active' : '' }}"
-                        href="{{ route('admin.docentes') }}"
-                    >
+                    <a class="nav-link {{ request()->routeIs('admin.docentes') ? 'active' : '' }}"
+                        href="{{ route('admin.docentes') }}">
                         <i class="bi bi-person-badge me-2"></i>Docentes
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a
-                        class="nav-link {{ request()->routeIs('admin.espacios') || request()->routeIs('admin.espacios.*') ? 'active' : '' }}"
-                        href="{{ route('admin.espacios.utilizacion') }}"
-                    >
+                    <a class="nav-link {{ request()->routeIs('admin.espacios') || request()->routeIs('admin.espacios.*') ? 'active' : '' }}"
+                        href="{{ route('admin.espacios.utilizacion') }}">
                         <i class="bi bi-building me-2"></i>Espacios
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a
-                        class="nav-link {{ request()->routeIs('admin.cambios-horario') ? 'active' : '' }}"
-                        href="{{ route('admin.cambios-horario') }}"
-                    >
+                    <a class="nav-link {{ request()->routeIs('admin.cambios-horario') ? 'active' : '' }}"
+                        href="{{ route('admin.cambios-horario') }}">
                         <i class="bi bi-repeat me-2"></i>Cambios
                     </a>
                 </li>
+                @if (auth()->user()?->isSuperAdmin())
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="bi bi-gear me-2"></i>Admin escuelas
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="{{ route('instituciones.select') }}">
+                                    <i class="bi bi-building me-2"></i>Seleccionar escuela
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ route('admin.instituciones') }}">
+                                    <i class="bi bi-plus me-2"></i>Administración escuelas
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ route('admin.materias') }}">
+                                    <i class="bi bi-plus me-2"></i>Administración materias
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                @endif
             </ul>
 
             {{-- Espaciador para empujar a la derecha --}}
@@ -75,12 +92,8 @@
 
                 {{-- Usuario Dropdown --}}
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle"
-                       href="#"
-                       id="userDropdown"
-                       role="button"
-                       data-bs-toggle="dropdown"
-                       aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
 
                         {{ auth()->user()->name ?? 'Usuario' }}
                     </a>
@@ -92,7 +105,9 @@
                             </span>
                         </li>
 
-                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
 
                         <li>
                             <a class="dropdown-item" href="#">
@@ -106,16 +121,20 @@
                             </a>
                         </li>
 
-                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
 
-                        @if (auth()->user()?->isSuperAdmin() || auth()->user()?->instituciones_disponibles->count() > 1)
+                        @if (auth()->user()?->isSuperAdmin())
                             <li>
                                 <a class="dropdown-item" href="{{ route('instituciones.select') }}">
                                     Cambiar escuela
                                 </a>
                             </li>
 
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                         @endif
 
                         <li>
@@ -133,4 +152,3 @@
         </div>
     </div>
 </nav>
-

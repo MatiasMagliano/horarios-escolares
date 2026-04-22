@@ -17,6 +17,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/instituciones', function () {
         return view('admin.instituciones');
     })->name('admin.instituciones');
+
+    Route::get('/admin/materias', function () {
+        return view('admin.materias');
+    })->name('admin.materias');
 });
 
 Route::middleware(['auth', 'institucion.activa'])->group(function () {

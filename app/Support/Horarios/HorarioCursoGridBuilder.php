@@ -6,10 +6,16 @@ use App\Models\BloqueHorario;
 use App\Models\Curso;
 use App\Models\CursoMateria;
 use App\Models\HorarioBase;
+use App\Support\Instituciones\InstitucionContext;
 use Illuminate\Support\Collection;
 
 class HorarioCursoGridBuilder
 {
+    public function __construct(
+        private readonly InstitucionContext $institucionContext
+    ) {
+    }
+
     public function build(?int $cursoId): Collection
     {
         if (!$cursoId) {
@@ -21,7 +27,11 @@ class HorarioCursoGridBuilder
             return collect();
         }
 
-        $turnos = [$curso->turno, TurnoHelper::contraturnoDe($curso->turno)];
+        $turnos = $this->resolveTurnosVisibles($curso);
+        if ($turnos === []) {
+            return collect();
+        }
+
         $bloques = $this->getBloquesForTurnos($turnos);
         $horarios = $this->getHorariosForCursoAndTurnos($cursoId, $turnos);
 
@@ -125,5 +135,18 @@ class HorarioCursoGridBuilder
                     ->groupBy(fn ($horario) => $horario->bloque->orden)
                     ->map(fn ($bloques) => $bloques->keyBy('dia_semana'));
             });
+    }
+
+    private function resolveTurnosVisibles(Curso $curso): array
+    {
+        $institucion = $this->institucionContext->institucion();
+
+        if (!$institucion) {
+            return [$curso->turno, TurnoHelper::contraturnoDe($curso->turno)];
+        }
+
+        $turnos = $institucion->turnosVisiblesParaCurso($curso->turno);
+
+        return $turnos !== [] ? $turnos : [$curso->turno];
     }
 }

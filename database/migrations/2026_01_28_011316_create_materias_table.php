@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('materias', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('institucion_id')->constrained('datos_institucionales')->cascadeOnDelete();
             $table->string('nombre');
             $table->timestamps();
 
-            $table->unique(['institucion_id', 'nombre'], 'materias_institucion_nombre_unique');
+            $table->unique('nombre', 'materias_nombre_unique');
         });
     }
 
