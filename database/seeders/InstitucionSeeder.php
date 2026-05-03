@@ -21,8 +21,8 @@ class InstitucionSeeder extends Seeder
                 'anio_maximo' => (int) env('SEED_DEFAULT_INSTITUCION_ANIO_MAXIMO', 7),
                 'tiene_turno_maniana' => true,
                 'tiene_turno_tarde' => true,
-                'tiene_contraturno_maniana' => false,
-                'tiene_contraturno_tarde' => false,
+                'tiene_contraturno_maniana' => true,
+                'tiene_contraturno_tarde' => true,
                 'activo' => true,
             ]
         );

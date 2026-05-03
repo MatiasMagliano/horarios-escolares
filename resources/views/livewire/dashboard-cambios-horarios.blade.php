@@ -1,6 +1,6 @@
 <div class="card shadow-sm border-0 h-100 bg-light">
     <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start gap-3">
+        <div class="d-flex flex-column justify-content-between align-items-start gap-3">
             <div>
                 <div class="text-uppercase text-muted small mb-1">Gestión de cambios</div>
                 <h2 class="h5 mb-1">Cambios de horarios pendientes</h2>
