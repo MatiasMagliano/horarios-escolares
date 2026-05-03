@@ -244,6 +244,27 @@ class BloqueHorarioTemplateManager
         $this->createBloqueHorarioFromConfigs($institucion);
     }
 
+    public function ensureTurnosForInstitucion(Institucion $institucion): void
+    {
+        $existingTurnos = BloqueHorarioConfig::withoutGlobalScope('institucion')
+            ->where('institucion_id', $institucion->id)
+            ->distinct()
+            ->pluck('turno')
+            ->all();
+
+        $missingTurnos = array_values(array_diff($institucion->turnosConfigurados(), $existingTurnos));
+
+        foreach ($missingTurnos as $turno) {
+            $this->saveBlocksForInstitucion(
+                $institucion,
+                $this->blocksForNewTurno($institucion, $turno),
+                replaceExisting: false
+            );
+        }
+
+        $this->createBloqueHorarioFromConfigs($institucion);
+    }
+
     /**
      * Guarda las configuraciones de bloques en la tabla bloque_horario_configs
      * Si ya existen, no las reemplaza
@@ -282,10 +303,48 @@ class BloqueHorarioTemplateManager
                 'tipo' => $tipo,
             ];
 
+            $query = BloqueHorarioConfig::withoutGlobalScope('institucion');
+
             $replaceExisting
-                ? BloqueHorarioConfig::updateOrCreate($attributes, $values)
-                : BloqueHorarioConfig::firstOrCreate($attributes, $values);
+                ? $query->updateOrCreate($attributes, $values)
+                : $query->firstOrCreate($attributes, $values);
         }
+    }
+
+    /**
+     * @return array<int, array<string, int|string>>
+     */
+    private function blocksForNewTurno(Institucion $institucion, string $turno): array
+    {
+        $sourceTurno = match ($turno) {
+            'contraturno_tarde' => 'maniana',
+            'contraturno_maniana' => 'tarde',
+            'maniana' => 'contraturno_tarde',
+            'tarde' => 'contraturno_maniana',
+            default => null,
+        };
+
+        if ($sourceTurno && $institucion->tieneTurno($sourceTurno)) {
+            $sourceBlocks = $this->getConfigsPorTurno($institucion, $sourceTurno);
+
+            if ($sourceBlocks->isNotEmpty()) {
+                return $sourceBlocks
+                    ->map(fn (BloqueHorarioConfig $block) => [
+                        'nombre' => $block->nombre,
+                        'turno' => $turno,
+                        'orden' => $block->orden,
+                        'hora_inicio' => is_string($block->hora_inicio) ? $block->hora_inicio : $block->hora_inicio?->format('H:i'),
+                        'hora_fin' => is_string($block->hora_fin) ? $block->hora_fin : $block->hora_fin?->format('H:i'),
+                        'tipo' => $block->tipo,
+                    ])
+                    ->all();
+            }
+        }
+
+        return collect($this->template(self::TEMPLATE_ESTANDAR_40))
+            ->where('turno', $turno)
+            ->values()
+            ->all();
     }
 
     /**
@@ -357,6 +416,10 @@ class BloqueHorarioTemplateManager
      */
     public function getConfigsPorTurno(Institucion $institucion, string $turno)
     {
-        return $institucion->getBloquesPorTurno($turno);
+        return BloqueHorarioConfig::withoutGlobalScope('institucion')
+            ->where('institucion_id', $institucion->id)
+            ->where('turno', $turno)
+            ->orderBy('orden')
+            ->get();
     }
 }

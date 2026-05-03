@@ -74,7 +74,9 @@ class ConfiguracionBloqueHorario extends Component
 
     public function editarBloque(int $bloqueId): void
     {
-        $bloque = BloqueHorarioConfig::findOrFail($bloqueId);
+        $bloque = BloqueHorarioConfig::withoutGlobalScope('institucion')
+            ->where('institucion_id', $this->institucionId)
+            ->findOrFail($bloqueId);
         
         $this->editandoBloqueId = $bloqueId;
         $this->bloqueNombre = $bloque->nombre;
@@ -93,7 +95,9 @@ class ConfiguracionBloqueHorario extends Component
         ]);
 
         if ($this->editandoBloqueId) {
-            $bloque = BloqueHorarioConfig::findOrFail($this->editandoBloqueId);
+            $bloque = BloqueHorarioConfig::withoutGlobalScope('institucion')
+                ->where('institucion_id', $this->institucionId)
+                ->findOrFail($this->editandoBloqueId);
 
             app(BloqueHorarioTemplateManager::class)->updateBloqueConfig($bloque, [
                 'nombre' => $this->bloqueNombre,
@@ -151,7 +155,9 @@ class ConfiguracionBloqueHorario extends Component
 
     public function eliminarBloque(int $bloqueId): void
     {
-        $bloque = BloqueHorarioConfig::findOrFail($bloqueId);
+        $bloque = BloqueHorarioConfig::withoutGlobalScope('institucion')
+            ->where('institucion_id', $this->institucionId)
+            ->findOrFail($bloqueId);
 
         app(BloqueHorarioTemplateManager::class)->deleteBloqueHorarioForConfig($bloque);
 

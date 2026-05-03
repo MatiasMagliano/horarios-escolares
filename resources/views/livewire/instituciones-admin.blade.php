@@ -22,7 +22,7 @@
                                 <th>Año Máximo</th>
                                 <th>Turnos</th>
                                 <th>Estado</th>
-                                <th style="width: 10%;">Acciones</th>
+                                <th style="width: 16%;">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -43,9 +43,26 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <button type="button" wire:click="editar({{ $institucion->id }})" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
+                                    <div class="btn-group btn-group-sm" role="group" aria-label="Herramientas de institución">
+                                        <button type="button"
+                                            wire:click="editar({{ $institucion->id }})"
+                                            class="btn btn-outline-primary"
+                                            title="Editar escuela">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button type="button"
+                                            wire:click="abrirConfiguracionBloquesPara({{ $institucion->id }})"
+                                            class="btn btn-outline-info"
+                                            title="Editar grilla">
+                                            <i class="bi bi-calendar3"></i>
+                                        </button>
+                                        <button type="button"
+                                            wire:click="confirmarEliminar({{ $institucion->id }})"
+                                            class="btn btn-outline-danger"
+                                            title="Eliminar escuela">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                             @empty
@@ -268,6 +285,76 @@
                     <div class="modal-footer">
                         <button type="button" wire:click="cerrarConfiguracionBloques" class="btn btn-secondary">
                             Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if ($eliminandoId)
+        <div class="modal d-block" style="background-color: rgba(0, 0, 0, 0.5);" role="dialog" tabindex="-1">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div>
+                            <h5 class="modal-title">Eliminar escuela</h5>
+                            <p class="text-muted small mb-0">{{ $eliminandoNombre }}</p>
+                        </div>
+                        <button type="button" class="btn-close" wire:click="cancelarEliminacion"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        @if ($eliminacionBloqueada)
+                            <div class="alert alert-warning mb-3">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                {{ $eliminacionBloqueada }}
+                            </div>
+                        @else
+                            <div class="alert alert-danger mb-3">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                Esta acción es irreversible. Se eliminarán los datos operativos asociados a esta escuela.
+                            </div>
+                        @endif
+
+                        <div class="table-responsive border rounded mb-3">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Dato afectado</th>
+                                        <th class="text-end" style="width: 20%;">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($eliminacionResumen as $label => $cantidad)
+                                        <tr>
+                                            <td>{{ $label }}</td>
+                                            <td class="text-end fw-semibold">{{ $cantidad }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <label class="form-label">
+                            Escribí <span class="fw-semibold">{{ $eliminandoSlug }}</span> para confirmar
+                        </label>
+                        <input type="text"
+                            wire:model.live="eliminacionConfirmacion"
+                            class="form-control"
+                            @disabled($eliminacionBloqueada)>
+                        @error('eliminacionConfirmacion') <small class="text-danger">{{ $message }}</small> @enderror
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" wire:click="cancelarEliminacion" class="btn btn-outline-secondary">
+                            Cancelar
+                        </button>
+                        <button type="button"
+                            wire:click="eliminarInstitucion"
+                            class="btn btn-danger"
+                            @disabled($eliminacionBloqueada || $eliminacionConfirmacion !== $eliminandoSlug)>
+                            <i class="bi bi-trash me-1"></i> Eliminar escuela
                         </button>
                     </div>
                 </div>

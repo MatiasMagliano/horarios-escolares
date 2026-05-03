@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Institucion;
 use App\Support\Horarios\BloqueHorarioTemplateManager;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 
@@ -35,6 +36,12 @@ class InstitucionesAdmin extends Component
 
     public ?int $editandoId = null;
     public bool $mostrarConfiguracionBloques = false;
+    public ?int $eliminandoId = null;
+    public string $eliminandoNombre = '';
+    public string $eliminandoSlug = '';
+    public string $eliminacionConfirmacion = '';
+    public array $eliminacionResumen = [];
+    public ?string $eliminacionBloqueada = null;
 
     protected function rules(): array
     {
@@ -136,7 +143,7 @@ class InstitucionesAdmin extends Component
                 );
             }
         } else {
-            $manager->createBloqueHorarioFromConfigs($institucion);
+            $manager->ensureTurnosForInstitucion($institucion);
         }
 
         return $institucion;
@@ -218,9 +225,138 @@ class InstitucionesAdmin extends Component
         $this->mostrarConfiguracionBloques = true;
     }
 
+    public function abrirConfiguracionBloquesPara(int $id): void
+    {
+        $institucion = Institucion::findOrFail($id);
+
+        $this->editandoId = $institucion->id;
+        $this->mostrarConfiguracionBloques = true;
+    }
+
     public function cerrarConfiguracionBloques(): void
     {
         $this->mostrarConfiguracionBloques = false;
+    }
+
+    public function confirmarEliminar(int $id): void
+    {
+        $institucion = Institucion::findOrFail($id);
+
+        $this->eliminandoId = $institucion->id;
+        $this->eliminandoNombre = $institucion->nombre_institucion;
+        $this->eliminandoSlug = $institucion->slug;
+        $this->eliminacionConfirmacion = '';
+        $this->eliminacionResumen = $this->resumenEliminacion($institucion);
+        $this->eliminacionBloqueada = $this->motivoBloqueoEliminacion($institucion);
+    }
+
+    public function cancelarEliminacion(): void
+    {
+        $this->reset([
+            'eliminandoId',
+            'eliminandoNombre',
+            'eliminandoSlug',
+            'eliminacionConfirmacion',
+            'eliminacionResumen',
+            'eliminacionBloqueada',
+        ]);
+    }
+
+    public function eliminarInstitucion(): void
+    {
+        if (!$this->eliminandoId) {
+            return;
+        }
+
+        $this->validate([
+            'eliminacionConfirmacion' => ['required', 'same:eliminandoSlug'],
+        ], [
+            'eliminacionConfirmacion.same' => 'La confirmación debe coincidir con el slug de la escuela.',
+        ]);
+
+        $institucion = Institucion::findOrFail($this->eliminandoId);
+        $bloqueo = $this->motivoBloqueoEliminacion($institucion);
+
+        if ($bloqueo) {
+            $this->eliminacionBloqueada = $bloqueo;
+
+            return;
+        }
+
+        $institucionId = $institucion->id;
+
+        DB::transaction(function () use ($institucion, $institucionId) {
+            $this->eliminarDatosDependientes($institucionId);
+
+            $institucion->delete();
+
+            if ((int) session('institucion_id') === (int) $institucionId) {
+                session()->forget('institucion_id');
+            }
+
+            $user = auth()->user();
+
+            if ($user && (int) $user->institucion_activa_id === (int) $institucionId) {
+                $user->forceFill(['institucion_activa_id' => null])->save();
+            }
+        });
+
+        if ((int) $this->editandoId === (int) $institucionId) {
+            $this->editandoId = null;
+            $this->mostrarConfiguracionBloques = false;
+            $this->dispatch('cerrar-modal-institucion');
+        }
+
+        $this->cancelarEliminacion();
+        $this->dispatch('instituciones-actualizadas');
+        session()->flash('success', 'Escuela eliminada correctamente.');
+    }
+
+    private function eliminarDatosDependientes(int $institucionId): void
+    {
+        DB::table('cambio_horario_detalles')->where('institucion_id', $institucionId)->delete();
+        DB::table('horarios_base')->where('institucion_id', $institucionId)->delete();
+        DB::table('cambios_horario')->where('institucion_id', $institucionId)->delete();
+        DB::table('cm_docente')->where('institucion_id', $institucionId)->delete();
+        DB::table('curso_materia')->where('institucion_id', $institucionId)->delete();
+        DB::table('cursos')->where('institucion_id', $institucionId)->delete();
+        DB::table('docentes')->where('institucion_id', $institucionId)->delete();
+        DB::table('espacios_fisicos')->where('institucion_id', $institucionId)->delete();
+        DB::table('bloque_horario_configs')->where('institucion_id', $institucionId)->delete();
+        DB::table('bloques_horarios')->where('institucion_id', $institucionId)->delete();
+        DB::table('institucion_user')->where('institucion_id', $institucionId)->delete();
+    }
+
+    private function resumenEliminacion(Institucion $institucion): array
+    {
+        $id = $institucion->id;
+
+        return [
+            'Usuarios vinculados' => DB::table('institucion_user')->where('institucion_id', $id)->count(),
+            'Usuarios con esta escuela activa' => DB::table('users')->where('institucion_activa_id', $id)->count(),
+            'Cursos' => DB::table('cursos')->where('institucion_id', $id)->count(),
+            'Docentes' => DB::table('docentes')->where('institucion_id', $id)->count(),
+            'Espacios físicos' => DB::table('espacios_fisicos')->where('institucion_id', $id)->count(),
+            'Bloques horarios' => DB::table('bloques_horarios')->where('institucion_id', $id)->count(),
+            'Configuraciones de bloques' => DB::table('bloque_horario_configs')->where('institucion_id', $id)->count(),
+            'Materias de cursos' => DB::table('curso_materia')->where('institucion_id', $id)->count(),
+            'Horarios base' => DB::table('horarios_base')->where('institucion_id', $id)->count(),
+            'Asignaciones docentes' => DB::table('cm_docente')->where('institucion_id', $id)->count(),
+            'Cambios de horario' => DB::table('cambios_horario')->where('institucion_id', $id)->count(),
+            'Detalles de cambios' => DB::table('cambio_horario_detalles')->where('institucion_id', $id)->count(),
+        ];
+    }
+
+    private function motivoBloqueoEliminacion(Institucion $institucion): ?string
+    {
+        if (
+            $institucion->activo
+            && Institucion::query()->where('activo', true)->count() <= 1
+        ) {
+            return 'No se puede eliminar la única escuela activa del sistema. Primero activá o creá otra escuela.';
+        }
+
+        return null;
     }
 
     private function resetFormulario(): void

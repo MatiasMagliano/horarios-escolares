@@ -107,7 +107,8 @@ class Institucion extends Model
      */
     public function bloqueHorarioConfigs(): HasMany
     {
-        return $this->hasMany(BloqueHorarioConfig::class);
+        return $this->hasMany(BloqueHorarioConfig::class)
+            ->withoutGlobalScope('institucion');
     }
 
     /**
