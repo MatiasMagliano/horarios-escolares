@@ -126,6 +126,73 @@
                             </div>
                         </div>
 
+                        @if (!$editandoId)
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Template de bloques horarios</label>
+                                <select wire:model.live="bloqueHorarioTemplate" class="form-select">
+                                    @foreach ($bloqueHorarioTemplates as $valor => $label)
+                                        <option value="{{ $valor }}">{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                                @error('bloqueHorarioTemplate') <small class="text-danger">{{ $message }}</small> @enderror
+                            </div>
+
+                            @if ($bloqueHorarioTemplate === \App\Support\Horarios\BloqueHorarioTemplateManager::TEMPLATE_PERSONALIZADO)
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Hora de inicio de la jornada</label>
+                                    <input type="time" wire:model.live="personalizadoHoraInicio" class="form-control">
+                                    @error('personalizadoHoraInicio') <small class="text-danger">{{ $message }}</small> @enderror
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Cantidad de bloques</label>
+                                    <input type="number" wire:model.live.debounce.500ms="personalizadoCantidadBloques" class="form-control" min="1" max="12">
+                                    @error('personalizadoCantidadBloques') <small class="text-danger">{{ $message }}</small> @enderror
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Cantidad de recreos</label>
+                                    <input type="number" wire:model.live.debounce.500ms="personalizadoCantidadRecreos" class="form-control" min="0" max="5">
+                                    @error('personalizadoCantidadRecreos') <small class="text-danger">{{ $message }}</small> @enderror
+                                </div>
+
+                                <div class="col-12 mb-3">
+                                    <div class="table-responsive border rounded">
+                                        <table class="table table-sm align-middle mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th style="width: 12%;">Orden</th>
+                                                    <th style="width: 18%;">Nombre</th>
+                                                    <th style="width: 20%;">Inicio</th>
+                                                    <th style="width: 20%;">Fin</th>
+                                                    <th style="width: 15%;">Tipo</th>
+                                                    <th style="width: 15%;">Duración</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($personalizadoPreviewManiana as $bloque)
+                                                    <tr>
+                                                        <td>
+                                                            <span class="badge bg-secondary">{{ $bloque['orden'] }}</span>
+                                                        </td>
+                                                        <td class="fw-semibold">{{ $bloque['nombre'] }}</td>
+                                                        <td>{{ $bloque['hora_inicio'] }}</td>
+                                                        <td>{{ $bloque['hora_fin'] }}</td>
+                                                        <td>
+                                                            <span class="badge {{ $bloque['tipo'] === 'recreo' ? 'bg-info' : 'bg-success' }}">
+                                                                {{ ucfirst($bloque['tipo']) }}
+                                                            </span>
+                                                        </td>
+                                                        <td>{{ $bloque['duracion'] }} min</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            @endif
+                        @endif
+
                         <div class="col-12 mt-2 mb-2">
                             <h6 class="border-bottom pb-2">Director/a</h6>
                         </div>
@@ -169,6 +236,15 @@
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" wire:click="cancelar">
                         Cancelar
                     </button>
+                    @if ($editandoId)
+                        <button type="button" wire:click="abrirConfiguracionBloques" class="btn btn-info">
+                            <i class="bi bi-clock-history me-1"></i> Configurar Bloques
+                        </button>
+                    @else
+                        <button type="button" wire:click="guardarYAbrirConfiguracionBloques" class="btn btn-info">
+                            <i class="bi bi-clock-history me-1"></i> Guardar y configurar bloques
+                        </button>
+                    @endif
                     <button type="button" wire:click="guardar" class="btn btn-primary">
                         Guardar
                     </button>
@@ -176,6 +252,28 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de Configuración de Bloques Horarios -->
+    @if ($mostrarConfiguracionBloques && $editandoId)
+        <div class="modal d-block" style="background-color: rgba(0, 0, 0, 0.5);" role="dialog" tabindex="-1">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Configuración de Bloques Horarios</h5>
+                        <button type="button" class="btn-close" wire:click="cerrarConfiguracionBloques"></button>
+                    </div>
+                    <div class="modal-body">
+                        @livewire('configuracion-bloque-horario', ['institucionId' => $editandoId], key('config-' . $editandoId))
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" wire:click="cerrarConfiguracionBloques" class="btn btn-secondary">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
 
 @script

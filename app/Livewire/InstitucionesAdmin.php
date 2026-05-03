@@ -28,8 +28,13 @@ class InstitucionesAdmin extends Component
     public string $telefono_vicedirector = '';
     public string $email_vicedirector = '';
     public bool $activo = true;
+    public string $bloqueHorarioTemplate = BloqueHorarioTemplateManager::TEMPLATE_ESTANDAR_40;
+    public string $personalizadoHoraInicio = '07:10';
+    public $personalizadoCantidadBloques = 8;
+    public $personalizadoCantidadRecreos = 2;
 
     public ?int $editandoId = null;
+    public bool $mostrarConfiguracionBloques = false;
 
     protected function rules(): array
     {
@@ -53,6 +58,24 @@ class InstitucionesAdmin extends Component
             'telefono_vicedirector' => 'nullable|string|max:50',
             'email_vicedirector' => 'nullable|email|max:255',
             'activo' => 'boolean',
+            'bloqueHorarioTemplate' => ['required', 'string', Rule::in(array_keys(app(BloqueHorarioTemplateManager::class)->options()))],
+            'personalizadoHoraInicio' => [
+                Rule::requiredIf($this->bloqueHorarioTemplate === BloqueHorarioTemplateManager::TEMPLATE_PERSONALIZADO),
+                'date_format:H:i',
+            ],
+            'personalizadoCantidadBloques' => [
+                Rule::requiredIf($this->bloqueHorarioTemplate === BloqueHorarioTemplateManager::TEMPLATE_PERSONALIZADO),
+                'integer',
+                'min:1',
+                'max:12',
+            ],
+            'personalizadoCantidadRecreos' => [
+                Rule::requiredIf($this->bloqueHorarioTemplate === BloqueHorarioTemplateManager::TEMPLATE_PERSONALIZADO),
+                'integer',
+                'min:0',
+                'max:5',
+                'lt:personalizadoCantidadBloques',
+            ],
         ];
     }
 
@@ -65,9 +88,29 @@ class InstitucionesAdmin extends Component
 
     public function guardar(): void
     {
+        $this->persistirInstitucion();
+
+        $this->cancelar();
+        $this->dispatch('instituciones-actualizadas');
+    }
+
+    public function guardarYAbrirConfiguracionBloques(): void
+    {
+        $institucion = $this->persistirInstitucion();
+
+        $this->editandoId = $institucion->id;
+        $this->mostrarConfiguracionBloques = true;
+        $this->dispatch('cerrar-modal-institucion');
+        $this->dispatch('instituciones-actualizadas');
+    }
+
+    private function persistirInstitucion(): Institucion
+    {
         $this->validate();
 
         $data = $this->getFormData();
+        $esEdicion = (bool) $this->editandoId;
+
         if ($this->editandoId) {
             $institucion = Institucion::findOrFail($this->editandoId);
             $institucion->update($data);
@@ -75,10 +118,28 @@ class InstitucionesAdmin extends Component
             $institucion = Institucion::create($data);
         }
 
-        app(BloqueHorarioTemplateManager::class)->ensureForInstitucion($institucion);
+        $manager = app(BloqueHorarioTemplateManager::class);
 
-        $this->cancelar();
-        $this->dispatch('instituciones-actualizadas');
+        if (!$esEdicion) {
+            if ($this->bloqueHorarioTemplate === BloqueHorarioTemplateManager::TEMPLATE_PERSONALIZADO) {
+                $manager->saveBlocksForInstitucion(
+                    $institucion,
+                    $this->personalizadoPreview(),
+                    replaceExisting: true
+                );
+                $manager->createBloqueHorarioFromConfigs($institucion);
+            } else {
+                $manager->ensureForInstitucion(
+                    $institucion,
+                    $this->bloqueHorarioTemplate,
+                    replaceExisting: true
+                );
+            }
+        } else {
+            $manager->createBloqueHorarioFromConfigs($institucion);
+        }
+
+        return $institucion;
     }
 
     private function getFormData(): array
@@ -146,6 +207,22 @@ class InstitucionesAdmin extends Component
         $this->dispatch('cerrar-modal-institucion');
     }
 
+    public function abrirConfiguracionBloques(): void
+    {
+        if (!$this->editandoId) {
+            $this->guardarYAbrirConfiguracionBloques();
+
+            return;
+        }
+
+        $this->mostrarConfiguracionBloques = true;
+    }
+
+    public function cerrarConfiguracionBloques(): void
+    {
+        $this->mostrarConfiguracionBloques = false;
+    }
+
     private function resetFormulario(): void
     {
         $this->reset([
@@ -160,6 +237,39 @@ class InstitucionesAdmin extends Component
         $this->genero_director = 'masculino';
         $this->genero_vicedirector = 'masculino';
         $this->activo = true;
+        $this->bloqueHorarioTemplate = BloqueHorarioTemplateManager::TEMPLATE_ESTANDAR_40;
+        $this->personalizadoHoraInicio = '07:10';
+        $this->personalizadoCantidadBloques = 8;
+        $this->personalizadoCantidadRecreos = 2;
+        $this->mostrarConfiguracionBloques = false;
+    }
+
+    public function personalizadoPreview(): array
+    {
+        $cantidadBloques = filter_var($this->personalizadoCantidadBloques, FILTER_VALIDATE_INT);
+        $cantidadRecreos = filter_var($this->personalizadoCantidadRecreos, FILTER_VALIDATE_INT);
+
+        if ($cantidadBloques === false || $cantidadBloques < 1) {
+            return [];
+        }
+
+        if ($cantidadRecreos === false || $cantidadRecreos < 0) {
+            $cantidadRecreos = 0;
+        }
+
+        return app(BloqueHorarioTemplateManager::class)->personalizado(
+            $this->personalizadoHoraInicio,
+            $cantidadBloques,
+            $cantidadRecreos
+        );
+    }
+
+    public function personalizadoPreviewManiana(): array
+    {
+        return collect($this->personalizadoPreview())
+            ->where('turno', 'maniana')
+            ->values()
+            ->all();
     }
 
     public function render()
@@ -168,6 +278,8 @@ class InstitucionesAdmin extends Component
             'instituciones' => Institucion::query()
                 ->orderBy('nombre_institucion')
                 ->get(),
+            'bloqueHorarioTemplates' => app(BloqueHorarioTemplateManager::class)->options(),
+            'personalizadoPreviewManiana' => $this->personalizadoPreviewManiana(),
         ]);
     }
 }

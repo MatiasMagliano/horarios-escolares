@@ -101,4 +101,34 @@ class Institucion extends Model
             ->values()
             ->all();
     }
+
+    /**
+     * Relación: muchas configuraciones de bloques horarios
+     */
+    public function bloqueHorarioConfigs(): HasMany
+    {
+        return $this->hasMany(BloqueHorarioConfig::class);
+    }
+
+    /**
+     * Obtiene los bloques configurados para un turno específico, ordenados
+     */
+    public function getBloquesPorTurno(string $turno)
+    {
+        return $this->bloqueHorarioConfigs()
+            ->where('turno', $turno)
+            ->orderBy('orden')
+            ->get();
+    }
+
+    /**
+     * Obtiene todos los bloques configurados para todos los turnos
+     */
+    public function getTodosBloques()
+    {
+        return $this->bloqueHorarioConfigs()
+            ->orderBy('turno')
+            ->orderBy('orden')
+            ->get();
+    }
 }

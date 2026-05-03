@@ -10,7 +10,7 @@
                         <option value="">Seleccione un curso...</option>
                         @foreach($this->cursos as $curso)
                         <option value="{{ $curso->id }}">
-                            {{ $curso->anio }}º {{ $curso->division }}
+                            {{ $curso->anio }}º {{ $curso->division }} {{($curso->turno) ? '- ' . $this->designacionTurno($curso->turno) : ''}}
                         </option>
                         @endforeach
                     </select>
