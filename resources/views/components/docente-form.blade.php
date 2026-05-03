@@ -141,7 +141,7 @@ new class extends Component
                 <div class="col-md-4">
                     {{-- DENOMINACIÓN --}}
                     <div class="mb-3">
-                        <label class="form-label">Denominación</label>
+                        <label class="form-label">Nombre de grilla</label>
                         <input wire:model="nombre" type="text" class="form-control" maxlength="100">
                         @error('nombre') <div class="text-danger small">{{ $message }}</div> @enderror
                     </div>
@@ -149,7 +149,7 @@ new class extends Component
                 <div class="col-md-4">
                     {{-- NOMBRE COMPLETO --}}
                     <div class="mb-3">
-                        <label class="form-label">Nombre completo</label>
+                        <label class="form-label">Nombre de acta</label>
                         <input wire:model="nombre_completo" type="text" class="form-control" maxlength="100">
                         @error('nombre_completo') <div class="text-danger small">{{ $message }}</div> @enderror
                     </div>

@@ -131,7 +131,7 @@
                                 @forelse($ocupaciones as $ocupacion)
                                 <div class="border rounded p-1 mb-1 bg-light">
                                     <div class="fw-semibold">
-                                        {{ $ocupacion->curso->anio }}º {{ $ocupacion->curso->division }}
+                                        {{ $ocupacion->curso->anio }}º {{ $ocupacion->curso->division }} ({{ $ocupacion->curso->turno_designacion }})
                                     </div>
                                     <div>
                                         {{ $ocupacion->cursoMateria?->materia?->nombre ?? '—' }}
