@@ -92,9 +92,26 @@
             {{-- Espaciador para empujar a la derecha --}}
             <ul class="navbar-nav ms-auto align-items-lg-center">
                 @if (auth()->check())
+                    @php
+                        $usuarioActual = auth()->user();
+                        $institucionActiva = $usuarioActual?->institucionActiva;
+                        $rolActivo = $usuarioActual?->roleNameInInstitucion($institucionActiva?->id);
+                        $rolesActivos = [
+                            'admin' => 'Administrador',
+                            'preceptor' => 'Preceptor',
+                            'aprobador' => 'Aprobador',
+                            'secretario' => 'Secretario',
+                            'solicitante' => 'Solicitante',
+                            'Super-admin' => 'Super-admin',
+                        ];
+                    @endphp
                     <li class="nav-item me-lg-3">
                         <span class="navbar-text small text-white-50">
-                            {{ auth()->user()?->institucionActiva?->nombre_institucion ?? 'Sin escuela activa' }}
+                            @if ($institucionActiva)
+                                {{ $institucionActiva->nombre_institucion }}@if($rolActivo), {{ $rolesActivos[$rolActivo] ?? ucfirst($rolActivo) }}@endif
+                            @else
+                                Sin escuela activa
+                            @endif
                         </span>
                     </li>
                 @endif

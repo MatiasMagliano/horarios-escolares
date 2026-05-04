@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -68,6 +68,62 @@ class User extends Authenticatable
     public function isSuperAdmin(): bool
     {
         return (bool) $this->is_super_admin;
+    }
+
+    public function hasRoleInInstitucion(string $role, ?int $institucionId): bool
+    {
+        return $this->hasAnyRoleInInstitucion([$role], $institucionId);
+    }
+
+    public function roleNameInInstitucion(?int $institucionId): ?string
+    {
+        if ($this->isSuperAdmin()) {
+            return 'Super-admin';
+        }
+
+        if (! $institucionId) {
+            return null;
+        }
+
+        $modelHasRoles = config('permission.table_names.model_has_roles');
+        $rolePivotKey = config('permission.column_names.role_pivot_key') ?? 'role_id';
+        $modelKey = config('permission.column_names.model_morph_key');
+        $teamKey = config('permission.column_names.team_foreign_key');
+
+        return DB::table($modelHasRoles)
+            ->join('roles', "{$modelHasRoles}.{$rolePivotKey}", '=', 'roles.id')
+            ->where("{$modelHasRoles}.{$modelKey}", $this->getKey())
+            ->where("{$modelHasRoles}.model_type", $this->getMorphClass())
+            ->where("{$modelHasRoles}.{$teamKey}", $institucionId)
+            ->orderBy('roles.name')
+            ->value('roles.name');
+    }
+
+    /**
+     * @param array<int, string> $roles
+     */
+    public function hasAnyRoleInInstitucion(array $roles, ?int $institucionId): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        if (! $institucionId || empty($roles)) {
+            return false;
+        }
+
+        $modelHasRoles = config('permission.table_names.model_has_roles');
+        $rolePivotKey = config('permission.column_names.role_pivot_key') ?? 'role_id';
+        $modelKey = config('permission.column_names.model_morph_key');
+        $teamKey = config('permission.column_names.team_foreign_key');
+
+        return DB::table($modelHasRoles)
+            ->join('roles', "{$modelHasRoles}.{$rolePivotKey}", '=', 'roles.id')
+            ->where("{$modelHasRoles}.{$modelKey}", $this->getKey())
+            ->where("{$modelHasRoles}.model_type", $this->getMorphClass())
+            ->where("{$modelHasRoles}.{$teamKey}", $institucionId)
+            ->whereIn('roles.name', $roles)
+            ->exists();
     }
 
     public function puedeAccederInstitucion(int $institucionId): bool
