@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use App\Models\Docente;
+use Illuminate\Support\Facades\Gate;
 
 new class extends Component
 {
@@ -10,18 +11,24 @@ new class extends Component
 
     public function crear()
     {
+        Gate::authorize('abm-docentes');
+
         $this->docenteSeleccionado = null;
         $this->dispatch('modal-crear-docente');
     }
 
     public function editar($id)
     {
+        Gate::authorize('abm-docentes');
+
         $this->docenteSeleccionado = $id;
         $this->dispatch('modal-crear-docente');
     }
 
     public function cambiarEstado($id)
     {
+        Gate::authorize('activar-docentes');
+
         $docente = Docente::findOrFail($id);
         $docente->activo = !$docente->activo;
         session()->flash('success', 'Estado del docente actualizado correctamente.');
@@ -31,6 +38,8 @@ new class extends Component
     // SOLAMENTE DISPARA EL MODAL DE CONFIRMACIÓN, LA ELIMINACIÓN SE HACE EN EL COMPONENTE docente-form.blade.php
     public function eliminar($id)
     {
+        Gate::authorize('abm-docentes');
+
         $this->docenteSeleccionado = $id;
         $this->dispatch('abrir-modal-eliminar');
     }
@@ -106,9 +115,15 @@ new class extends Component
                     <td class="text-center">
                         <div class="btn-group" role="group" aria-label="">
                             {{-- Indicador de activo/inactivo --}}
-                            <button type="button" wire:click="cambiarEstado({{ $docente->id }})" class="btn btn-sm btn-outline-{{ $docente->activo ? 'secondary' : 'info' }}">
-                                {{ $docente->activo ? 'Activo' : 'Inactivo' }}
-                            </button>
+                            @can('activar-docentes')
+                                <button type="button" wire:click="cambiarEstado({{ $docente->id }})" class="btn btn-sm btn-outline-{{ $docente->activo ? 'secondary' : 'info' }}">
+                                    {{ $docente->activo ? 'Activo' : 'Inactivo' }}
+                                </button>
+                            @else
+                                <span class="btn btn-sm btn-outline-{{ $docente->activo ? 'secondary' : 'info' }} disabled">
+                                    {{ $docente->activo ? 'Activo' : 'Inactivo' }}
+                                </span>
+                            @endcan
 
                             {{-- Botón de editar --}}
                             <button type="button" wire:click="editar({{ $docente->id }})" class="btn btn-sm btn-outline-primary">

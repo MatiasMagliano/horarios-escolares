@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\EspacioFisico;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 
@@ -50,6 +51,8 @@ class EspaciosFisicosAdmin extends Component
 
     public function guardar(): void
     {
+        Gate::authorize('abm-espacios');
+
         $this->validate();
 
         EspacioFisico::create([
@@ -64,6 +67,8 @@ class EspaciosFisicosAdmin extends Component
 
     public function editar(int $id): void
     {
+        Gate::authorize('abm-espacios');
+
         $espacio = EspacioFisico::findOrFail($id);
 
         $this->editandoId = $espacio->id;
@@ -76,6 +81,8 @@ class EspaciosFisicosAdmin extends Component
 
     public function actualizar(): void
     {
+        Gate::authorize('abm-espacios');
+
         if (!$this->editandoId) {
             return;
         }

@@ -42,8 +42,10 @@
 
         <!-- LISTADO DE TRÁMITES PENDIENTES (VER CÓDIGO EN "Desarrollo") -->
 
-        <a href="{{ route('admin.cambios-horario') }}" class="btn btn-outline-primary btn-sm mt-3">
-            Ver todos los cambios
-        </a>
+        @can('ver-cambios-horario')
+            <a href="{{ route('admin.cambios-horario') }}" class="btn btn-outline-primary btn-sm mt-3">
+                Ver todos los cambios
+            </a>
+        @endcan
     </div>
 </div>

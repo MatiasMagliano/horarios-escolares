@@ -14,13 +14,19 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/instituciones/seleccionar', [InstitucionSeleccionController::class, 'store'])
         ->name('instituciones.store');
 
-    Route::get('/admin/instituciones', function () {
-        return view('admin.instituciones');
-    })->name('admin.instituciones');
+    Route::middleware('super-admin')->group(function () {
+        Route::get('/admin/instituciones', function () {
+            return view('admin.instituciones');
+        })->name('admin.instituciones');
 
-    Route::get('/admin/materias', function () {
-        return view('admin.materias');
-    })->name('admin.materias');
+        Route::get('/admin/materias', function () {
+            return view('admin.materias');
+        })->name('admin.materias');
+
+        Route::get('/admin/usuarios', function () {
+            return view('admin.usuarios');
+        })->name('admin.usuarios');
+    });
 });
 
 Route::middleware(['auth', 'institucion.activa'])->group(function () {
@@ -39,49 +45,51 @@ Route::middleware(['auth', 'institucion.activa'])->group(function () {
 
     Route::get('/admin/cursos', function () {
         return redirect()->route('admin.cursos.listado');
-    })->name('admin.cursos');
+    })->middleware('can:abm-cursos')->name('admin.cursos');
 
     Route::get('/admin/cursos/listado', function () {
         return view('admin.cursos-listado');
-    })->name('admin.cursos.listado');
+    })->middleware('can:abm-cursos')->name('admin.cursos.listado');
 
     Route::get('/admin/cursos/materias', function () {
         return view('admin.cursos-materias');
-    })->name('admin.cursos.materias');
+    })->middleware('can:abm-cursos')->name('admin.cursos.materias');
 
     Route::get('/admin/docentes', function () {
         return view('admin.docentes');
-    })->name('admin.docentes');
+    })->middleware('can:abm-docentes')->name('admin.docentes');
 
     Route::get('/admin/espacios', function () {
         return redirect()->route('admin.espacios.utilizacion');
-    })->name('admin.espacios');
+    })->middleware('can:abm-espacios')->name('admin.espacios');
 
     Route::get('/admin/espacios/utilizacion', function () {
         return view('admin.espacios-utilizacion');
-    })->name('admin.espacios.utilizacion');
+    })->middleware('can:abm-espacios')->name('admin.espacios.utilizacion');
 
     Route::get('/admin/espacios/administracion', function () {
         return view('admin.espacios-administracion');
-    })->name('admin.espacios.administracion');
+    })->middleware('can:abm-espacios')->name('admin.espacios.administracion');
 
     Route::get('/admin/cambios-horario', function () {
         return view('admin.cambios-horario');
-    })->name('admin.cambios-horario');
+    })->middleware('can:ver-cambios-horario')->name('admin.cambios-horario');
 
     Route::get('/admin/alertas/superposiciones-docentes', function (DocenteSuperposicionDetector $detector) {
         return view('admin.alertas-superposiciones-docentes', [
             'conflictos' => $detector->detect(),
         ]);
-    })->name('admin.alertas.superposiciones-docentes');
+    })->middleware('can:abm-docentes')->name('admin.alertas.superposiciones-docentes');
 
     Route::get('/pdf/horario-curso/{curso}', [PdfController::class, 'horarioCurso'])
         ->name('pdf.horario-curso');
 
     Route::get('/pdf/utilizacion-espacios/{espacio}', [PdfController::class, 'utilizacionEspacios'])
+        ->middleware('can:abm-espacios')
         ->name('pdf.utilizacion-espacios');
 
     Route::get('/pdf/cambio-horario/{cambio}/acta', [PdfController::class, 'cambioHorarioActa'])
+        ->middleware('can:ver-cambios-horario')
         ->name('pdf.cambio-horario-acta');
 });
 

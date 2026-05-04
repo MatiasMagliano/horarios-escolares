@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use App\Models\Curso;
+use Illuminate\Support\Facades\Gate;
 
 new class extends Component {
 
@@ -16,6 +17,8 @@ new class extends Component {
     // modal de creación de curso
     public function crear()
     {
+        Gate::authorize('abm-cursos');
+
         $this->cursoIdSeleccionado = null;
         $this->dispatch('curso-abrir-modal');
     }
@@ -23,6 +26,8 @@ new class extends Component {
     // modal de edición de curso
     public function editar($id)
     {
+        Gate::authorize('abm-cursos');
+
         $this->cursoIdSeleccionado = $id;
         $this->dispatch('curso-abrir-modal');
     }
@@ -30,12 +35,16 @@ new class extends Component {
     // eliminar curso
     public function confirmarEliminacion($id)
     {
+        Gate::authorize('abm-cursos');
+
         $this->cursoAEliminar = $id;
         $this->dispatch('curso-abrir-modal-eliminar');
     }
 
     public function eliminar()
     {
+        Gate::authorize('abm-cursos');
+
         if ($this->cursoAEliminar) {
             Curso::find($this->cursoAEliminar)?->delete();
         }

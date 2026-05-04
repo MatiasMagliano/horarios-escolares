@@ -2,7 +2,7 @@
     <div class="container-fluid">
 
         {{-- Marca --}}
-        <a class="navbar-brand" href="{{ route('admin.horarios') }}">
+        <a class="navbar-brand" href="{{ route('dashboard') }}">
             <i class="bi bi-backpack2 me-2"></i>Horarios Escolares
         </a>
 
@@ -25,42 +25,46 @@
                         <i class="bi bi-calendar-check me-2"></i>Horarios
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.cursos') || request()->routeIs('admin.cursos.*') ? 'active' : '' }}"
-                        href="{{ route('admin.cursos.listado') }}">
-                        <i class="bi bi-mortarboard me-2"></i></i>Cursos
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.docentes') ? 'active' : '' }}"
-                        href="{{ route('admin.docentes') }}">
-                        <i class="bi bi-person-badge me-2"></i>Docentes
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.espacios') || request()->routeIs('admin.espacios.*') ? 'active' : '' }}"
-                        href="{{ route('admin.espacios.utilizacion') }}">
-                        <i class="bi bi-building me-2"></i>Espacios
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.cambios-horario') ? 'active' : '' }}"
-                        href="{{ route('admin.cambios-horario') }}">
-                        <i class="bi bi-repeat me-2"></i>Cambios
-                    </a>
-                </li>
+                @can('abm-cursos')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.cursos') || request()->routeIs('admin.cursos.*') ? 'active' : '' }}"
+                            href="{{ route('admin.cursos.listado') }}">
+                            <i class="bi bi-mortarboard me-2"></i>Cursos
+                        </a>
+                    </li>
+                @endcan
+                @can('abm-docentes')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.docentes') ? 'active' : '' }}"
+                            href="{{ route('admin.docentes') }}">
+                            <i class="bi bi-person-badge me-2"></i>Docentes
+                        </a>
+                    </li>
+                @endcan
+                @can('abm-espacios')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.espacios') || request()->routeIs('admin.espacios.*') ? 'active' : '' }}"
+                            href="{{ route('admin.espacios.utilizacion') }}">
+                            <i class="bi bi-building me-2"></i>Espacios
+                        </a>
+                    </li>
+                @endcan
+                @can('ver-cambios-horario')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.cambios-horario') ? 'active' : '' }}"
+                            href="{{ route('admin.cambios-horario') }}">
+                            <i class="bi bi-repeat me-2"></i>Cambios
+                        </a>
+                    </li>
+                @endcan
                 @if (auth()->user()?->isSuperAdmin())
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                        <a class="nav-link dropdown-toggle {{ request()->routeIs('admin.instituciones') || request()->routeIs('admin.materias') || request()->routeIs('admin.usuarios') ? 'active' : '' }}"
+                            href="#" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
                             <i class="bi bi-gear me-2"></i>Admin escuelas
                         </a>
                         <ul class="dropdown-menu">
-                            <li>
-                                <a class="dropdown-item" href="{{ route('instituciones.select') }}">
-                                    <i class="bi bi-building me-2"></i>Seleccionar escuela
-                                </a>
-                            </li>
                             <li>
                                 <a class="dropdown-item" href="{{ route('admin.instituciones') }}">
                                     <i class="bi bi-plus me-2"></i>Administración escuelas
@@ -69,6 +73,11 @@
                             <li>
                                 <a class="dropdown-item" href="{{ route('admin.materias') }}">
                                     <i class="bi bi-plus me-2"></i>Administración materias
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ route('admin.usuarios') }}">
+                                    <i class="bi bi-people me-2"></i>Administración usuarios
                                 </a>
                             </li>
                         </ul>
@@ -125,7 +134,7 @@
                             <hr class="dropdown-divider">
                         </li>
 
-                        @if (auth()->user()?->isSuperAdmin())
+                        @if ((auth()->user()?->institucionesDisponibles->count() ?? 0) > 1)
                             <li>
                                 <a class="dropdown-item" href="{{ route('instituciones.select') }}">
                                     Cambiar escuela

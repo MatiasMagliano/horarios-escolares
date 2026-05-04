@@ -11,6 +11,7 @@ use App\Models\Curso;
 use App\Models\Materia;
 use App\Models\CursoMateria;
 use App\Support\Instituciones\InstitucionContext;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class CambioHorario extends Component
@@ -100,6 +101,8 @@ class CambioHorario extends Component
 
     public function nuevo()
     {
+        Gate::authorize('crear-cambios-horario');
+
         $this->resetExcept('modo');
         $this->institucion = auth()->user()?->institucionActiva;
         $this->modo = 'formulario';
@@ -115,6 +118,8 @@ class CambioHorario extends Component
 
     public function guardar()
     {
+        Gate::authorize('crear-cambios-horario');
+
         $this->validate();
 
         if (!$this->acta_finalizada) {
@@ -344,6 +349,8 @@ class CambioHorario extends Component
     // ESTADOS DE LA MÁQUINA DE ESTADOS (WORK IN PROGRESS)
     public function autorizar($id)
     {
+        Gate::authorize('gestionar-cambios-horario');
+
         try {
             $cambio = CambioHorarioModel::findOrFail($id);
             $cambio->autorizar(auth()->user());
@@ -356,6 +363,8 @@ class CambioHorario extends Component
 
     public function firmar($id)
     {
+        Gate::authorize('firmar-cambios-horario');
+
         try {
             $cambio = CambioHorarioModel::findOrFail($id);
             $cambio->firmar(auth()->user());
@@ -368,6 +377,8 @@ class CambioHorario extends Component
 
     public function activar($id)
     {
+        Gate::authorize('gestionar-cambios-horario');
+
         try {
             $cambio = CambioHorarioModel::findOrFail($id);
             $cambio->activar(auth()->user());
@@ -380,6 +391,8 @@ class CambioHorario extends Component
 
     public function finalizar($id)
     {
+        Gate::authorize('gestionar-cambios-horario');
+
         try {
             $cambio = CambioHorarioModel::findOrFail($id);
             $cambio->finalizar(auth()->user());
@@ -397,7 +410,10 @@ class CambioHorario extends Component
             'docentes' => Docente::query()
                 ->where('activo', true)
                 ->orderBy('nombre_completo')
-                ->get()
+                ->get(),
+            'puedeCrearCambios' => Gate::allows('crear-cambios-horario'),
+            'puedeGestionarCambios' => Gate::allows('gestionar-cambios-horario'),
+            'puedeFirmarCambios' => Gate::allows('firmar-cambios-horario'),
         ]);
     }
 }

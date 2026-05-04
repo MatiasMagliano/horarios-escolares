@@ -4,6 +4,7 @@ use Livewire\Component;
 use App\Models\Docente;
 use App\Support\Instituciones\InstitucionContext;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 new class extends Component
@@ -71,6 +72,8 @@ new class extends Component
 
     public function save()
     {
+        Gate::authorize('abm-docentes');
+
         $this->validate();
 
         $data = [
@@ -80,8 +83,11 @@ new class extends Component
             'nacimiento' => $this->nacimiento,
             'telefono' => filled($this->telefono) ? trim($this->telefono) : null,
             'email' => filled($this->email) ? mb_strtolower(trim($this->email)) : null,
-            'activo' => $this->activo,
         ];
+
+        if (! $this->editing || Gate::allows('activar-docentes')) {
+            $data['activo'] = $this->activo;
+        }
 
         if ($this->editing) {
             $this->docente->update($data);
@@ -99,6 +105,8 @@ new class extends Component
     // se pone acá, porque se dispara confirmación antes de proceder
     public function eliminar()
     {
+        Gate::authorize('abm-docentes');
+
         if (!$this->docente) return;
 
         if ($this->docente->tieneAsignacionesVigentes()) {

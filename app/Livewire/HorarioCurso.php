@@ -8,6 +8,7 @@ use App\Models\HorarioBase;
 use App\Support\Horarios\HorarioCursoGridBuilder;
 use App\Support\Horarios\TurnoHelper;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 
 class HorarioCurso extends Component
@@ -40,6 +41,8 @@ class HorarioCurso extends Component
     // EDICIÓN DE CELDAS (2 funciones)
     public function editarCelda($bloqueId, $dia)
     {
+        Gate::authorize('editar-horarios');
+
         $this->celdaSeleccionada = [
             'bloque_id' => $bloqueId,
             'dia' => $dia,
@@ -60,6 +63,8 @@ class HorarioCurso extends Component
 
     public function guardarCelda()
     {
+        Gate::authorize('editar-horarios');
+
         if (!$this->celdaSeleccionada || !$this->cursoId) {
             return;
         }
@@ -199,7 +204,9 @@ class HorarioCurso extends Component
 
     public function render()
     {
-        return view('livewire.horario-curso');
+        return view('livewire.horario-curso', [
+            'puedeEditarHorarios' => Gate::allows('editar-horarios'),
+        ]);
     }
 
     private function gridBuilder(): HorarioCursoGridBuilder

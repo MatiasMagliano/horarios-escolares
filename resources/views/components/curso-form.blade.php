@@ -3,6 +3,7 @@
 use Livewire\Component;
 use App\Models\Curso;
 use App\Support\Instituciones\InstitucionContext;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 new class extends Component
@@ -98,6 +99,8 @@ new class extends Component
 
     public function save()
     {
+        Gate::authorize('abm-cursos');
+
         $this->validate();
 
         $data = [

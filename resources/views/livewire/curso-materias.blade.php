@@ -9,6 +9,7 @@ use App\Models\CursoMateria;
 use App\Models\EspacioFisico;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 new class extends Component {
@@ -80,6 +81,8 @@ new class extends Component {
 
     public function guardar()
     {
+        Gate::authorize('abm-cursos');
+
         $this->mensajeError = null;
         $this->validate();
 
@@ -102,6 +105,8 @@ new class extends Component {
 
     public function editar($id)
     {
+        Gate::authorize('abm-cursos');
+
         $this->mensajeError = null;
         $cm = CursoMateria::where('curso_id', $this->curso->id)
             ->with('cmDocenteVigente')
@@ -129,6 +134,8 @@ new class extends Component {
 
     public function actualizar()
     {
+        Gate::authorize('abm-cursos');
+
         $this->mensajeError = null;
         $this->validate([
             'docente_id_edicion' => 'required|exists:docentes,id',
@@ -166,6 +173,8 @@ new class extends Component {
 
     public function eliminar($id)
     {
+        Gate::authorize('abm-cursos');
+
         $this->mensajeError = null;
 
         $cm = CursoMateria::where('curso_id', $this->curso->id)

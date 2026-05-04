@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\BelongsToInstitucion;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 
 class CambioHorario extends Model
 {
@@ -128,7 +129,7 @@ class CambioHorario extends Model
             throw new \Exception('Solo puede autorizarse un borrador.');
         }
 
-        if (!$user->hasRole('aprobador')) {
+        if (! Gate::forUser($user)->allows('gestionar-cambios-horario')) {
             throw new \Exception('No tiene permisos para autorizar.');
         }
 
@@ -144,7 +145,7 @@ class CambioHorario extends Model
             throw new \Exception('Debe estar autorizado.');
         }
 
-        if (!$user->hasRole('secretario')) {
+        if (! Gate::forUser($user)->allows('firmar-cambios-horario')) {
             throw new \Exception('No tiene permisos para firmar.');
         }
 
@@ -158,6 +159,10 @@ class CambioHorario extends Model
     {
         if ($this->estado !== 'firmado') {
             throw new \Exception('Debe estar firmado.');
+        }
+
+        if (! Gate::forUser($user)->allows('gestionar-cambios-horario')) {
+            throw new \Exception('No tiene permisos para activar.');
         }
 
         if (!$this->puedeActivarse()) {
@@ -176,8 +181,13 @@ class CambioHorario extends Model
             throw new \Exception('Solo puede finalizarse un cambio activo.');
         }
 
+        if (! Gate::forUser($user)->allows('gestionar-cambios-horario')) {
+            throw new \Exception('No tiene permisos para finalizar.');
+        }
+
         $this->update([
             'estado' => 'finalizado',
+            'finalizado_por' => $user->id,
             'finalizado_en' => now(),
         ]);
     }

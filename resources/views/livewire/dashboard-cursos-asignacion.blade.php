@@ -56,7 +56,7 @@
                                 'sin_horarios' => 'clock-history',
                                 default => 'question-circle'
                             };
-                            $ruta = $curso['estado'] === 'sin_materias' 
+                            $ruta = $curso['estado'] === 'sin_materias' || ! \Illuminate\Support\Facades\Gate::allows('ver-horarios')
                                 ? route('admin.cursos.materias', ['curso' => $curso['id']])
                                 : route('admin.horarios');
                         @endphp
@@ -84,12 +84,16 @@
         @endif
 
         <div class="mt-3 d-flex gap-2">
-            <a href="{{ route('admin.cursos') }}" class="btn btn-outline-primary btn-sm flex-grow-1">
-                <i class="bi bi-book"></i> Cursos
-            </a>
-            <a href="{{ route('admin.horarios') }}" class="btn btn-outline-secondary btn-sm flex-grow-1">
-                <i class="bi bi-grid-3x2"></i> Horarios
-            </a>
+            @can('abm-cursos')
+                <a href="{{ route('admin.cursos') }}" class="btn btn-outline-primary btn-sm flex-grow-1">
+                    <i class="bi bi-book"></i> Cursos
+                </a>
+            @endcan
+            @can('ver-horarios')
+                <a href="{{ route('admin.horarios') }}" class="btn btn-outline-secondary btn-sm flex-grow-1">
+                    <i class="bi bi-grid-3x2"></i> Horarios
+                </a>
+            @endcan
         </div>
     </div>
 </div>

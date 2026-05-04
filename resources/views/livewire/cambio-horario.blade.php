@@ -3,9 +3,11 @@
 
     <div class="d-flex justify-content-between mb-3">
         <h4>Cambios de Horario</h4>
-        <button wire:click="nuevo" class="btn btn-primary">
-            + Nuevo cambio
-        </button>
+        @if($puedeCrearCambios)
+            <button wire:click="nuevo" class="btn btn-primary">
+                + Nuevo cambio
+            </button>
+        @endif
     </div>
 
     @if (session()->has('success'))
@@ -73,7 +75,7 @@
                         </a>
                         @endif
 
-                        @if($c->puedeAutorizar())
+                        @if($puedeGestionarCambios && $c->puedeAutorizar())
                         <button wire:click="autorizar({{ $c->id }})"
                             type="button"
                             class="btn btn-sm btn-outline-info">
@@ -81,7 +83,7 @@
                         </button>
                         @endif
 
-                        @if($c->estado === 'autorizado')
+                        @if($puedeFirmarCambios && $c->estado === 'autorizado')
                         <button wire:click="firmar({{ $c->id }})"
                             type="button"
                             class="btn btn-sm btn-outline-warning">
@@ -89,7 +91,7 @@
                         </button>
                         @endif
 
-                        @if($c->estado === 'firmado')
+                        @if($puedeGestionarCambios && $c->estado === 'firmado')
                         <button wire:click="activar({{ $c->id }})"
                             type="button"
                             class="btn btn-sm btn-outline-success">
@@ -97,7 +99,7 @@
                         </button>
                         @endif
 
-                        @if($c->estado === 'activo')
+                        @if($puedeGestionarCambios && $c->estado === 'activo')
                         <button wire:click="finalizar({{ $c->id }})"
                             type="button"
                             class="btn btn-sm btn-outline-dark">

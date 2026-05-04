@@ -14,24 +14,32 @@
                     </div>
 
                     <div class="text-lg-end">
-                        <a href="{{ route('admin.horarios') }}" class="btn btn-primary">
-                            Ir a horarios
-                        </a>
+                        @can('ver-horarios')
+                            <a href="{{ route('admin.horarios') }}" class="btn btn-primary">
+                                Ir a horarios
+                            </a>
+                        @endcan
                     </div>
                 </div>
 
                 <hr class="my-4">
 
                 <div class="row g-3">
-                    <div class="col-6 mb-4">
-                        <livewire:dashboard-superposiciones-docentes />
-                    </div>
-                    <div class="col-6 mb-4">
-                        <livewire:dashboard-cambios-horarios />
-                    </div>
-                    <div class="col-12">
-                        <livewire:dashboard-cursos-asignacion />
-                    </div>
+                    @can('abm-docentes')
+                        <div class="col-6 mb-4">
+                            <livewire:dashboard-superposiciones-docentes />
+                        </div>
+                    @endcan
+                    @can('ver-cambios-horario')
+                        <div class="col-6 mb-4">
+                            <livewire:dashboard-cambios-horarios />
+                        </div>
+                    @endcan
+                    @can('abm-cursos')
+                        <div class="col-12">
+                            <livewire:dashboard-cursos-asignacion />
+                        </div>
+                    @endcan
                 </div>
             </div>
         </div>

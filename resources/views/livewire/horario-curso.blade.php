@@ -99,7 +99,12 @@
                                 $materia = $cursoMateria?->materia;
                                 $docente = $horario?->docenteVigente;
                                 @endphp
-                                <td wire:click="editarCelda({{ $bloque->id }}, {{ $dia }})" class="text-center align-middle" style="cursor: pointer;">
+                                <td
+                                    @if($puedeEditarHorarios)
+                                        wire:click="editarCelda({{ $bloque->id }}, {{ $dia }})"
+                                    @endif
+                                    class="text-center align-middle"
+                                    style="{{ $puedeEditarHorarios ? 'cursor: pointer;' : '' }}">
                                 @if($materia)
                                 <div class="fw-semibold text-center">
                                     {{ $materia->nombre }}
@@ -135,6 +140,7 @@
     </div>
 
     {{-- MODAL EDITAR CELDA --}}
+    @if($puedeEditarHorarios)
     <div wire:ignore.self class="modal fade" id="editarCelda" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
             <div class="modal-content">
@@ -170,6 +176,7 @@
             </div>
         </div>
     </div>
+    @endif
 </div>
 
 <script>
