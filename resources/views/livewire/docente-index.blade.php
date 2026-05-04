@@ -72,8 +72,8 @@ new class extends Component
             <thead class="table-light">
                 <tr class="text-center">
                     <th style="width: 5%;">DNI</th>
-                    <th style="width: 17%;">Denominación</th>
-                    <th style="width: 27%">Nombre completo</th>
+                    <th style="width: 17%;">Nombre de grilla</th>
+                    <th style="width: 27%">Nombre de acta</th>
                     <th style="width: 5%;">Teléfono</th>
                     <th style="width: 15%;">E-mail</th>
                     <th style="width: 20%;">Herramientas</th>

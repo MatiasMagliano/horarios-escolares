@@ -59,7 +59,7 @@
             </div>
             @if($materias->hasPages())
             <div class="card-footer bg-white border-top-0 pt-3">
-                {{ $materias->links('pagination::bootstrap-5') }}
+                {{ $materias->setPath('/admin/materias')->links('pagination::bootstrap-5') }}
             </div>
             @endif
         </div>
