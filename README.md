@@ -1,59 +1,112 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Horarios Escolares
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema de gestión de horarios para instituciones educativas, desarrollado con Laravel y Livewire.
 
-## About Laravel
+## Descripción
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Esta aplicación permite administrar cursos, materias, docentes, espacios físicos, horarios y cambios de horario para una institución educativa. Incluye dashboards de administración, selección de institución activa, permisos basados en roles y generación de PDF para horarios y actas.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Características principales
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Autenticación de usuarios con Laravel Breeze.
+- Selección de institución activa por usuario.
+- Administración de:
+  - Instituciones
+  - Materias
+  - Usuarios
+  - Cursos y materias de curso
+  - Docentes
+  - Espacios físicos y su utilización
+  - Horarios base y cambios de horario
+- Alertas de superposición de docentes.
+- Paneles Livewire para administración y visualización de datos.
+- Generación de PDF para:
+  - Horario de curso
+  - Utilización de espacios
+  - Acta de cambio de horario
+- Control de acceso mediante permisos (`spatie/laravel-permission`).
 
-## Learning Laravel
+## Tecnologías
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- PHP 8.2
+- Laravel 12
+- Livewire 4
+- Tailwind CSS
+- Vite
+- Alpine.js
+- DOMPDF
+- Spatie Permission
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Estructura del proyecto
 
-## Laravel Sponsors
+- `app/Livewire/`: componentes Livewire para gestión de horarios, cursos, espacios y paneles.
+- `app/Http/Controllers/`: controladores para selección de institución, PDF, perfil y autenticación.
+- `app/Models/`: modelos de dominio como `Curso`, `Docente`, `EspacioFisico`, `HorarioBase`, `CambioHorario`, `Institucion` y más.
+- `resources/views/`: vistas de administración, dashboard, auth, perfil y PDF.
+- `routes/web.php`: rutas principales con middleware de autenticación y permisos.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Requisitos
 
-### Premium Partners
+- PHP >= 8.2
+- Composer
+- Node.js (recomendado 18+)
+- npm
+- Base de datos compatible con Laravel (MySQL / SQLite / PostgreSQL)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Instalación
 
-## Contributing
+```bash
+cd /sitios/horarios-escolares
+composer install
+cp .env.example .env
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Configura tu conexión a base de datos en `.env` y luego ejecuta:
 
-## Code of Conduct
+```bash
+php artisan migrate
+npm install
+npm run build
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Desarrollo
 
-## Security Vulnerabilities
+Ejecuta el servidor y el compilador de assets en modo desarrollo:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+npm run dev
+```
 
-## License
+También puedes usar el script definido en Composer:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+composer run-script dev
+```
+
+## Pruebas
+
+```bash
+composer run-script test
+```
+
+## Rutas importantes
+
+- `/instituciones/seleccionar` - Selección de institución activa.
+- `/dashboard` - Panel principal.
+- `/admin/instituciones`, `/admin/materias`, `/admin/usuarios` - Administración global.
+- `/admin/cursos/listado`, `/admin/cursos/materias` - Gestión de cursos.
+- `/admin/docentes` - Gestión de docentes.
+- `/admin/espacios/utilizacion`, `/admin/espacios/administracion` - Gestión de espacios físicos.
+- `/admin/cambios-horario` - Gestión de cambios de horario.
+- `/admin/alertas/superposiciones-docentes` - Detección de conflictos de horario entre docentes.
+- `/profile` - Edición de perfil.
+
+## Notas
+
+- El acceso a secciones administrativas se controla mediante permisos como `abm-cursos`, `abm-docentes`, `abm-espacios` y `ver-cambios-horario`.
+- La generación de PDF utiliza `barryvdh/laravel-dompdf`.
+
+## Licencia
+
+Proyecto con licencia MIT.
