@@ -64,6 +64,14 @@
                             Ver detalles
                         </button>
 
+                        @if($puedeCrearCambios && $c->estado === 'borrador')
+                        <button wire:click="editar({{ $c->id }})"
+                            type="button"
+                            class="btn btn-sm btn-outline-primary">
+                            Editar borrador
+                        </button>
+                        @endif
+
                         @if($c->acta)
                         <a
                             href="{{ route('pdf.cambio-horario-acta', ['cambio' => $c->id]) }}"
@@ -75,19 +83,29 @@
                         </a>
                         @endif
 
+                        @if($c->path_acta)
+                        <a
+                            href="{{ asset('storage/' . $c->path_acta) }}"
+                            class="btn btn-sm btn-outline-secondary"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Acta firmada
+                        </a>
+                        @endif
+
                         @if($puedeGestionarCambios && $c->puedeAutorizar())
                         <button wire:click="autorizar({{ $c->id }})"
                             type="button"
                             class="btn btn-sm btn-outline-info">
                             Autorizar
                         </button>
-                        @endif
-
-                        @if($puedeFirmarCambios && $c->estado === 'autorizado')
-                        <button wire:click="firmar({{ $c->id }})"
-                            type="button"
-                            class="btn btn-sm btn-outline-warning">
-                            Firmar
+                        @elseif($puedeGestionarCambios && $c->estado === 'borrador')
+                        <button type="button"
+                            class="btn btn-sm btn-outline-info"
+                            disabled
+                            title="Cargá detalles y finalizá el acta para autorizar">
+                            Autorizar
                         </button>
                         @endif
 
@@ -108,6 +126,21 @@
                         @endif
                     </div>
 
+                    @if($puedeFirmarCambios && $c->estado === 'autorizado')
+                    <div class="mt-2">
+                        <input type="file"
+                            wire:model="actasFirmadas.{{ $c->id }}"
+                            class="form-control form-control-sm"
+                            accept=".pdf,.jpg,.jpeg,.png">
+                        @error("actasFirmadas.$c->id") <div class="text-danger small">{{ $message }}</div> @enderror
+                        <button wire:click="firmar({{ $c->id }})"
+                            type="button"
+                            class="btn btn-sm btn-outline-warning mt-1">
+                            Subir y firmar
+                        </button>
+                    </div>
+                    @endif
+
                 </td>
             </tr>
             @endforeach
@@ -123,6 +156,21 @@
         <div class="card-body">
             <h3 class="card-title">Solicitud de cambio de horario</h3>
             <hr>
+
+            @if (session()->has('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            @endif
+
+            @if (session()->has('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            @endif
+
             <form wire:submit.prevent="guardar">
                 <div class="container-fluid">
                     <div class="d-flex justify-content-between align-items-center">
@@ -222,8 +270,22 @@
                         @endif
                     </div>
 
+                    @if($cambio)
+                    <hr class="my-4">
+                    <div class="mb-4">
+                        <span class="h5">4. Detalles del cambio</span>
+                    </div>
+                    <livewire:cambio-horario-detalle
+                        :cambio="$cambio"
+                        :key="'detalles-'.$cambio->id" />
+                    @else
+                    <div class="alert alert-info">
+                        Guardá el borrador para cargar los detalles del cambio antes de generar el acta.
+                    </div>
+                    @endif
+
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="h5">4. Detalle del acta</span>
+                        <span class="h5">5. Detalle del acta</span>
 
                         <button type="button" class="btn btn-outline-primary btn-sm" wire:click="generarActa">
                             Generar acta
@@ -245,7 +307,7 @@
 
                     {{-- ACTA FINAL --}}
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="h5">5. Acta final</span>
+                        <span class="h5">6. Acta final</span>
 
                         <button type="button" class="btn btn-outline-success btn-sm" wire:click="finalizarActa">
                             Finalizar acta
@@ -275,16 +337,9 @@
                         Cancelar
                     </button>
                     <button type="submit" class="btn btn-success">
-                        Guardar borrador
+                        {{ $cambio ? 'Actualizar borrador' : 'Guardar borrador' }}
                     </button>
                 </div>
-
-                @if($cambio)
-                <hr class="my-4">
-                <livewire:cambio-horario-detalle
-                    :cambio="$cambio"
-                    :key="'detalles-'.$cambio->id" />
-                @endif
             </form>
         </div>
     </div>
@@ -392,9 +447,9 @@
                                         <div class="small text-muted">{{ $hbDocente }} · {{ $hbBloque }}</div>
                                     </td>
                                     <td>{{ $this->diaSemanaTexto($detalle->dia_nuevo) }}</td>
-                                    <td>{{ $detalle->curso_nuevo_id ?? '—' }}</td>
-                                    <td>{{ $detalle->bloque_nuevo_id ?? '—' }}</td>
-                                    <td>{{ $detalle->docente_nuevo_id ?? '—' }}</td>
+                                    <td>{{ $detalle->cursoNuevo?->nombre_completo ?? '—' }}</td>
+                                    <td>{{ $detalle->bloqueNuevo?->nombre ?? '—' }}</td>
+                                    <td>{{ $detalle->docenteNuevo?->nombre_completo ?? $detalle->docenteNuevo?->nombre ?? '—' }}</td>
                                     <td>{{ $detalle->observaciones ?: '—' }}</td>
                                 </tr>
                                 @endforeach

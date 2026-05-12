@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\BelongsToInstitucion;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Cache;
 
 class CambioHorario extends Model
 {
@@ -94,7 +95,7 @@ class CambioHorario extends Model
 
     public function puedeAutorizar(): bool
     {
-        return $this->estado === 'borrador';
+        return $this->estado === 'borrador' && $this->detalles()->exists() && (bool) $this->acta;
     }
 
     public function estaActivoEnFecha($fecha): bool
@@ -129,6 +130,14 @@ class CambioHorario extends Model
             throw new \Exception('Solo puede autorizarse un borrador.');
         }
 
+        if (! $this->detalles()->exists()) {
+            throw new \Exception('Debe cargar al menos un detalle antes de autorizar.');
+        }
+
+        if (! $this->acta) {
+            throw new \Exception('Debe generar y finalizar el acta antes de autorizar.');
+        }
+
         if (! Gate::forUser($user)->allows('gestionar-cambios-horario')) {
             throw new \Exception('No tiene permisos para autorizar.');
         }
@@ -138,8 +147,10 @@ class CambioHorario extends Model
             'autorizado_por' => $user->id,
             'autorizado_en' => now(),
         ]);
+
+        $this->olvidarCacheDashboard();
     }
-    public function firmar(User $user)
+    public function firmar(User $user, ?string $pathActa = null)
     {
         if ($this->estado !== 'autorizado') {
             throw new \Exception('Debe estar autorizado.');
@@ -149,11 +160,19 @@ class CambioHorario extends Model
             throw new \Exception('No tiene permisos para firmar.');
         }
 
-        $this->update([
+        $data = [
             'estado' => 'firmado',
             'firmado_por' => $user->id,
             'firmado_en' => now(),
-        ]);
+        ];
+
+        if ($pathActa) {
+            $data['path_acta'] = $pathActa;
+        }
+
+        $this->update($data);
+
+        $this->olvidarCacheDashboard();
     }
     public function activar(User $user)
     {
@@ -174,6 +193,8 @@ class CambioHorario extends Model
             'activado_por' => $user->id,
             'activado_en' => now(),
         ]);
+
+        $this->olvidarCacheDashboard();
     }
     public function finalizar(User $user)
     {
@@ -190,10 +211,16 @@ class CambioHorario extends Model
             'finalizado_por' => $user->id,
             'finalizado_en' => now(),
         ]);
+
+        $this->olvidarCacheDashboard();
     }
 
     public function puedeActivarse(): bool
     {
+        if (! $this->detalles()->exists()) {
+            return false;
+        }
+
         foreach ($this->detalles as $detalle) {
 
             $conflicto = CambioHorarioDetalle::where('horario_base_id', $detalle->horario_base_id)
@@ -254,5 +281,11 @@ class CambioHorario extends Model
             'permuta' => 'Permuta de horario',
             default => '—',
         };
+    }
+
+    private function olvidarCacheDashboard(): void
+    {
+        Cache::forget('dashboard.cambios_horarios');
+        Cache::forget('dashboard.cambios_horarios.' . $this->institucion_id);
     }
 }

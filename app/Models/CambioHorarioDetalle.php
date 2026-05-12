@@ -30,4 +30,19 @@ class CambioHorarioDetalle extends Model
     {
         return $this->belongsTo(HorarioBase::class);
     }
+
+    public function docenteNuevo()
+    {
+        return $this->belongsTo(Docente::class, 'docente_nuevo_id');
+    }
+
+    public function bloqueNuevo()
+    {
+        return $this->belongsTo(BloqueHorario::class, 'bloque_nuevo_id');
+    }
+
+    public function cursoNuevo()
+    {
+        return $this->belongsTo(Curso::class, 'curso_nuevo_id');
+    }
 }

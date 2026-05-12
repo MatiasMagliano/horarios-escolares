@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Support\Dashboard\CambioHorarioPendientesDetector;
 use App\Models\CambioHorario;
+use App\Support\Instituciones\InstitucionContext;
 use Illuminate\Support\Facades\Cache;
 
 class DashboardCambiosHorarios extends Component
@@ -19,7 +20,9 @@ class DashboardCambiosHorarios extends Component
 
     public function cargarEstadisticas()
     {
-        $datos = Cache::remember('dashboard.cambios_horarios', now()->addMinutes(15), function () {
+        $cacheKey = 'dashboard.cambios_horarios.' . app(InstitucionContext::class)->id();
+
+        $datos = Cache::remember($cacheKey, now()->addMinutes(15), function () {
             $detector = new CambioHorarioPendientesDetector();
             $estadisticas = $detector->detectarPorEstado();
             

@@ -11,11 +11,19 @@ use App\Models\Curso;
 use App\Models\Materia;
 use App\Models\CursoMateria;
 use App\Support\Instituciones\InstitucionContext;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Livewire\WithFileUploads;
 
 class CambioHorario extends Component
 {
+    use WithFileUploads;
+
+    protected $listeners = [
+        'cambio-horario-detalles-actualizados' => 'invalidarActaPorDetalle',
+    ];
+
     public ?CambioHorarioModel $cambio = null;
 
     public $institucion;
@@ -33,6 +41,7 @@ class CambioHorario extends Component
     public $fecha_desde;
     public $fecha_hasta;
     public $acta_finalizada = false;
+    public array $actasFirmadas = [];
 
     public $estado = 'borrador';
 
@@ -95,7 +104,6 @@ class CambioHorario extends Component
                 'date',
                 'after_or_equal:fecha_desde'
             ],
-            'acta' => 'required|string|min:10',
         ];
     }
 
@@ -122,9 +130,19 @@ class CambioHorario extends Component
 
         $this->validate();
 
-        if (!$this->acta_finalizada) {
-            $this->addError('acta_finalizada', 'Se debe finalizar el acta antes de guardar el borrador.');
+        if ($this->acta && !$this->acta_finalizada) {
+            $this->addError('acta_finalizada', 'Finalizá el acta antes de guardar ese texto en el borrador.');
             return;
+        }
+
+        $actaGuardada = null;
+
+        if ($this->acta_finalizada) {
+            $actaGuardada = $this->cambio && $this->acta === $this->cambio->acta
+                ? $this->acta
+                : $this->buildActaHtml();
+        } elseif ($this->cambio) {
+            $actaGuardada = $this->cambio->acta;
         }
 
         $data = [
@@ -138,7 +156,7 @@ class CambioHorario extends Component
             'fecha_hasta' => $this->duracion === 'temporal'
                 ? $this->fecha_hasta
                 : null,
-            'acta' => $this->buildActaHtml(),
+            'acta' => $actaGuardada,
             'estado' => 'borrador',
             'pedido_por' => auth()->id(),
             'pedido_en' => now()->toDateString(),
@@ -146,11 +164,63 @@ class CambioHorario extends Component
 
         if ($this->cambio) {
             $this->cambio->update($data);
+            session()->flash('success', 'Borrador actualizado correctamente.');
         } else {
             $this->cambio = CambioHorarioModel::create($data);
+            session()->flash('success', 'Borrador guardado. Ahora cargá los detalles antes de generar el acta.');
         }
 
-        $this->modo = 'listado';
+        Cache::forget('dashboard.cambios_horarios');
+        Cache::forget('dashboard.cambios_horarios.' . app(InstitucionContext::class)->id());
+        $this->modo = 'formulario';
+        $this->cambio->refresh();
+    }
+
+    public function invalidarActaPorDetalle(): void
+    {
+        if ($this->cambio) {
+            $this->cambio->update(['acta' => null]);
+            Cache::forget('dashboard.cambios_horarios');
+            Cache::forget('dashboard.cambios_horarios.' . app(InstitucionContext::class)->id());
+        }
+
+        $this->acta = '';
+        $this->acta_finalizada = false;
+        $this->cambio?->refresh();
+        $this->dispatch('trix-cargar-html', html: '');
+        $this->dispatch('trix-set-locked', locked: false);
+        session()->flash('success', 'El detalle cambió. Volvé a generar y finalizar el acta.');
+    }
+
+    public function editar($id): void
+    {
+        Gate::authorize('crear-cambios-horario');
+
+        $cambio = CambioHorarioModel::with('detalles')->findOrFail($id);
+
+        if ($cambio->estado !== 'borrador') {
+            session()->flash('error', 'Solo se pueden editar cambios en borrador.');
+            return;
+        }
+
+        $this->cambio = $cambio;
+        $this->modo = 'formulario';
+        $this->duracion = $cambio->duracion;
+        $this->tipo_cambio = $cambio->tipo_cambio;
+        $this->docente_id = $cambio->docente_id;
+        $this->curso_id = $cambio->curso_id;
+        $this->materia_id = $cambio->materia_id;
+        $this->ciclo_lectivo = $cambio->ciclo_lectivo;
+        $this->fecha_desde = $cambio->fecha_desde?->format('Y-m-d');
+        $this->fecha_hasta = $cambio->fecha_hasta?->format('Y-m-d');
+        $this->acta = $cambio->acta ?: '';
+        $this->acta_finalizada = (bool) $cambio->acta;
+
+        $this->cargarCursosDelDocente($this->docente_id);
+        $this->cargarMateriasDelCurso($this->curso_id);
+
+        $this->dispatch('trix-cargar-html', html: $this->acta);
+        $this->dispatch('trix-set-locked', locked: $this->acta_finalizada);
     }
 
     public function updatedDocenteId($value): void
@@ -164,9 +234,19 @@ class CambioHorario extends Component
             return;
         }
 
+        $this->cargarCursosDelDocente($value);
+    }
+
+    private function cargarCursosDelDocente($docenteId): void
+    {
+        if (!$docenteId) {
+            $this->cursosFiltrados = [];
+            return;
+        }
+
         $this->cursosFiltrados = Curso::query()
-            ->whereHas('cursoMaterias.cmDocentes', function ($q) use ($value) {
-                $q->vigente()->where('docente_id', $value);
+            ->whereHas('cursoMaterias.cmDocentes', function ($q) use ($docenteId) {
+                $q->vigente()->where('docente_id', $docenteId);
             })
             ->orderBy('anio')
             ->orderBy('division')
@@ -189,9 +269,19 @@ class CambioHorario extends Component
             return;
         }
 
+        $this->cargarMateriasDelCurso($value);
+    }
+
+    private function cargarMateriasDelCurso($cursoId): void
+    {
+        if (!$cursoId || !$this->docente_id) {
+            $this->materiasFiltradas = [];
+            return;
+        }
+
         $this->materiasFiltradas = Materia::query()
-            ->whereHas('cursoMaterias', function ($q) use ($value) {
-                $q->where('curso_id', $value)
+            ->whereHas('cursoMaterias', function ($q) use ($cursoId) {
+                $q->where('curso_id', $cursoId)
                     ->whereHas('cmDocentes', function ($q2) {
                         $q2->vigente()->where('docente_id', $this->docente_id);
                     });
@@ -265,9 +355,84 @@ class CambioHorario extends Component
             $texto .= "en el presente ciclo lectivo {$this->ciclo_lectivo}</p>";
         }
 
+        $texto .= $this->detalleActaHtml();
+
         $texto .= "<p>Sin más, se deja constancia bajo firma de los presentes.</p>";
 
         return $texto;
+    }
+
+    private function detalleActaHtml(): string
+    {
+        if (!$this->cambio) {
+            return '<p>El detalle del cambio se incorporará una vez cargado el borrador.</p>';
+        }
+
+        $this->cambio->load([
+            'detalles.horarioBase.bloque',
+            'detalles.horarioBase.curso',
+            'detalles.horarioBase.cursoMateria.materia',
+            'detalles.horarioBase.docenteVigente',
+            'detalles.docenteNuevo',
+            'detalles.bloqueNuevo',
+            'detalles.cursoNuevo',
+        ]);
+
+        if ($this->cambio->detalles->isEmpty()) {
+            return '<p>No se registraron detalles específicos del cambio de horario.</p>';
+        }
+
+        $cantidadHoras = $this->cambio->detalles->count();
+        $unidad = $cantidadHoras === 1 ? 'hora cátedra' : 'horas cátedra';
+        $titulo = $this->tipo_cambio === 'permuta'
+            ? "La permuta comprende {$cantidadHoras} {$unidad}, detalladas a continuación:"
+            : "El cambio comprende {$cantidadHoras} {$unidad}, detalladas a continuación:";
+
+        $items = $this->cambio->detalles
+            ->map(fn ($detalle) => '<li>' . $this->detalleLineaActa($detalle) . '</li>')
+            ->implode('');
+
+        return "<p>{$titulo}</p><ol>{$items}</ol>";
+    }
+
+    private function detalleLineaActa($detalle): string
+    {
+        $base = $detalle->horarioBase;
+        $docenteOriginal = $base?->docenteVigente?->nombre_completo
+            ?? $base?->docenteVigente?->nombre
+            ?? Docente::find($this->docente_id)?->nombre_completo
+            ?? 'docente sin datos';
+        $docenteNuevo = $detalle->docenteNuevo?->nombre_completo
+            ?? $detalle->docenteNuevo?->nombre
+            ?? $docenteOriginal;
+        $materiaSeleccionada = collect($this->materiasFiltradas)->firstWhere('id', $this->materia_id);
+        $materia = $base?->cursoMateria?->materia?->nombre
+            ?? ($materiaSeleccionada['nombre'] ?? null)
+            ?? 'materia sin datos';
+        $cursoOriginal = $base?->curso?->nombre_completo ?? 'curso sin datos';
+        $cursoNuevo = $detalle->cursoNuevo?->nombre_completo ?? $cursoOriginal;
+        $diaOriginal = $this->diaSemanaTexto($base?->dia_semana);
+        $diaNuevo = $this->diaSemanaTexto($detalle->dia_nuevo ?: $base?->dia_semana);
+        $bloqueOriginal = $this->bloqueTextoActa($base?->bloque);
+        $bloqueNuevo = $this->bloqueTextoActa($detalle->bloqueNuevo ?: $base?->bloque);
+
+        if ($this->tipo_cambio === 'permuta') {
+            return e("Los docentes {$docenteOriginal} y {$docenteNuevo} permutan la hora de {$materia} de {$cursoOriginal}, originalmente los {$diaOriginal} en {$bloqueOriginal}, quedando registrada para los {$diaNuevo} en {$bloqueNuevo}, en {$cursoNuevo}.");
+        }
+
+        return e("El/la docente {$docenteOriginal} modifica la hora de {$materia} de {$cursoOriginal}, originalmente los {$diaOriginal} en {$bloqueOriginal}, que pasará a dictarse los {$diaNuevo} en {$bloqueNuevo}, en {$cursoNuevo}.");
+    }
+
+    private function bloqueTextoActa($bloque): string
+    {
+        if (!$bloque) {
+            return 'bloque sin datos';
+        }
+
+        $inicio = $bloque->hora_inicio?->format('H:i');
+        $fin = $bloque->hora_fin?->format('H:i');
+
+        return trim("{$bloque->nombre} ({$inicio} - {$fin})");
     }
 
     public function generarActa(): void
@@ -275,6 +440,16 @@ class CambioHorario extends Component
         $rules = $this->rules();
         unset($rules['acta']);
         $this->validate($rules);
+
+        if (!$this->cambio) {
+            $this->addError('acta', 'Guardá el borrador y cargá los detalles antes de generar el acta.');
+            return;
+        }
+
+        if (!$this->cambio->detalles()->exists()) {
+            $this->addError('acta', 'Cargá al menos un detalle del cambio antes de generar el acta.');
+            return;
+        }
 
         $this->acta = $this->textoBase;
         $this->acta_finalizada = false;
@@ -314,6 +489,9 @@ class CambioHorario extends Component
             'detalles.horarioBase.bloque',
             'detalles.horarioBase.cursoMateria.materia',
             'detalles.horarioBase.docenteVigente',
+            'detalles.docenteNuevo',
+            'detalles.bloqueNuevo',
+            'detalles.cursoNuevo',
         ])->find($id);
 
         if (!$cambio) {
@@ -365,9 +543,20 @@ class CambioHorario extends Component
     {
         Gate::authorize('firmar-cambios-horario');
 
+        $this->validate([
+            "actasFirmadas.$id" => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ], [
+            "actasFirmadas.$id.required" => 'Subí el acta firmada antes de firmar el trámite.',
+            "actasFirmadas.$id.mimes" => 'El acta firmada debe ser PDF, JPG o PNG.',
+            "actasFirmadas.$id.max" => 'El acta firmada no debe superar los 5 MB.',
+        ]);
+
         try {
             $cambio = CambioHorarioModel::findOrFail($id);
-            $cambio->firmar(auth()->user());
+            $path = $this->actasFirmadas[$id]->store('actas-cambios-horario', 'public');
+
+            $cambio->firmar(auth()->user(), $path);
+            unset($this->actasFirmadas[$id]);
 
             session()->flash('success', 'Cambio firmado correctamente.');
         } catch (\Throwable $e) {

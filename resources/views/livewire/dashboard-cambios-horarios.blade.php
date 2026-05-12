@@ -40,7 +40,32 @@
             </div>
         </div>
 
-        <!-- LISTADO DE TRÁMITES PENDIENTES (VER CÓDIGO EN "Desarrollo") -->
+        @if(count($cambiosPendientes) > 0)
+            <div class="list-group list-group-flush border-top border-bottom">
+                @foreach($cambiosPendientes as $cambio)
+                    <div class="list-group-item px-0 bg-transparent">
+                        <div class="d-flex justify-content-between gap-2">
+                            <div class="min-w-0">
+                                <div class="fw-semibold text-truncate">
+                                    {{ $cambio['docente']['nombre_completo'] ?? 'Docente sin datos' }}
+                                </div>
+                                <div class="small text-muted text-truncate">
+                                    {{ ($cambio['curso']['anio'] ?? '—') }}° {{ $cambio['curso']['division'] ?? '' }}
+                                    / {{ $cambio['materia']['nombre'] ?? 'Materia sin datos' }}
+                                </div>
+                            </div>
+                            <span class="badge bg-{{ $this->obtenerColorEstado($cambio['estado']) }}-subtle text-{{ $this->obtenerColorEstado($cambio['estado']) }}">
+                                {{ $this->obtenerTextoEstado($cambio['estado']) }}
+                            </span>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="text-muted small border-top border-bottom py-3">
+                No hay cambios pendientes.
+            </div>
+        @endif
 
         @can('ver-cambios-horario')
             <a href="{{ route('admin.cambios-horario') }}" class="btn btn-outline-primary btn-sm mt-3">
