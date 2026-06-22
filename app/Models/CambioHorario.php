@@ -6,6 +6,7 @@ use App\Models\Concerns\BelongsToInstitucion;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class CambioHorario extends Model
 {
@@ -18,7 +19,8 @@ class CambioHorario extends Model
         'autorizado',
         'firmado',
         'activo',
-        'finalizado'
+        'finalizado',
+        'anulado',
     ];
 
 
@@ -45,6 +47,8 @@ class CambioHorario extends Model
         'activado_en',
         'finalizado_por',
         'finalizado_en',
+        'anulado_por',
+        'anulado_en',
         'pedido_por',
         'pedido_en',
     ];
@@ -59,6 +63,7 @@ class CambioHorario extends Model
         'firmado_en' => 'date',
         'activado_en' => 'date',
         'finalizado_en' => 'date',
+        'anulado_en' => 'datetime',
         'pedido_en' => 'date',
     ];
 
@@ -98,6 +103,11 @@ class CambioHorario extends Model
         return $this->estado === 'borrador' && $this->detalles()->exists() && (bool) $this->acta;
     }
 
+    public function puedeAnular(): bool
+    {
+        return in_array($this->estado, ['borrador', 'autorizado'], true);
+    }
+
     public function estaActivoEnFecha($fecha): bool
     {
         return $this->estado === 'activo'
@@ -123,7 +133,7 @@ class CambioHorario extends Model
             ->exists();
     }
 
-    // MÁQUINA DE ESTADOS: AUTORIZAR, FIRMAR, ACTIVAR, FINALIZAR
+    // MÁQUINA DE ESTADOS: BORRADOR -> AUTORIZADO -> FIRMADO -> ACTIVO -> FINALIZADO
     public function autorizar(User $user)
     {
         if ($this->estado !== 'borrador') {
@@ -138,7 +148,7 @@ class CambioHorario extends Model
             throw new \Exception('Debe generar y finalizar el acta antes de autorizar.');
         }
 
-        if (! Gate::forUser($user)->allows('gestionar-cambios-horario')) {
+        if (! Gate::forUser($user)->allows('aprobar-cambios-horario')) {
             throw new \Exception('No tiene permisos para autorizar.');
         }
 
@@ -174,14 +184,33 @@ class CambioHorario extends Model
 
         $this->olvidarCacheDashboard();
     }
+
+    public function anular(User $user): void
+    {
+        if (!$this->puedeAnular()) {
+            throw new \Exception('Solo puede anularse un cambio en borrador o autorizado.');
+        }
+
+        if (! Gate::forUser($user)->allows('anular-cambios-horario', $this)) {
+            throw new \Exception('No tiene permisos para anular este cambio.');
+        }
+
+        $this->update([
+            'estado' => 'anulado',
+            'anulado_por' => $user->id,
+            'anulado_en' => now(),
+        ]);
+
+        $this->olvidarCacheDashboard();
+    }
     public function activar(User $user)
     {
         if ($this->estado !== 'firmado') {
             throw new \Exception('Debe estar firmado.');
         }
 
-        if (! Gate::forUser($user)->allows('gestionar-cambios-horario')) {
-            throw new \Exception('No tiene permisos para activar.');
+        if (! Gate::forUser($user)->allows('efectivizar-cambios-horario')) {
+            throw new \Exception('No tiene permisos para efectivizar.');
         }
 
         if (!$this->puedeActivarse()) {
@@ -202,7 +231,7 @@ class CambioHorario extends Model
             throw new \Exception('Solo puede finalizarse un cambio activo.');
         }
 
-        if (! Gate::forUser($user)->allows('gestionar-cambios-horario')) {
+        if (! Gate::forUser($user)->allows('efectivizar-cambios-horario')) {
             throw new \Exception('No tiene permisos para finalizar.');
         }
 
@@ -244,6 +273,47 @@ class CambioHorario extends Model
         return true;
     }
 
+    public function asignarNumeroActaSiCorresponde(): void
+    {
+        if ($this->numero_acta && $this->anio_acta) {
+            return;
+        }
+
+        DB::transaction(function () {
+            $cambio = static::query()
+                ->whereKey($this->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($cambio->numero_acta && $cambio->anio_acta) {
+                $this->forceFill([
+                    'numero_acta' => $cambio->numero_acta,
+                    'anio_acta' => $cambio->anio_acta,
+                ]);
+                return;
+            }
+
+            $anio = (int) ($cambio->ciclo_lectivo ?: now()->format('Y'));
+
+            $ultimoNumero = static::query()
+                ->where('institucion_id', $cambio->institucion_id)
+                ->where('anio_acta', $anio)
+                ->whereNotNull('numero_acta')
+                ->lockForUpdate()
+                ->max('numero_acta');
+
+            $cambio->update([
+                'anio_acta' => $anio,
+                'numero_acta' => ((int) $ultimoNumero) + 1,
+            ]);
+
+            $this->forceFill([
+                'anio_acta' => $cambio->anio_acta,
+                'numero_acta' => $cambio->numero_acta,
+            ]);
+        });
+    }
+
     // método en progreso que pone envigencia un cambio de horario
     public function horarioEfectivo($fecha)
     {
@@ -281,6 +351,46 @@ class CambioHorario extends Model
             'permuta' => 'Permuta de horario',
             default => '—',
         };
+    }
+
+    public function getCuerpoActaAttribute(): string
+    {
+        $html = (string) ($this->acta ?? '');
+
+        if ($html === '' || (!str_contains($html, 'acta-documento') && !str_contains($html, 'id="acta"'))) {
+            return $html;
+        }
+
+        $document = new \DOMDocument('1.0', 'UTF-8');
+        $previous = libxml_use_internal_errors(true);
+        $loaded = $document->loadHTML(
+            '<?xml encoding="UTF-8">' . $html,
+            LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+        );
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        if (!$loaded) {
+            return $html;
+        }
+
+        $xpath = new \DOMXPath($document);
+        $nodes = $xpath->query(
+            "//*[contains(concat(' ', normalize-space(@class), ' '), ' acta-body ') or contains(concat(' ', normalize-space(@class), ' '), ' card-body ')]"
+        );
+        $body = $nodes?->item(0);
+
+        if (!$body) {
+            return $html;
+        }
+
+        $contenido = '';
+
+        foreach ($body->childNodes as $child) {
+            $contenido .= $document->saveHTML($child);
+        }
+
+        return trim($contenido);
     }
 
     private function olvidarCacheDashboard(): void

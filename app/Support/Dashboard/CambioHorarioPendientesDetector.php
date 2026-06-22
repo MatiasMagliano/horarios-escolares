@@ -23,6 +23,7 @@ class CambioHorarioPendientesDetector
             'firmado' => (int) ($cambios->get('firmado')?->total ?? 0),
             'activo' => (int) ($cambios->get('activo')?->total ?? 0),
             'finalizado' => (int) ($cambios->get('finalizado')?->total ?? 0),
+            'anulado' => (int) ($cambios->get('anulado')?->total ?? 0),
             'total_pendientes' => ((int) ($cambios->get('borrador')?->total ?? 0) + (int) ($cambios->get('autorizado')?->total ?? 0) + (int) ($cambios->get('firmado')?->total ?? 0)),
         ];
     }
@@ -62,6 +63,7 @@ class CambioHorarioPendientesDetector
             'firmado' => 'Firmado',
             'activo' => 'Activo',
             'finalizado' => 'Finalizado',
+            'anulado' => 'Anulado',
             default => 'Desconocido',
         };
     }
@@ -74,6 +76,7 @@ class CambioHorarioPendientesDetector
             'firmado' => 'info',
             'activo' => 'success',
             'finalizado' => 'secondary',
+            'anulado' => 'danger',
             default => 'dark',
         };
     }

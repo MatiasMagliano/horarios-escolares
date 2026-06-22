@@ -34,8 +34,12 @@
                     <span class="h6 fw-semibold text-secondary">{{ $estadisticas['finalizado'] }}</span>
                 </div>
                 <div class="col-6 col-sm-4">
+                    <small class="text-muted d-block mb-1">Anulado</small>
+                    <span class="h6 fw-semibold text-danger">{{ $estadisticas['anulado'] ?? 0 }}</span>
+                </div>
+                <div class="col-6 col-sm-4">
                     <small class="text-muted d-block mb-1">Total</small>
-                    <span class="h6 fw-semibold">{{ $estadisticas['borrador'] + $estadisticas['autorizado'] + $estadisticas['firmado'] + $estadisticas['activo'] + $estadisticas['finalizado'] }}</span>
+                    <span class="h6 fw-semibold">{{ $estadisticas['borrador'] + $estadisticas['autorizado'] + $estadisticas['firmado'] + $estadisticas['activo'] + $estadisticas['finalizado'] + ($estadisticas['anulado'] ?? 0) }}</span>
                 </div>
             </div>
         </div>

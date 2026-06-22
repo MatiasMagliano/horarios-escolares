@@ -9,6 +9,7 @@ use App\Support\Horarios\HorarioCursoGridBuilder;
 use App\Support\Horarios\UtilizacionEspaciosGridBuilder;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Carbon;
 
 class PdfController extends Controller
@@ -51,7 +52,9 @@ class PdfController extends Controller
 
     public function cambioHorarioActa(CambioHorario $cambio)
     {
+        $cambio->asignarNumeroActaSiCorresponde();
         $cambio->loadMissing(['docente', 'curso', 'materia', 'solicitante']);
+        $cambio->refresh();
 
         $institucion = request()->user()?->institucionActiva;
         Carbon::setLocale('es');
@@ -63,6 +66,17 @@ class PdfController extends Controller
         ])
             ->setPaper('a4', 'portrait')
             ->download("acta-cambio-horario-{$cambio->id}.pdf");
+    }
+
+    public function cambioHorarioActaFirmada(CambioHorario $cambio)
+    {
+        abort_unless($cambio->path_acta, 404);
+        abort_unless(Storage::disk('public')->exists($cambio->path_acta), 404);
+
+        return Storage::disk('public')->response(
+            $cambio->path_acta,
+            "acta-firmada-cambio-horario-{$cambio->id}." . pathinfo($cambio->path_acta, PATHINFO_EXTENSION)
+        );
     }
 
     private function resolveCursoIdsVisibles(Request $request, EspacioFisico $espacio): array

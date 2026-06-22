@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\CambioHorario;
 use App\Models\Institucion;
 use App\Support\Instituciones\InstitucionContext;
 use Illuminate\Support\Facades\Gate;
@@ -37,10 +38,24 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('abm-docentes', fn ($user) => $hasAnyRoleInActiveInstitucion($user, ['admin', 'aprobador']));
         Gate::define('activar-docentes', fn ($user) => $hasAnyRoleInActiveInstitucion($user, ['aprobador']));
         Gate::define('abm-espacios', fn ($user) => $hasAnyRoleInActiveInstitucion($user, ['admin', 'preceptor', 'aprobador']));
-        Gate::define('crear-cambios-horario', fn ($user) => $hasAnyRoleInActiveInstitucion($user, ['admin', 'preceptor', 'aprobador', 'solicitante']));
-        Gate::define('gestionar-cambios-horario', fn ($user) => $hasAnyRoleInActiveInstitucion($user, ['aprobador']));
+        Gate::define('crear-cambios-horario', fn ($user) => $hasAnyRoleInActiveInstitucion($user, ['admin', 'administrador', 'aprobador', 'solicitante']));
+        Gate::define('aprobar-cambios-horario', fn ($user) => $hasAnyRoleInActiveInstitucion($user, ['aprobador']));
+        Gate::define('gestionar-cambios-horario', fn ($user) => Gate::forUser($user)->allows('aprobar-cambios-horario'));
+        Gate::define('efectivizar-cambios-horario', fn ($user) => $hasAnyRoleInActiveInstitucion($user, ['admin', 'administrador', 'aprobador']));
         Gate::define('firmar-cambios-horario', fn ($user) => $hasAnyRoleInActiveInstitucion($user, ['secretario']));
-        Gate::define('ver-cambios-horario', fn ($user) => $hasAnyRoleInActiveInstitucion($user, ['admin', 'preceptor', 'aprobador', 'secretario', 'solicitante']));
+        Gate::define('ver-cambios-horario', fn ($user) => $hasAnyRoleInActiveInstitucion($user, ['admin', 'administrador', 'preceptor', 'aprobador', 'secretario', 'solicitante']));
+        Gate::define('anular-cambios-horario', function ($user, CambioHorario $cambio) use ($hasAnyRoleInActiveInstitucion): bool {
+            if (!$cambio->puedeAnular()) {
+                return false;
+            }
+
+            if ($hasAnyRoleInActiveInstitucion($user, ['admin', 'administrador', 'aprobador'])) {
+                return true;
+            }
+
+            return $hasAnyRoleInActiveInstitucion($user, ['solicitante'])
+                && (int) $cambio->pedido_por === (int) $user->id;
+        });
 
         view()->composer('*', function ($view) {
             $institucionActiva = null;

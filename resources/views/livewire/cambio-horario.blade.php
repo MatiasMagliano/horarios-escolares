@@ -4,9 +4,9 @@
     <div class="d-flex justify-content-between mb-3">
         <h4>Cambios de Horario</h4>
         @if($puedeCrearCambios)
-            <button wire:click="nuevo" class="btn btn-primary">
-                + Nuevo cambio
-            </button>
+        <button wire:click="nuevo" class="btn btn-primary">
+            + Nuevo cambio
+        </button>
         @endif
     </div>
 
@@ -51,6 +51,7 @@
                     'firmado' => 'warning',
                     'activo' => 'success',
                     'finalizado' => 'dark',
+                    'anulado' => 'danger',
                 } }}">
                         {{ ucfirst($c->estado) }}
                     </span>
@@ -72,35 +73,33 @@
                         </button>
                         @endif
 
-                        @if($c->acta)
+                        @if($puedeFirmarCambios && $c->estado === 'autorizado' && $c->acta && !$c->path_acta)
                         <a
                             href="{{ route('pdf.cambio-horario-acta', ['cambio' => $c->id]) }}"
                             class="btn btn-sm btn-outline-danger"
                             target="_blank"
-                            rel="noopener noreferrer"
-                        >
+                            rel="noopener noreferrer">
                             PDF acta
                         </a>
                         @endif
 
                         @if($c->path_acta)
                         <a
-                            href="{{ asset('storage/' . $c->path_acta) }}"
+                            href="{{ route('pdf.cambio-horario-acta-firmada', ['cambio' => $c->id]) }}"
                             class="btn btn-sm btn-outline-secondary"
                             target="_blank"
-                            rel="noopener noreferrer"
-                        >
+                            rel="noopener noreferrer">
                             Acta firmada
                         </a>
                         @endif
 
-                        @if($puedeGestionarCambios && $c->puedeAutorizar())
+                        @if($puedeAprobarCambios && $c->puedeAutorizar())
                         <button wire:click="autorizar({{ $c->id }})"
                             type="button"
                             class="btn btn-sm btn-outline-info">
                             Autorizar
                         </button>
-                        @elseif($puedeGestionarCambios && $c->estado === 'borrador')
+                        @elseif($puedeAprobarCambios && $c->estado === 'borrador')
                         <button type="button"
                             class="btn btn-sm btn-outline-info"
                             disabled
@@ -109,20 +108,31 @@
                         </button>
                         @endif
 
-                        @if($puedeGestionarCambios && $c->estado === 'firmado')
+                        @if($puedeEfectivizarCambios && $c->estado === 'firmado')
                         <button wire:click="activar({{ $c->id }})"
                             type="button"
                             class="btn btn-sm btn-outline-success">
-                            Activar
+                            Efectivizar cambio
                         </button>
                         @endif
 
-                        @if($puedeGestionarCambios && $c->estado === 'activo')
+                        @if($puedeEfectivizarCambios && $c->estado === 'activo')
                         <button wire:click="finalizar({{ $c->id }})"
                             type="button"
                             class="btn btn-sm btn-outline-dark">
                             Finalizar
                         </button>
+                        @endif
+
+                        @if($c->puedeAnular())
+                            @can('anular-cambios-horario', $c)
+                            <button wire:click="anular({{ $c->id }})"
+                                wire:confirm="¿Confirmás que querés anular este cambio de horario?"
+                                type="button"
+                                class="btn btn-sm btn-outline-danger">
+                                Anular
+                            </button>
+                            @endcan
                         @endif
                     </div>
 
@@ -192,7 +202,7 @@
                         <div class="col">
                             <div class="mb-3">
                                 <label>Tipo de cambio</label>
-                                <select wire:model="tipo_cambio" class="form-select">
+                                <select wire:model.live="tipo_cambio" class="form-select">
                                     <option value="cambio">Cambio de horario</option>
                                     <option value="permuta">Permuta de horario</option>
                                 </select>
@@ -228,7 +238,7 @@
                         </div>
                         <div class="col mb-3">
                             <label>Materia</label>
-                            <select wire:model="materia_id" class="form-select" @disabled(empty($materiasFiltradas))>
+                            <select wire:model.live="materia_id" class="form-select" @disabled(empty($materiasFiltradas))>
                                 <option value="">Seleccione una materia</option>
                                 @foreach($materiasFiltradas as $materia)
                                 <option value="{{ $materia['id'] }}">{{ $materia['nombre'] }}</option>
@@ -270,20 +280,124 @@
                         @endif
                     </div>
 
-                    @if($cambio)
                     <hr class="my-4">
                     <div class="mb-4">
                         <span class="h5">4. Detalles del cambio</span>
                     </div>
-                    <livewire:cambio-horario-detalle
-                        :cambio="$cambio"
-                        :key="'detalles-'.$cambio->id" />
+
+                    @if($tipo_cambio === 'cambio')
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-4">
+                            <select wire:model="horario_base_id" class="form-select" @disabled($this->horariosBaseCambio->isEmpty())>
+                                <option value="">Horario original...</option>
+                                @foreach($this->horariosBaseCambio as $h)
+                                @php
+                                $bloqueTexto = $h->bloque
+                                ? $h->bloque->nombre . ' (' . $h->bloque->hora_inicio?->format('H:i') . ' - ' . $h->bloque->hora_fin?->format('H:i') . ')'
+                                : 'Bloque sin datos';
+                                @endphp
+                                <option value="{{ $h->id }}">
+                                    {{ $this->diaSemanaTexto($h->dia_semana) }} · {{ $bloqueTexto }}
+                                </option>
+                                @endforeach
+                            </select>
+                            @error('horario_base_id') <div class="text-danger small">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="col-md-2">
+                            <select wire:model="dia_nuevo" class="form-select">
+                                <option value="">Día nuevo...</option>
+                                <option value="1">Lunes</option>
+                                <option value="2">Martes</option>
+                                <option value="3">Miércoles</option>
+                                <option value="4">Jueves</option>
+                                <option value="5">Viernes</option>
+                            </select>
+                            @error('dia_nuevo') <div class="text-danger small">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="col-md-3">
+                            <select wire:model="nuevo_bloque_id" class="form-select">
+                                <option value="">Bloque nuevo...</option>
+                                @foreach($this->bloquesCambioPorFranja as $franja => $bloques)
+                                <optgroup label="{{ $this->designacionTurno($franja) }}">
+                                    @foreach($bloques as $bloque)
+                                    <option value="{{ $bloque->id }}">
+                                        {{ $bloque->nombre }} · {{ $bloque->hora_inicio?->format('H:i') }} - {{ $bloque->hora_fin?->format('H:i') }}
+                                    </option>
+                                    @endforeach
+                                </optgroup>
+                                @endforeach
+                            </select>
+                            @error('nuevo_bloque_id') <div class="text-danger small">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="col-md-3">
+                            <input type="text"
+                                wire:model="observaciones_detalle"
+                                class="form-control"
+                                placeholder="Observaciones">
+                            @error('observaciones_detalle') <div class="text-danger small">{{ $message }}</div> @enderror
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3 mb-4">
+                        <span class="h5">Detalle de horarios seleccionados</span>
+
+                        <button type="button" wire:click="agregarDetalleCambio" class="btn btn-outline-secondary btn-sm">
+                            Agregar bloque
+                        </button>
+                    </div>
+
+                    @error('detalle') <div class="text-danger small mb-2">{{ $message }}</div> @enderror
+
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Horario original</th>
+                                <th>Nuevo día</th>
+                                <th>Nuevo bloque</th>
+                                <th>Obs.</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($detallesCambio as $index => $detalle)
+                            <tr>
+                                <td>
+                                    <div>{{ $detalle['materia'] ?? '—' }}</div>
+                                    <div class="small text-muted">
+                                        {{ $detalle['dia_original_texto'] ?? '—' }}
+                                        · {{ $detalle['bloque_original_texto'] ?? '—' }}
+                                    </div>
+                                </td>
+                                <td>{{ $detalle['dia_nuevo_texto'] ?? '—' }}</td>
+                                <td>{{ $detalle['bloque_nuevo_texto'] ?? '—' }}</td>
+                                <td>{{ $detalle['observaciones'] ?: '—' }}</td>
+                                <td>
+                                    <button type="button"
+                                        wire:click="eliminarDetalleCambio({{ $index }})"
+                                        class="btn btn-sm btn-danger">
+                                        X
+                                    </button>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="text-muted text-center">
+                                    Sin detalles cargados todavía.
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                     @else
                     <div class="alert alert-info">
-                        Guardá el borrador para cargar los detalles del cambio antes de generar el acta.
+                        La carga específica de permutas queda para el siguiente bloque de trabajo.
                     </div>
                     @endif
 
+                    <hr class="my-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="h5">5. Detalle del acta</span>
 
@@ -319,9 +433,11 @@
                     <div class="row mt-3 mb-4">
                         <div class="col">
                             @include('livewire.partials.cambio-horario-acta', [
-                                'tipoCambio' => $this->tipo_cambio,
-                                'fechaActual' => $this->fechaActual,
-                                'cuerpoHtml' => $acta,
+                            'tipoCambio' => $this->tipo_cambio,
+                            'fechaActual' => $this->fechaActual,
+                            'cuerpoHtml' => $acta,
+                            'numeroActa' => $cambio?->numero_acta,
+                            'anioActa' => $cambio?->anio_acta,
                             ])
                         </div>
                     </div>
@@ -464,7 +580,17 @@
                 <div>
                     <h6 class="mb-2">Acta guardada generada</h6>
                     <div class="border rounded p-3 bg-light">
-                        {!! $cambio->acta ?: '<em>No hay acta guardada.</em>' !!}
+                        @if($cambio->acta)
+                            @include('livewire.partials.cambio-horario-acta', [
+                                'tipoCambio' => $cambio->tipo_cambio,
+                                'fechaActual' => $this->fechaActual,
+                                'cuerpoHtml' => $cambio->cuerpo_acta,
+                                'numeroActa' => $cambio->numero_acta,
+                                'anioActa' => $cambio->anio_acta,
+                            ])
+                        @else
+                            <em>No hay acta guardada.</em>
+                        @endif
                     </div>
                 </div>
 
@@ -510,6 +636,10 @@
                 return;
             }
 
+            if (event.target.dataset.loadingHtml === 'true') {
+                return;
+            }
+
             const input = document.getElementById('acta-editor-input');
             const host = event.target.closest('[wire\\:id]');
             if (!input || !host) {
@@ -532,20 +662,12 @@
             }
 
             const html = payload?.html ?? '';
+            editor.dataset.loadingHtml = 'true';
             input.value = html;
             editor.editor.loadHTML(html);
-
-            const host = editor.closest('[wire\\:id]');
-            if (!host) {
-                return;
-            }
-
-            const component = Livewire.find(host.getAttribute('wire:id'));
-            if (!component) {
-                return;
-            }
-
-            component.set('acta', html);
+            requestAnimationFrame(() => {
+                delete editor.dataset.loadingHtml;
+            });
         });
 
         Livewire.on('trix-set-locked', (payload) => {

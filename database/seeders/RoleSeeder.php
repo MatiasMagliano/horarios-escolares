@@ -17,7 +17,7 @@ class RoleSeeder extends Seeder
         $instituciones = Institucion::query()->pluck('id');
 
         foreach ($instituciones as $institucionId) {
-            foreach (['admin', 'preceptor', 'solicitante', 'aprobador', 'secretario'] as $roleName) {
+            foreach (['administrador', 'preceptor', 'solicitante', 'aprobador', 'secretario'] as $roleName) {
                 Role::query()->firstOrCreate([
                     'name' => $roleName,
                     'guard_name' => 'web',

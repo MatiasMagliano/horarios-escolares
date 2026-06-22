@@ -89,8 +89,12 @@ Route::middleware(['auth', 'institucion.activa'])->group(function () {
         ->name('pdf.utilizacion-espacios');
 
     Route::get('/pdf/cambio-horario/{cambio}/acta', [PdfController::class, 'cambioHorarioActa'])
-        ->middleware('can:ver-cambios-horario')
+        ->middleware('can:firmar-cambios-horario')
         ->name('pdf.cambio-horario-acta');
+
+    Route::get('/pdf/cambio-horario/{cambio}/acta-firmada', [PdfController::class, 'cambioHorarioActaFirmada'])
+        ->middleware('can:ver-cambios-horario')
+        ->name('pdf.cambio-horario-acta-firmada');
 });
 
 Route::middleware(['auth', 'institucion.activa'])->group(function () {

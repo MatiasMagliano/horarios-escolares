@@ -23,7 +23,7 @@ class CambioHorarioDetalle extends Model
 
     public function cambio()
     {
-        return $this->belongsTo(CambioHorario::class);
+        return $this->belongsTo(CambioHorario::class, 'cambio_horario_id');
     }
 
     public function horarioBase()
