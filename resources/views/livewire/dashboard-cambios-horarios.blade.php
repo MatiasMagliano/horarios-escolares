@@ -71,7 +71,7 @@
             </div>
         @endif
 
-        @can('ver-cambios-horario')
+        @can('schedule_changes.view')
             <a href="{{ route('admin.cambios-horario') }}" class="btn btn-outline-primary btn-sm mt-3">
                 Ver todos los cambios
             </a>

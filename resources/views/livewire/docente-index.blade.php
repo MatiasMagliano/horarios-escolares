@@ -11,7 +11,7 @@ new class extends Component
 
     public function crear()
     {
-        Gate::authorize('abm-docentes');
+        Gate::authorize('teachers.create');
 
         $this->docenteSeleccionado = null;
         $this->dispatch('modal-crear-docente');
@@ -19,7 +19,7 @@ new class extends Component
 
     public function editar($id)
     {
-        Gate::authorize('abm-docentes');
+        Gate::authorize('teachers.update');
 
         $this->docenteSeleccionado = $id;
         $this->dispatch('modal-crear-docente');
@@ -27,7 +27,7 @@ new class extends Component
 
     public function cambiarEstado($id)
     {
-        Gate::authorize('activar-docentes');
+        Gate::authorize('teachers.activate');
 
         $docente = Docente::findOrFail($id);
         $docente->activo = !$docente->activo;
@@ -38,7 +38,7 @@ new class extends Component
     // SOLAMENTE DISPARA EL MODAL DE CONFIRMACIÓN, LA ELIMINACIÓN SE HACE EN EL COMPONENTE docente-form.blade.php
     public function eliminar($id)
     {
-        Gate::authorize('abm-docentes');
+        Gate::authorize('teachers.delete');
 
         $this->docenteSeleccionado = $id;
         $this->dispatch('abrir-modal-eliminar');
@@ -58,9 +58,11 @@ new class extends Component
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="mb-0">Docentes</h3>
 
-        <button wire:click="crear" class="btn btn-success mb-3">
-            + Nuevo Docente
-        </button>
+        @can('teachers.create')
+            <button wire:click="crear" class="btn btn-success mb-3">
+                + Nuevo Docente
+            </button>
+        @endcan
     </div>
     <div class="alert alert-info">
         <span>La "denominación" será el nombre con el que aparecerá en la Grilla de Horarios</span>
@@ -115,7 +117,7 @@ new class extends Component
                     <td class="text-center">
                         <div class="btn-group" role="group" aria-label="">
                             {{-- Indicador de activo/inactivo --}}
-                            @can('activar-docentes')
+                            @can('teachers.activate')
                                 <button type="button" wire:click="cambiarEstado({{ $docente->id }})" class="btn btn-sm btn-outline-{{ $docente->activo ? 'secondary' : 'info' }}">
                                     {{ $docente->activo ? 'Activo' : 'Inactivo' }}
                                 </button>
@@ -126,14 +128,18 @@ new class extends Component
                             @endcan
 
                             {{-- Botón de editar --}}
-                            <button type="button" wire:click="editar({{ $docente->id }})" class="btn btn-sm btn-outline-primary">
-                                Editar
-                            </button>
+                            @can('teachers.update')
+                                <button type="button" wire:click="editar({{ $docente->id }})" class="btn btn-sm btn-outline-primary">
+                                    Editar
+                                </button>
+                            @endcan
 
                             {{-- Botón de eliminar --}}
-                            <button type="button" wire:click="eliminar({{ $docente->id }})" class="btn btn-sm btn-outline-danger">
-                                Eliminar
-                            </button>
+                            @can('teachers.delete')
+                                <button type="button" wire:click="eliminar({{ $docente->id }})" class="btn btn-sm btn-outline-danger">
+                                    Eliminar
+                                </button>
+                            @endcan
                         </div>
                     </td>
                 </tr>

@@ -118,7 +118,7 @@ class CambioHorario extends Component
 
     public function nuevo()
     {
-        Gate::authorize('crear-cambios-horario');
+        Gate::authorize('schedule_changes.create');
 
         $this->resetExcept('modo');
         $this->institucion = auth()->user()?->institucionActiva;
@@ -138,7 +138,7 @@ class CambioHorario extends Component
 
     public function guardar()
     {
-        Gate::authorize('crear-cambios-horario');
+        Gate::authorize($this->cambio ? 'schedule_changes.update' : 'schedule_changes.create');
 
         $this->validate();
 
@@ -210,6 +210,8 @@ class CambioHorario extends Component
 
     public function agregarDetalleCambio(): void
     {
+        Gate::authorize($this->cambio ? 'schedule_changes.update' : 'schedule_changes.create');
+
         if ($this->tipo_cambio !== 'cambio') {
             $this->addError('detalle', 'Por ahora estamos afinando solo el cambio de horario.');
             return;
@@ -262,6 +264,8 @@ class CambioHorario extends Component
 
     public function eliminarDetalleCambio($key): void
     {
+        Gate::authorize($this->cambio ? 'schedule_changes.update' : 'schedule_changes.create');
+
         $detalle = $this->detallesCambio[$key] ?? null;
 
         if (!$detalle) {
@@ -415,7 +419,7 @@ class CambioHorario extends Component
 
     public function editar($id): void
     {
-        Gate::authorize('crear-cambios-horario');
+        Gate::authorize('schedule_changes.update');
 
         $cambio = CambioHorarioModel::with('detalles')->findOrFail($id);
 
@@ -756,9 +760,7 @@ class CambioHorario extends Component
             'detalles.horarioBase.bloque',
             'detalles.horarioBase.cursoMateria.materia',
             'detalles.horarioBase.docenteVigente',
-            'detalles.docenteNuevo',
             'detalles.bloqueNuevo',
-            'detalles.cursoNuevo',
         ])->find($id);
 
         if (!$cambio) {
@@ -794,7 +796,7 @@ class CambioHorario extends Component
     // ESTADOS DE LA MÁQUINA DE ESTADOS (WORK IN PROGRESS)
     public function autorizar($id)
     {
-        Gate::authorize('aprobar-cambios-horario');
+        Gate::authorize('schedule_changes.approve');
 
         try {
             $cambio = CambioHorarioModel::findOrFail($id);
@@ -809,7 +811,7 @@ class CambioHorario extends Component
     public function anular($id): void
     {
         $cambio = CambioHorarioModel::findOrFail($id);
-        Gate::authorize('anular-cambios-horario', $cambio);
+        Gate::authorize('schedule_changes.delete');
 
         try {
             $cambio->anular(auth()->user());
@@ -821,7 +823,7 @@ class CambioHorario extends Component
 
     public function firmar($id)
     {
-        Gate::authorize('firmar-cambios-horario');
+        Gate::authorize('schedule_changes.sign');
 
         $this->validate([
             "actasFirmadas.$id" => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
@@ -846,7 +848,7 @@ class CambioHorario extends Component
 
     public function activar($id)
     {
-        Gate::authorize('efectivizar-cambios-horario');
+        Gate::authorize('schedule_changes.effective');
 
         try {
             $cambio = CambioHorarioModel::findOrFail($id);
@@ -860,7 +862,7 @@ class CambioHorario extends Component
 
     public function finalizar($id)
     {
-        Gate::authorize('efectivizar-cambios-horario');
+        Gate::authorize('schedule_changes.effective');
 
         try {
             $cambio = CambioHorarioModel::findOrFail($id);
@@ -880,10 +882,10 @@ class CambioHorario extends Component
                 ->where('activo', true)
                 ->orderBy('nombre_completo')
                 ->get(),
-            'puedeCrearCambios' => Gate::allows('crear-cambios-horario'),
-            'puedeAprobarCambios' => Gate::allows('aprobar-cambios-horario'),
-            'puedeEfectivizarCambios' => Gate::allows('efectivizar-cambios-horario'),
-            'puedeFirmarCambios' => Gate::allows('firmar-cambios-horario'),
+            'puedeCrearCambios' => Gate::allows('schedule_changes.create'),
+            'puedeAprobarCambios' => Gate::allows('schedule_changes.approve'),
+            'puedeEfectivizarCambios' => Gate::allows('schedule_changes.effective'),
+            'puedeFirmarCambios' => Gate::allows('schedule_changes.sign'),
         ]);
     }
 }

@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use App\Models\Institucion;
 use App\Models\User;
+use App\Support\Permissions\PermissionCatalog;
+use App\Support\Permissions\RolePermissionPresetResolver;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -13,7 +15,7 @@ use Spatie\Permission\PermissionRegistrar;
 
 class UsuariosAdmin extends Component
 {
-    private const ROLES = ['admin', 'preceptor', 'solicitante', 'aprobador', 'secretario'];
+    private const ROLES = PermissionCatalog::ROLES;
 
     public string $busqueda = '';
     public ?int $editandoId = null;
@@ -25,6 +27,7 @@ class UsuariosAdmin extends Component
     public array $institucionesSeleccionadas = [];
     public array $rolesPorInstitucion = [];
     public bool $mostrarFormulario = false;
+    public string $modoFormulario = 'datos';
 
     public function boot(): void
     {
@@ -49,10 +52,23 @@ class UsuariosAdmin extends Component
     public function nuevo(): void
     {
         $this->resetFormulario();
+        $this->modoFormulario = 'datos';
         $this->mostrarFormulario = true;
     }
 
     public function editar(int $id): void
+    {
+        $this->cargarUsuarioEnFormulario($id);
+        $this->modoFormulario = 'datos';
+    }
+
+    public function editarAcceso(int $id): void
+    {
+        $this->cargarUsuarioEnFormulario($id);
+        $this->modoFormulario = 'acceso';
+    }
+
+    private function cargarUsuarioEnFormulario(int $id): void
     {
         $user = User::query()
             ->with('instituciones')
@@ -91,7 +107,7 @@ class UsuariosAdmin extends Component
         $this->institucionesSeleccionadas = $seleccionadas;
 
         foreach ($seleccionadas as $institucionId) {
-            $this->rolesPorInstitucion[$institucionId] ??= 'admin';
+            $this->rolesPorInstitucion[$institucionId] ??= 'administrador';
         }
 
         $this->rolesPorInstitucion = collect($this->rolesPorInstitucion)
@@ -101,10 +117,36 @@ class UsuariosAdmin extends Component
         if ($this->institucion_activa_id && ! in_array((int) $this->institucion_activa_id, $seleccionadas, true)) {
             $this->institucion_activa_id = $seleccionadas[0] ?? null;
         }
+
+        if (! $this->institucion_activa_id && ! empty($seleccionadas)) {
+            $this->institucion_activa_id = $seleccionadas[0];
+        }
+    }
+
+    public function updatedIsSuperAdmin(): void
+    {
+        if ($this->is_super_admin) {
+            return;
+        }
+
+        $seleccionadas = collect($this->institucionesSeleccionadas)
+            ->map(fn ($id) => (int) $id)
+            ->filter()
+            ->values();
+
+        if ($this->institucion_activa_id && ! $seleccionadas->contains((int) $this->institucion_activa_id)) {
+            $this->institucion_activa_id = $seleccionadas->first();
+        }
     }
 
     public function guardar(): void
     {
+        if ($this->editandoId && $this->modoFormulario === 'datos') {
+            $this->guardarDatosUsuario();
+
+            return;
+        }
+
         $this->validate();
 
         $instituciones = collect($this->institucionesSeleccionadas)
@@ -186,6 +228,29 @@ class UsuariosAdmin extends Component
         $this->resetFormulario();
     }
 
+    private function guardarDatosUsuario(): void
+    {
+        $this->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->editandoId)],
+            'password' => ['nullable', 'string', 'min:8'],
+        ]);
+
+        $data = [
+            'name' => $this->name,
+            'email' => $this->email,
+        ];
+
+        if (filled($this->password)) {
+            $data['password'] = Hash::make($this->password);
+        }
+
+        User::query()->findOrFail($this->editandoId)->update($data);
+
+        session()->flash('success', 'Datos del usuario actualizados correctamente.');
+        $this->resetFormulario();
+    }
+
     private function sincronizarRoles(User $user, array $instituciones): void
     {
         $table = config('permission.table_names.model_has_roles');
@@ -210,6 +275,11 @@ class UsuariosAdmin extends Component
                 'guard_name' => 'web',
                 $teamKey => $institucionId,
             ]);
+
+            if ($role->wasRecentlyCreated) {
+                app(PermissionRegistrar::class)->setPermissionsTeamId($institucionId);
+                $role->syncPermissions(RolePermissionPresetResolver::permissionsForRole($roleName));
+            }
 
             DB::table($table)->insert([
                 $rolePivotKey => $role->id,
@@ -275,7 +345,10 @@ class UsuariosAdmin extends Component
             'institucionesSeleccionadas',
             'rolesPorInstitucion',
             'mostrarFormulario',
+            'modoFormulario',
         ]);
+
+        $this->modoFormulario = 'datos';
     }
 
     public function render()
@@ -296,6 +369,7 @@ class UsuariosAdmin extends Component
             'usuarios' => $usuarios,
             'instituciones' => Institucion::query()->orderBy('nombre_institucion')->get(),
             'roles' => self::ROLES,
+            'roleLabels' => PermissionCatalog::roleLabels(),
             'rolesUsuarios' => $this->rolesParaUsuarios($usuarios->pluck('id')->all()),
         ]);
     }

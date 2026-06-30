@@ -25,7 +25,7 @@
             @endif
         </p>
 
-        @can('abm-docentes')
+        @can('alerts.superpositions')
             <a href="{{ route('admin.alertas.superposiciones-docentes') }}" class="btn btn-outline-primary btn-sm mx-auto">
                 Ver detalle
             </a>

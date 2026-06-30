@@ -17,7 +17,7 @@ new class extends Component {
     // modal de creación de curso
     public function crear()
     {
-        Gate::authorize('abm-cursos');
+        Gate::authorize('courses.create');
 
         $this->cursoIdSeleccionado = null;
         $this->dispatch('curso-abrir-modal');
@@ -26,7 +26,7 @@ new class extends Component {
     // modal de edición de curso
     public function editar($id)
     {
-        Gate::authorize('abm-cursos');
+        Gate::authorize('courses.update');
 
         $this->cursoIdSeleccionado = $id;
         $this->dispatch('curso-abrir-modal');
@@ -35,7 +35,7 @@ new class extends Component {
     // eliminar curso
     public function confirmarEliminacion($id)
     {
-        Gate::authorize('abm-cursos');
+        Gate::authorize('courses.delete');
 
         $this->cursoAEliminar = $id;
         $this->dispatch('curso-abrir-modal-eliminar');
@@ -43,7 +43,7 @@ new class extends Component {
 
     public function eliminar()
     {
-        Gate::authorize('abm-cursos');
+        Gate::authorize('courses.delete');
 
         if ($this->cursoAEliminar) {
             Curso::find($this->cursoAEliminar)?->delete();
@@ -77,9 +77,11 @@ new class extends Component {
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="mb-0">Cursos</h3>
 
-        <button wire:click="crear" class="btn btn-success mb-3">
-            + Nuevo Curso
-        </button>
+        @can('courses.create')
+            <button wire:click="crear" class="btn btn-success mb-3">
+                + Nuevo Curso
+            </button>
+        @endcan
     </div>
 
     @if($cursosSinMaterias->isNotEmpty())
@@ -139,14 +141,16 @@ new class extends Component {
 
                     <td class="text-center">
                         
-                        {{-- Botón de editar --}}
-                        <button wire:click="editar({{ $curso->id }})" class="btn btn-sm btn-outline-primary">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        {{-- Botón de eliminar --}}
-                        <button wire:click="confirmarEliminacion({{ $curso->id }})" class="btn btn-sm btn-outline-danger">
-                            <i class="bi bi-trash"></i>
-                        </button>
+                        @can('courses.update')
+                            <button wire:click="editar({{ $curso->id }})" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        @endcan
+                        @can('courses.delete')
+                            <button wire:click="confirmarEliminacion({{ $curso->id }})" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        @endcan
                     </td>
                 </tr>
             @empty

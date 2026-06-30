@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Institucion;
 use App\Models\User;
+use App\Support\Permissions\PermissionCatalog;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -37,19 +38,14 @@ class UserSeeder extends Seeder
 
         $usuarios = [
             [
-                'name' => 'Admin Institucional',
+                'name' => 'Administrador Institucional',
                 'email' => 'admin.institucion@example.com',
-                'role' => 'admin',
+                'role' => 'administrador',
             ],
             [
                 'name' => 'Preceptor Demo',
                 'email' => 'preceptor@example.com',
                 'role' => 'preceptor',
-            ],
-            [
-                'name' => 'Solicitante Demo',
-                'email' => 'solicitante@example.com',
-                'role' => 'solicitante',
             ],
             [
                 'name' => 'Aprobador Demo',
@@ -66,6 +62,10 @@ class UserSeeder extends Seeder
         app(PermissionRegistrar::class)->setPermissionsTeamId($institucionInicial->id);
 
         foreach ($usuarios as $datos) {
+            if (! in_array($datos['role'], PermissionCatalog::ROLES, true)) {
+                continue;
+            }
+
             $user = User::query()->updateOrCreate(
                 ['email' => $datos['email']],
                 [
@@ -84,6 +84,9 @@ class UserSeeder extends Seeder
 
             $user->syncRoles([$datos['role']]);
         }
+
+        $solicitante = User::query()->where('email', 'solicitante@example.com')->first();
+        $solicitante?->delete();
 
         app(PermissionRegistrar::class)->setPermissionsTeamId(null);
     }

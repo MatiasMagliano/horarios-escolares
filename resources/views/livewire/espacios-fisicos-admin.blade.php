@@ -1,4 +1,5 @@
 <div class="row g-4">
+    @can('spaces.create')
     <div class="col-xl-4">
         <div class="card shadow-sm">
             <div class="card-header bg-light">
@@ -35,8 +36,9 @@
             </div>
         </div>
     </div>
+    @endcan
 
-    <div class="col-xl-8">
+    <div class="@can('spaces.create') col-xl-8 @else col-12 @endcan">
         <div class="card shadow-sm">
             <div class="card-header bg-light">
                 <h5 class="mb-1">Espacios registrados</h5>
@@ -68,9 +70,11 @@
                                 </td>
                                 <td>{{ $espacio->curso_materias_count }}</td>
                                 <td class="text-center">
-                                    <button type="button" wire:click="editar({{ $espacio->id }})" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
+                                    @can('spaces.update')
+                                        <button type="button" wire:click="editar({{ $espacio->id }})" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                    @endcan
                                 </td>
                             </tr>
                             @empty

@@ -148,7 +148,7 @@ class CambioHorario extends Model
             throw new \Exception('Debe generar y finalizar el acta antes de autorizar.');
         }
 
-        if (! Gate::forUser($user)->allows('aprobar-cambios-horario')) {
+        if (! Gate::forUser($user)->allows('schedule_changes.approve')) {
             throw new \Exception('No tiene permisos para autorizar.');
         }
 
@@ -166,7 +166,7 @@ class CambioHorario extends Model
             throw new \Exception('Debe estar autorizado.');
         }
 
-        if (! Gate::forUser($user)->allows('firmar-cambios-horario')) {
+        if (! Gate::forUser($user)->allows('schedule_changes.sign')) {
             throw new \Exception('No tiene permisos para firmar.');
         }
 
@@ -191,7 +191,7 @@ class CambioHorario extends Model
             throw new \Exception('Solo puede anularse un cambio en borrador o autorizado.');
         }
 
-        if (! Gate::forUser($user)->allows('anular-cambios-horario', $this)) {
+        if (! Gate::forUser($user)->allows('schedule_changes.delete')) {
             throw new \Exception('No tiene permisos para anular este cambio.');
         }
 
@@ -209,7 +209,7 @@ class CambioHorario extends Model
             throw new \Exception('Debe estar firmado.');
         }
 
-        if (! Gate::forUser($user)->allows('efectivizar-cambios-horario')) {
+        if (! Gate::forUser($user)->allows('schedule_changes.effective')) {
             throw new \Exception('No tiene permisos para efectivizar.');
         }
 
@@ -231,7 +231,7 @@ class CambioHorario extends Model
             throw new \Exception('Solo puede finalizarse un cambio activo.');
         }
 
-        if (! Gate::forUser($user)->allows('efectivizar-cambios-horario')) {
+        if (! Gate::forUser($user)->allows('schedule_changes.effective')) {
             throw new \Exception('No tiene permisos para finalizar.');
         }
 

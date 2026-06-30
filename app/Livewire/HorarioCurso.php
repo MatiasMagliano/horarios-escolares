@@ -41,7 +41,7 @@ class HorarioCurso extends Component
     // EDICIÓN DE CELDAS (2 funciones)
     public function editarCelda($bloqueId, $dia)
     {
-        Gate::authorize('editar-horarios');
+        Gate::authorize('schedules.update');
 
         $this->celdaSeleccionada = [
             'bloque_id' => $bloqueId,
@@ -63,7 +63,7 @@ class HorarioCurso extends Component
 
     public function guardarCelda()
     {
-        Gate::authorize('editar-horarios');
+        Gate::authorize('schedules.update');
 
         if (!$this->celdaSeleccionada || !$this->cursoId) {
             return;
@@ -205,7 +205,7 @@ class HorarioCurso extends Component
     public function render()
     {
         return view('livewire.horario-curso', [
-            'puedeEditarHorarios' => Gate::allows('editar-horarios'),
+            'puedeEditarHorarios' => Gate::allows('schedules.update'),
         ]);
     }
 

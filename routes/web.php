@@ -26,6 +26,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/usuarios', function () {
             return view('admin.usuarios');
         })->name('admin.usuarios');
+
+        Route::get('/admin/permisos', function () {
+            return view('admin.permisos');
+        })->name('admin.permisos');
+
+        Route::get('/admin/permisos/presets', function () {
+            return view('admin.permisos-presets');
+        })->name('admin.permisos.presets');
     });
 });
 
@@ -37,63 +45,64 @@ Route::middleware(['auth', 'institucion.activa'])->group(function () {
     
     Route::get('/dashboard', function () {
         return view('dashboard');
-    })->name('dashboard');
+    })->middleware('can:dashboard.view')->name('dashboard');
 
     Route::get('/admin/horarios', function () {
         return view('admin.horarios');
-    })->name('admin.horarios');
+    })->middleware('can:schedules.view')->name('admin.horarios');
 
     Route::get('/admin/cursos', function () {
         return redirect()->route('admin.cursos.listado');
-    })->middleware('can:abm-cursos')->name('admin.cursos');
+    })->middleware('can:courses.view')->name('admin.cursos');
 
     Route::get('/admin/cursos/listado', function () {
         return view('admin.cursos-listado');
-    })->middleware('can:abm-cursos')->name('admin.cursos.listado');
+    })->middleware('can:courses.view')->name('admin.cursos.listado');
 
     Route::get('/admin/cursos/materias', function () {
         return view('admin.cursos-materias');
-    })->middleware('can:abm-cursos')->name('admin.cursos.materias');
+    })->middleware('can:course_subjects.view')->name('admin.cursos.materias');
 
     Route::get('/admin/docentes', function () {
         return view('admin.docentes');
-    })->middleware('can:abm-docentes')->name('admin.docentes');
+    })->middleware('can:teachers.view')->name('admin.docentes');
 
     Route::get('/admin/espacios', function () {
         return redirect()->route('admin.espacios.utilizacion');
-    })->middleware('can:abm-espacios')->name('admin.espacios');
+    })->middleware('can:spaces.utilization')->name('admin.espacios');
 
     Route::get('/admin/espacios/utilizacion', function () {
         return view('admin.espacios-utilizacion');
-    })->middleware('can:abm-espacios')->name('admin.espacios.utilizacion');
+    })->middleware('can:spaces.utilization')->name('admin.espacios.utilizacion');
 
     Route::get('/admin/espacios/administracion', function () {
         return view('admin.espacios-administracion');
-    })->middleware('can:abm-espacios')->name('admin.espacios.administracion');
+    })->middleware('can:spaces.view')->name('admin.espacios.administracion');
 
     Route::get('/admin/cambios-horario', function () {
         return view('admin.cambios-horario');
-    })->middleware('can:ver-cambios-horario')->name('admin.cambios-horario');
+    })->middleware('can:schedule_changes.view')->name('admin.cambios-horario');
 
     Route::get('/admin/alertas/superposiciones-docentes', function (DocenteSuperposicionDetector $detector) {
         return view('admin.alertas-superposiciones-docentes', [
             'conflictos' => $detector->detect(),
         ]);
-    })->middleware('can:abm-docentes')->name('admin.alertas.superposiciones-docentes');
+    })->middleware('can:alerts.superpositions')->name('admin.alertas.superposiciones-docentes');
 
     Route::get('/pdf/horario-curso/{curso}', [PdfController::class, 'horarioCurso'])
+        ->middleware('can:schedules.export_pdf')
         ->name('pdf.horario-curso');
 
     Route::get('/pdf/utilizacion-espacios/{espacio}', [PdfController::class, 'utilizacionEspacios'])
-        ->middleware('can:abm-espacios')
+        ->middleware('can:spaces.utilization')
         ->name('pdf.utilizacion-espacios');
 
     Route::get('/pdf/cambio-horario/{cambio}/acta', [PdfController::class, 'cambioHorarioActa'])
-        ->middleware('can:firmar-cambios-horario')
+        ->middleware('can:schedule_changes.sign')
         ->name('pdf.cambio-horario-acta');
 
     Route::get('/pdf/cambio-horario/{cambio}/acta-firmada', [PdfController::class, 'cambioHorarioActaFirmada'])
-        ->middleware('can:ver-cambios-horario')
+        ->middleware('can:schedule_changes.view')
         ->name('pdf.cambio-horario-acta-firmada');
 });
 

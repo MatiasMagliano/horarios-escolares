@@ -81,7 +81,7 @@ new class extends Component {
 
     public function guardar()
     {
-        Gate::authorize('abm-cursos');
+        Gate::authorize('course_subjects.create');
 
         $this->mensajeError = null;
         $this->validate();
@@ -105,7 +105,7 @@ new class extends Component {
 
     public function editar($id)
     {
-        Gate::authorize('abm-cursos');
+        Gate::authorize('course_subjects.update');
 
         $this->mensajeError = null;
         $cm = CursoMateria::where('curso_id', $this->curso->id)
@@ -134,7 +134,7 @@ new class extends Component {
 
     public function actualizar()
     {
-        Gate::authorize('abm-cursos');
+        Gate::authorize('course_subjects.update');
 
         $this->mensajeError = null;
         $this->validate([
@@ -173,7 +173,7 @@ new class extends Component {
 
     public function eliminar($id)
     {
-        Gate::authorize('abm-cursos');
+        Gate::authorize('course_subjects.delete');
 
         $this->mensajeError = null;
 
@@ -285,6 +285,7 @@ new class extends Component {
     @endif
 
     <div class="row g-4 mt-1">
+        @can('course_subjects.create')
         <div class="col-xl-4">
             <div class="card h-100 shadow-sm">
                 <div class="card-header bg-light">
@@ -343,8 +344,9 @@ new class extends Component {
                 </div>
             </div>
         </div>
+        @endcan
 
-        <div class="col-xl-8">
+        <div class="@can('course_subjects.create') col-xl-8 @else col-12 @endcan">
             <div class="card shadow-sm">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <div>
@@ -390,20 +392,24 @@ new class extends Component {
                                         <span class="fw-semibold">{{ $cm->horario_base_count }}</span>
                                     </td>
                                     <td class="text-center">
-                                        <button
-                                            type="button"
-                                            wire:click="editar({{ $cm->id }})"
-                                            class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </button>
-                                        <button
-                                            type="button"
-                                            wire:click="eliminar({{ $cm->id }})"
-                                            class="btn btn-sm btn-outline-danger"
-                                            data-bs-toggle="tooltip" data-bs-placement="right" title="Eliminación no disponible si la materia tiene horarios cargados"
-                                            >
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                                        @can('course_subjects.update')
+                                            <button
+                                                type="button"
+                                                wire:click="editar({{ $cm->id }})"
+                                                class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
+                                        @endcan
+                                        @can('course_subjects.delete')
+                                            <button
+                                                type="button"
+                                                wire:click="eliminar({{ $cm->id }})"
+                                                class="btn btn-sm btn-outline-danger"
+                                                data-bs-toggle="tooltip" data-bs-placement="right" title="Eliminación no disponible si la materia tiene horarios cargados"
+                                                >
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        @endcan
                                     </td>
                                 </tr>
                                 @endforeach

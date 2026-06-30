@@ -125,7 +125,7 @@
                         @endif
 
                         @if($c->puedeAnular())
-                            @can('anular-cambios-horario', $c)
+                            @can('schedule_changes.delete')
                             <button wire:click="anular({{ $c->id }})"
                                 wire:confirm="¿Confirmás que querés anular este cambio de horario?"
                                 type="button"
@@ -543,9 +543,7 @@
                                 <tr>
                                     <th>Horario base</th>
                                     <th>Nuevo día</th>
-                                    <th>Nuevo curso</th>
                                     <th>Nuevo bloque</th>
-                                    <th>Nuevo docente</th>
                                     <th>Obs.</th>
                                 </tr>
                             </thead>
@@ -555,17 +553,18 @@
                                 $hb = $detalle->horarioBase;
                                 $hbMateria = $hb?->cursoMateria?->materia?->nombre ?? '—';
                                 $hbDocente = $hb?->docenteVigente?->nombre ?? '—';
-                                $hbBloque = $hb?->bloque?->hora_inicio?->format('H:i') . ' - ' . $hb?->bloque?->hora_fin?->format('H:i');
+                                $hbDia = $this->diaSemanaTexto($hb?->dia_semana);
+                                $hbBloque = $hb?->bloque
+                                    ? trim($hb->bloque->nombre . ' (' . $hb->bloque->hora_inicio?->format('H:i') . ' - ' . $hb->bloque->hora_fin?->format('H:i') . ')')
+                                    : '—';
                                 @endphp
                                 <tr>
                                     <td>
                                         <div>{{ $hbMateria }}</div>
-                                        <div class="small text-muted">{{ $hbDocente }} · {{ $hbBloque }}</div>
+                                        <div class="small text-muted">{{ $hbDocente }} · {{ $hbDia }} · {{ $hbBloque }}</div>
                                     </td>
                                     <td>{{ $this->diaSemanaTexto($detalle->dia_nuevo) }}</td>
-                                    <td>{{ $detalle->cursoNuevo?->nombre_completo ?? '—' }}</td>
                                     <td>{{ $detalle->bloqueNuevo?->nombre ?? '—' }}</td>
-                                    <td>{{ $detalle->docenteNuevo?->nombre_completo ?? $detalle->docenteNuevo?->nombre ?? '—' }}</td>
                                     <td>{{ $detalle->observaciones ?: '—' }}</td>
                                 </tr>
                                 @endforeach

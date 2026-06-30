@@ -1,0 +1,5 @@
+USUARIO/MODULO,Horarios,Cursos,Docentes,Materias,Espacios,Cambios horarios
+admin.institucion@example.com,TODOS,TODOS,TODOS,TODOS,TODOS,TODOS
+preceptor@example.com,VER,VER,VER,VER,VER,VER
+aprobador@example.com,VER,VER,TODOS,VER,VER,TODOS
+secretario@example.com,VER,VER,TODOS,TODOS,VER,TODOS

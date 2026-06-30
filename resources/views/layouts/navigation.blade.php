@@ -19,13 +19,15 @@
                         <i class="bi bi-house me-2"></i>Inicio
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.horarios') ? 'active' : '' }}"
-                        href="{{ route('admin.horarios') }}">
-                        <i class="bi bi-calendar-check me-2"></i>Horarios
-                    </a>
-                </li>
-                @can('abm-cursos')
+                @can('schedules.view')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.horarios') ? 'active' : '' }}"
+                            href="{{ route('admin.horarios') }}">
+                            <i class="bi bi-calendar-check me-2"></i>Horarios
+                        </a>
+                    </li>
+                @endcan
+                @can('courses.view')
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.cursos') || request()->routeIs('admin.cursos.*') ? 'active' : '' }}"
                             href="{{ route('admin.cursos.listado') }}">
@@ -33,7 +35,7 @@
                         </a>
                     </li>
                 @endcan
-                @can('abm-docentes')
+                @can('teachers.view')
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.docentes') ? 'active' : '' }}"
                             href="{{ route('admin.docentes') }}">
@@ -41,7 +43,7 @@
                         </a>
                     </li>
                 @endcan
-                @can('abm-espacios')
+                @can('spaces.utilization')
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.espacios') || request()->routeIs('admin.espacios.*') ? 'active' : '' }}"
                             href="{{ route('admin.espacios.utilizacion') }}">
@@ -49,7 +51,7 @@
                         </a>
                     </li>
                 @endcan
-                @can('ver-cambios-horario')
+                @can('schedule_changes.view')
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.cambios-horario') ? 'active' : '' }}"
                             href="{{ route('admin.cambios-horario') }}">
@@ -62,7 +64,7 @@
                         <a class="nav-link dropdown-toggle {{ request()->routeIs('admin.instituciones') || request()->routeIs('admin.materias') || request()->routeIs('admin.usuarios') ? 'active' : '' }}"
                             href="#" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
-                            <i class="bi bi-gear me-2"></i>Admin escuelas
+                            <i class="bi bi-gear me-2"></i>Admininistración general
                         </a>
                         <ul class="dropdown-menu">
                             <li>
@@ -97,12 +99,11 @@
                         $institucionActiva = $usuarioActual?->institucionActiva;
                         $rolActivo = $usuarioActual?->roleNameInInstitucion($institucionActiva?->id);
                         $rolesActivos = [
-                            'admin' => 'Administrador',
+                            'administrador' => 'Administrador',
                             'preceptor' => 'Preceptor',
                             'aprobador' => 'Aprobador',
                             'secretario' => 'Secretario',
-                            'solicitante' => 'Solicitante',
-                            'Super-admin' => 'Super-admin',
+                            'super-admin' => 'Super-admin',
                         ];
                     @endphp
                     <li class="nav-item me-lg-3">

@@ -100,24 +100,24 @@ class CursoSeeder_4B extends BaseCursoSeeder
             // Si tuviera contraturno:
             'contraturno_maniana' => [
                 1 => [ // M1
-                    1 => [null],  // LUNES
+                    1 => ['Programación I'],  // LUNES
                     2 => [null],  // MARTES
                     3 => ['Programación I'],  // MIÉRCOLES
-                    4 => ['Programación I'],  // JUEVES
+                    4 => [null],  // JUEVES
                     5 => [null],  // VIERNES
                 ],
                 2 => [ // M2
-                    1 => [null],  // LUNES
+                    1 => ['Programación I'],  // LUNES
                     2 => [null],  // MARTES
                     3 => ['Programación I'],  // MIÉRCOLES
-                    4 => ['Programación I'],  // JUEVES
+                    4 => [null],  // JUEVES
                     5 => [null],  // VIERNES
                 ],
                 3 => [ // M3
-                    1 => [null],  // LUNES
+                    1 => ['Programación I'],  // LUNES
                     2 => [null],  // MARTES
                     3 => ['Programación I'],  // MIÉRCOLES
-                    4 => ['Programación I'],  // JUEVES
+                    4 => [null],  // JUEVES
                     5 => [null],  // VIERNES
                 ],
                 5 => [ // M4

@@ -99,7 +99,7 @@ new class extends Component
 
     public function save()
     {
-        Gate::authorize('abm-cursos');
+        Gate::authorize($this->editing ? 'courses.update' : 'courses.create');
 
         $this->validate();
 

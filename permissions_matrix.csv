@@ -1,0 +1,59 @@
+Module,Entity,Action,Permission,Exists,Notes,CurrentUsageNotes
+Horarios,Horario,Create,horarios.create,no,"Separate create gate recommended","Gate currently uses `editar-horarios` for edits; separate create gate missing"
+Horarios,Horario,Read,ver-horarios,yes,,"Defined in AppServiceProvider; used in views and dashboard"
+Horarios,Horario,Update,horarios.update,no,"Split from editar-horarios recommended","Gate currently uses `editar-horarios`; consider splitting"
+Horarios,Horario,Delete,horarios.delete,no,,"No specific gate; deletion controlled by component-level checks"
+Horarios,Horario,Export PDF,pdf.horario-curso,no,,"Route exists without `can:` middleware; consider restricting"
+Bloques,BloqueHorario,Create,bloques.create,no,,"No gate; component `ConfiguracionBloqueHorario` lacks authorization"
+Bloques,BloqueHorario,Read,bloques.view,no,,"No gate; UI access depends on page-level permissions"
+Bloques,BloqueHorario,Update,bloques.update,no,,"No gate; component methods unprotected"
+Bloques,BloqueHorario,Delete,bloques.delete,no,,
+Cursos,Curso,Create,cursos.create,no,"Recommend split from abm-cursos","Currently `abm-cursos` used as coarse permission"
+Cursos,Curso,Read,cursos.view,no,,"Currently `abm-cursos` covers all actions"
+Cursos,Curso,Update,cursos.update,no,,
+Cursos,Curso,Delete,cursos.delete,no,,
+CursoMaterias,CursoMateria,Create,curso_materias.create,no,,"Uses `abm-cursos` gate in controllers/components"
+CursoMaterias,CursoMateria,Read,curso_materias.view,no,,
+CursoMaterias,CursoMateria,Update,curso_materias.update,no,,
+CursoMaterias,CursoMateria,Delete,curso_materias.delete,no,,
+Docentes,Docente,Create,docentes.create,no,,"`abm-docentes` used for all actions now"
+Docentes,Docente,Read,docentes.view,no,,
+Docentes,Docente,Update,docentes.update,no,,
+Docentes,Docente,Delete,docentes.delete,no,,
+Docentes,Docente,Activate,activar-docentes,yes,,"Specific gate `activar-docentes` exists"
+Materias,Materia,Create,materias.create,no,,"No gate; route under super-admin group currently"
+Materias,Materia,Read,materias.view,no,,
+Materias,Materia,Update,materias.update,no,,
+Materias,Materia,Delete,materias.delete,no,,
+Espacios,EspacioFisico,Create,espacios.create,no,,"Uses `abm-espacios` currently"
+Espacios,EspacioFisico,Read,espacios.view,no,,"`abm-espacios` covers module"
+Espacios,EspacioFisico,Update,espacios.update,no,,
+Espacios,EspacioFisico,Delete,espacios.delete,no,,
+Espacios,Utilizacion,View,espacios.utilizacion,yes,,"Route `pdf.utilizacion-espacios` protected by `can:abm-espacios`"
+Cambios,CambioHorario,Create,cambios.create,yes,,"Gate `crear-cambios-horario` exists"
+Cambios,CambioHorario,Read,cambios.view,yes,,"Gate `ver-cambios-horario` exists"
+Cambios,CambioHorario,Update,cambios.update,no,,"Edits reuse `crear-cambios-horario` gate; consider split"
+Cambios,CambioHorario,Delete,cambios.delete,yes,,"Gate `anular-cambios-horario` exists (complex logic)"
+Cambios,CambioHorario,Approve,cambios.approve,yes,,"Gate `aprobar-cambios-horario` exists"
+Cambios,CambioHorario,Manage,cambios.manage,yes,,"`gestionar-cambios-horario` delegates to `aprobar-cambios-horario`"
+Cambios,CambioHorario,Make Effective,cambios.effective,yes,,"Gate `efectivizar-cambios-horario` exists"
+Cambios,CambioHorario,Sign,cambios.sign,yes,,"Gate `firmar-cambios-horario` exists"
+Instituciones,Institucion,Create,instituciones.create,yes,,"Routes under `super-admin` middleware"
+Instituciones,Institucion,Read,instituciones.view,yes,,"Super-admin can list; users have institucionesDisponibles"
+Instituciones,Institucion,Update,instituciones.update,yes,,"Super-admin only"
+Instituciones,Institucion,Delete,instituciones.delete,yes,,"Super-admin only"
+Usuarios,User,Create,usuarios.create,yes,,"`UsuariosAdmin` Livewire aborts unless super-admin"
+Usuarios,User,Read,usuarios.view,yes,,"super-admin only UI"
+Usuarios,User,Update,usuarios.update,yes,,"Includes roles per institution logic"
+Usuarios,User,Delete,usuarios.delete,yes,,"super-admin only"
+Roles,Role,Create,roles.create,partial,,"Created by seeders per institution; no UI"
+Roles,Role,Read,roles.view,no,,"No full UI; need admin.permisos interface"
+Roles,Role,Update,roles.update,no,,"To implement: assign permissions to roles per institution"
+Roles,Role,Delete,roles.delete,no,,
+Permisos,Permission,Create,permissions.create,no,,"Spatie-backed; no UI"
+Permisos,Permission,Read,permissions.view,no,,
+Permisos,Permission,Update,permissions.update,no,,
+Permisos,Permission,Delete,permissions.delete,no,,
+Dashboard,Dashboard,Read,dashboard.view,partial,,"Various views rely on module gates (`ver-horarios`, `abm-docentes`)"
+Reportes,PDFs,Generate,pdf.generate,partial,,"Some routes protected, others not (e.g., `pdf.horario-curso` unprotected)"
+Otros,AlertasSuperposiciones,Read,alertas.superposiciones,yes,,"Route guarded with `can:abm-docentes`"

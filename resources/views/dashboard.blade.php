@@ -14,7 +14,7 @@
                     </div>
 
                     <div class="text-lg-end">
-                        @can('ver-horarios')
+                        @can('schedules.view')
                             <a href="{{ route('admin.horarios') }}" class="btn btn-primary">
                                 Ir a horarios
                             </a>
@@ -25,17 +25,17 @@
                 <hr class="my-4">
 
                 <div class="row g-3">
-                    @can('abm-docentes')
+                    @can('alerts.superpositions')
                         <div class="col-6 mb-4">
                             <livewire:dashboard-superposiciones-docentes />
                         </div>
                     @endcan
-                    @can('ver-cambios-horario')
+                    @can('schedule_changes.view')
                         <div class="col-6 mb-4">
                             <livewire:dashboard-cambios-horarios />
                         </div>
                     @endcan
-                    @can('abm-cursos')
+                    @can('courses.view')
                         <div class="col-12">
                             <livewire:dashboard-cursos-asignacion />
                         </div>

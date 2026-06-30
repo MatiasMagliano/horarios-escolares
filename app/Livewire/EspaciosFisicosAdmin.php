@@ -51,7 +51,7 @@ class EspaciosFisicosAdmin extends Component
 
     public function guardar(): void
     {
-        Gate::authorize('abm-espacios');
+        Gate::authorize('spaces.create');
 
         $this->validate();
 
@@ -67,7 +67,7 @@ class EspaciosFisicosAdmin extends Component
 
     public function editar(int $id): void
     {
-        Gate::authorize('abm-espacios');
+        Gate::authorize('spaces.update');
 
         $espacio = EspacioFisico::findOrFail($id);
 
@@ -81,7 +81,7 @@ class EspaciosFisicosAdmin extends Component
 
     public function actualizar(): void
     {
-        Gate::authorize('abm-espacios');
+        Gate::authorize('spaces.update');
 
         if (!$this->editandoId) {
             return;

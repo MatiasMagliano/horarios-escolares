@@ -72,7 +72,7 @@ new class extends Component
 
     public function save()
     {
-        Gate::authorize('abm-docentes');
+        Gate::authorize($this->editing ? 'teachers.update' : 'teachers.create');
 
         $this->validate();
 
@@ -85,7 +85,7 @@ new class extends Component
             'email' => filled($this->email) ? mb_strtolower(trim($this->email)) : null,
         ];
 
-        if (! $this->editing || Gate::allows('activar-docentes')) {
+        if (! $this->editing || Gate::allows('teachers.activate')) {
             $data['activo'] = $this->activo;
         }
 
@@ -105,7 +105,7 @@ new class extends Component
     // se pone acá, porque se dispara confirmación antes de proceder
     public function eliminar()
     {
-        Gate::authorize('abm-docentes');
+        Gate::authorize('teachers.delete');
 
         if (!$this->docente) return;
 
