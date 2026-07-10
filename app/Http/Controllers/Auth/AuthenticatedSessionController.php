@@ -33,9 +33,10 @@ class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
         $instituciones = $user->instituciones_disponibles;
+        $institucionPredeterminada = $instituciones->firstWhere('id', (int) $user->institucion_activa_id);
 
-        if ($instituciones->count() === 1) {
-            $institucion = $instituciones->first();
+        if ($institucionPredeterminada || $instituciones->count() === 1) {
+            $institucion = $institucionPredeterminada ?? $instituciones->first();
             $request->session()->put('institucion_id', $institucion->id);
             $user->activarInstitucion($institucion);
             app(PermissionRegistrar::class)->setPermissionsTeamId($institucion->id);

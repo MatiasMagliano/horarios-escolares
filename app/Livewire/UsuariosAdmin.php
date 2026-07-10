@@ -189,7 +189,7 @@ class UsuariosAdmin extends Component
             && $this->institucion_activa_id
             && ! $instituciones->contains((int) $this->institucion_activa_id)
         ) {
-            $this->addError('institucion_activa_id', 'La escuela activa debe estar entre las escuelas vinculadas.');
+            $this->addError('institucion_activa_id', 'La escuela predeterminada debe estar entre las escuelas vinculadas.');
 
             return;
         }

@@ -33,7 +33,9 @@
                                 <th style="width: 20%;">Hora Fin</th>
                                 <th style="width: 15%;">Duración</th>
                                 <th style="width: 12%;">Tipo</th>
-                                <th style="width: 8%;">Acciones</th>
+                                @if ($puedeEditarBloques || $puedeEliminarBloques)
+                                    <th style="width: 8%;">Acciones</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -51,25 +53,32 @@
                                             {{ ucfirst($bloque['tipo']) }}
                                         </span>
                                     </td>
-                                    <td class="text-center">
-                                        <button type="button" 
-                                            wire:click="editarBloque({{ $bloque['id'] }})"
-                                            class="btn btn-sm btn-outline-primary"
-                                            title="Editar">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </button>
-                                        <button type="button" 
-                                            wire:click="eliminarBloque({{ $bloque['id'] }})"
-                                            class="btn btn-sm btn-outline-danger"
-                                            title="Eliminar"
-                                            onclick="return confirm('¿Está seguro?')">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </td>
+                                    @if ($puedeEditarBloques || $puedeEliminarBloques)
+                                        <td class="text-center">
+                                            @if ($puedeEditarBloques)
+                                                <button type="button"
+                                                    wire:click="editarBloque({{ $bloque['id'] }})"
+                                                    class="btn btn-sm btn-outline-primary"
+                                                    title="Editar">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
+                                            @endif
+
+                                            @if ($puedeEliminarBloques)
+                                                <button type="button"
+                                                    wire:click="eliminarBloque({{ $bloque['id'] }})"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    title="Eliminar"
+                                                    onclick="return confirm('¿Está seguro?')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            @endif
+                                        </td>
+                                    @endif
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted py-4">
+                                    <td colspan="{{ $puedeEditarBloques || $puedeEliminarBloques ? 7 : 6 }}" class="text-center text-muted py-4">
                                         No hay bloques configurados para este turno
                                     </td>
                                 </tr>
@@ -79,9 +88,9 @@
                 </div>
 
                 <!-- Botón Agregar -->
-                @if (!$editandoBloqueId && !$agregarNuevo)
-                    <button type="button" 
-                        wire:click="$set('agregarNuevo', true)"
+                @if ($puedeCrearBloques && !$editandoBloqueId && !$agregarNuevo)
+                    <button type="button"
+                        wire:click="iniciarCreacion"
                         class="btn btn-success mb-4">
                         <i class="bi bi-plus-circle me-1"></i> Agregar Bloque
                     </button>

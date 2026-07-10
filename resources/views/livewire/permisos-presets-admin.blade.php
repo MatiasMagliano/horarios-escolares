@@ -40,7 +40,7 @@
                     Restaurar predeterminado
                 </button>
                 <button type="button" wire:click="guardar" class="btn btn-primary btn-sm">
-                    Guardar preset
+                    Guardar y aplicar
                 </button>
                 <button type="button"
                     wire:click="eliminar"
@@ -77,7 +77,7 @@
                                     </td>
                                     <td class="text-center">
                                         <input type="checkbox"
-                                            wire:model.defer="checked.{{ $moduleKey }}.{{ $actionKey }}"
+                                            wire:model="checked.{{ $moduleKey }}.{{ $actionKey }}"
                                             class="form-check-input"
                                             aria-label="{{ $module['label'] }} - {{ $label }}">
                                     </td>

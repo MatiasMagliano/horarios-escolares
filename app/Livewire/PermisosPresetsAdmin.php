@@ -8,6 +8,9 @@ use App\Support\Permissions\RolePermissionPresetResolver;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class PermisosPresetsAdmin extends Component
 {
@@ -67,22 +70,32 @@ class PermisosPresetsAdmin extends Component
                 ['role_name' => $this->roleName],
                 ['permissions' => $permissions]
             );
+
+            $this->sincronizarRolesExistentes($this->roleName, $permissions);
         });
 
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
         $this->presetPersonalizado = true;
-        session()->flash('success', 'Preset guardado correctamente.');
+        session()->flash('success', 'Preset guardado y aplicado a los roles existentes.');
     }
 
     public function eliminar(): void
     {
+        $permissions = PermissionCatalog::rolePermissions()[$this->roleName] ?? [];
+
         RolePermissionPreset::query()
             ->where('role_name', $this->roleName)
             ->delete();
 
+        DB::transaction(function () use ($permissions) {
+            $this->sincronizarRolesExistentes($this->roleName, $permissions);
+        });
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
         $this->presetPersonalizado = false;
         $this->cargarPredeterminado();
 
-        session()->flash('success', 'Preset personalizado eliminado. Se restauró el predeterminado del sistema.');
+        session()->flash('success', 'Preset personalizado eliminado y predeterminado aplicado a los roles existentes.');
     }
 
     public function render()
@@ -126,5 +139,33 @@ class PermisosPresetsAdmin extends Component
         }
 
         return array_values(array_unique($selected));
+    }
+
+    /**
+     * @param array<int, string> $permissions
+     */
+    private function sincronizarRolesExistentes(string $roleName, array $permissions): void
+    {
+        $teamKey = config('permission.column_names.team_foreign_key');
+
+        foreach (PermissionCatalog::names() as $permissionName) {
+            Permission::query()->firstOrCreate([
+                'name' => $permissionName,
+                'guard_name' => 'web',
+            ]);
+        }
+
+        try {
+            Role::query()
+                ->where('name', $roleName)
+                ->where('guard_name', 'web')
+                ->get()
+                ->each(function (Role $role) use ($permissions, $teamKey) {
+                    app(PermissionRegistrar::class)->setPermissionsTeamId($role->{$teamKey});
+                    $role->syncPermissions($permissions);
+                });
+        } finally {
+            app(PermissionRegistrar::class)->setPermissionsTeamId(null);
+        }
     }
 }

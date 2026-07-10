@@ -5,10 +5,13 @@ namespace App\Livewire;
 use App\Models\BloqueHorarioConfig;
 use App\Models\Institucion;
 use App\Support\Horarios\BloqueHorarioTemplateManager;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 
 class ConfiguracionBloqueHorario extends Component
 {
+    use AuthorizesRequests;
+
     public ?int $institucionId = null;
     public ?Institucion $institucion = null;
     public string $turnoSeleccionado = 'maniana';
@@ -23,6 +26,8 @@ class ConfiguracionBloqueHorario extends Component
 
     public function mount(?int $institucionId = null): void
     {
+        $this->authorize('time_blocks.view');
+
         if ($institucionId) {
             $this->institucionId = $institucionId;
             $this->cargarInstitucion();
@@ -67,13 +72,24 @@ class ConfiguracionBloqueHorario extends Component
 
     public function cambiarTurno(string $turno): void
     {
+        $this->authorize('time_blocks.view');
+
         $this->turnoSeleccionado = $turno;
         $this->cargarBloquesPorTurno();
         $this->cancelarEdicion();
     }
 
+    public function iniciarCreacion(): void
+    {
+        $this->authorize('time_blocks.create');
+
+        $this->agregarNuevo = true;
+    }
+
     public function editarBloque(int $bloqueId): void
     {
+        $this->authorize('time_blocks.update');
+
         $bloque = BloqueHorarioConfig::withoutGlobalScope('institucion')
             ->where('institucion_id', $this->institucionId)
             ->findOrFail($bloqueId);
@@ -87,6 +103,8 @@ class ConfiguracionBloqueHorario extends Component
 
     public function guardarBloque(): void
     {
+        $this->authorize('time_blocks.update');
+
         $this->validate([
             'bloqueNombre' => 'required|string|max:50',
             'bloqueHoraInicio' => 'required|date_format:H:i',
@@ -118,6 +136,8 @@ class ConfiguracionBloqueHorario extends Component
 
     public function agregarBloque(): void
     {
+        $this->authorize('time_blocks.create');
+
         if (!$this->institucion) {
             return;
         }
@@ -155,6 +175,8 @@ class ConfiguracionBloqueHorario extends Component
 
     public function eliminarBloque(int $bloqueId): void
     {
+        $this->authorize('time_blocks.delete');
+
         $bloque = BloqueHorarioConfig::withoutGlobalScope('institucion')
             ->where('institucion_id', $this->institucionId)
             ->findOrFail($bloqueId);
@@ -183,6 +205,10 @@ class ConfiguracionBloqueHorario extends Component
 
     public function render()
     {
-        return view('livewire.configuracion-bloque-horario');
+        return view('livewire.configuracion-bloque-horario', [
+            'puedeCrearBloques' => auth()->user()?->can('time_blocks.create') ?? false,
+            'puedeEditarBloques' => auth()->user()?->can('time_blocks.update') ?? false,
+            'puedeEliminarBloques' => auth()->user()?->can('time_blocks.delete') ?? false,
+        ]);
     }
 }

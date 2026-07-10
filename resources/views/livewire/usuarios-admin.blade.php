@@ -29,7 +29,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Usuario</th>
-                                <th>Escuela activa</th>
+                                <th>Escuela predeterminada</th>
                                 <th>Escuelas y roles</th>
                                 <th>Alcance</th>
                                 <th class="text-center" style="width: 10%;">Acciones</th>
@@ -43,7 +43,7 @@
                                     <div class="text-muted small">{{ $usuario->email }}</div>
                                 </td>
                                 <td>
-                                    {{ $usuario->institucionActiva?->nombre_institucion ?? 'Sin escuela activa' }}
+                                    {{ $usuario->institucionActiva?->nombre_institucion ?? 'Sin escuela predeterminada' }}
                                 </td>
                                 <td>
                                     @forelse ($usuario->instituciones as $institucion)
@@ -119,7 +119,7 @@
                             </h5>
                             <p class="text-muted small mb-0">
                                 @if ($modoFormulario === 'acceso')
-                                Definí sus escuelas vinculadas, escuela activa y rol en cada escuela.
+                                Definí sus escuelas vinculadas, escuela predeterminada y rol en cada escuela.
                                 @elseif ($editandoId)
                                 Actualizá sus datos básicos y contraseña.
                                 @else
@@ -234,12 +234,12 @@
 
                         <div class="row g-3">
                             <div class="col-12">
-                                <label class="form-label">Escuela activa</label>
+                                <label class="form-label">Escuela predeterminada</label>
                                 <select wire:model="institucion_activa_id"
                                     class="form-select"
                                     @disabled(! $is_super_admin && $institucionesEscuelaActiva->isEmpty())>
                                     <option value="">
-                                        {{ $is_super_admin ? 'Sin escuela activa' : 'Seleccioná una escuela vinculada' }}
+                                        {{ $is_super_admin ? 'Sin escuela predeterminada' : 'Seleccioná una escuela vinculada' }}
                                     </option>
                                     @foreach ($institucionesEscuelaActiva as $institucion)
                                     <option value="{{ $institucion->id }}">

@@ -24,28 +24,29 @@
     </div>
     @endif
 
-    <table class="table table-bordered table-sm">
-        <thead>
-            <tr class="text-center">
-                <th>Solicitud</th>
-                <th>Duración</th>
-                <th>Tipo de cambio</th>
-                <th>Desde</th>
-                <th>Hasta</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($cambios as $c)
-            <tr>
-                <td class="text-center align-middle">{{ $c->pedido_en->format('d/m/Y') }}</td>
-                <td class="text-center align-middle">{{ ucfirst($c->duracionBD) }}</td>
-                <td class="text-center align-middle">{{ ucfirst($c->tipo_cambioBD) }}</td>
-                <td class="text-center align-middle">{{ $c->fecha_desde->format('d/m/Y') }}</td>
-                <td class="text-center align-middle">{{ $c->fecha_hasta ? $c->fecha_hasta->format('d/m/Y') : 'sin final' }}</td>
-                <td class="text-center align-middle">
-                    <span class="badge bg-{{ match($c->estado) {
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr class="text-center">
+                    <th>Solicitud</th>
+                    <th>Duración</th>
+                    <th>Tipo de cambio</th>
+                    <th>Desde</th>
+                    <th>Hasta</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($cambios as $c)
+                <tr>
+                    <td class="text-center align-middle">{{ $c->pedido_en->format('d/m/Y') }}</td>
+                    <td class="text-center align-middle">{{ ucfirst($c->duracionBD) }}</td>
+                    <td class="text-center align-middle">{{ ucfirst($c->tipo_cambioBD) }}</td>
+                    <td class="text-center align-middle">{{ $c->fecha_desde->format('d/m/Y') }}</td>
+                    <td class="text-center align-middle">{{ $c->fecha_hasta ? $c->fecha_hasta->format('d/m/Y') : 'sin final' }}</td>
+                    <td class="text-center align-middle">
+                        <span class="badge bg-{{ match($c->estado) {
                     'borrador' => 'secondary',
                     'autorizado' => 'info',
                     'firmado' => 'warning',
@@ -53,78 +54,78 @@
                     'finalizado' => 'dark',
                     'anulado' => 'danger',
                 } }}">
-                        {{ ucfirst($c->estado) }}
-                    </span>
-                </td>
-                <td class="text-center align-middle">
+                            {{ ucfirst($c->estado) }}
+                        </span>
+                    </td>
+                    <td class="text-center align-middle">
 
-                    <div class="btn-group" role="group">
-                        <button wire:click="verDetalle({{ $c->id }})"
-                            type="button"
-                            class="btn btn-sm btn-outline-secondary">
-                            Ver detalles
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button wire:click="verDetalle({{ $c->id }})"
+                                type="button"
+                                class="btn btn-sm btn-outline-secondary">
+                                Ver detalles
+                            </button>
 
-                        @if($puedeCrearCambios && $c->estado === 'borrador')
-                        <button wire:click="editar({{ $c->id }})"
-                            type="button"
-                            class="btn btn-sm btn-outline-primary">
-                            Editar borrador
-                        </button>
-                        @endif
+                            @if($puedeCrearCambios && $c->estado === 'borrador')
+                            <button wire:click="editar({{ $c->id }})"
+                                type="button"
+                                class="btn btn-sm btn-outline-primary">
+                                Editar borrador
+                            </button>
+                            @endif
 
-                        @if($puedeFirmarCambios && $c->estado === 'autorizado' && $c->acta && !$c->path_acta)
-                        <a
-                            href="{{ route('pdf.cambio-horario-acta', ['cambio' => $c->id]) }}"
-                            class="btn btn-sm btn-outline-danger"
-                            target="_blank"
-                            rel="noopener noreferrer">
-                            PDF acta
-                        </a>
-                        @endif
+                            @if($puedeFirmarCambios && $c->estado === 'autorizado' && $c->acta && !$c->path_acta)
+                            <a
+                                href="{{ route('pdf.cambio-horario-acta', ['cambio' => $c->id]) }}"
+                                class="btn btn-sm btn-outline-danger"
+                                target="_blank"
+                                rel="noopener noreferrer">
+                                PDF acta
+                            </a>
+                            @endif
 
-                        @if($c->path_acta)
-                        <a
-                            href="{{ route('pdf.cambio-horario-acta-firmada', ['cambio' => $c->id]) }}"
-                            class="btn btn-sm btn-outline-secondary"
-                            target="_blank"
-                            rel="noopener noreferrer">
-                            Acta firmada
-                        </a>
-                        @endif
+                            @if($c->path_acta)
+                            <a
+                                href="{{ route('pdf.cambio-horario-acta-firmada', ['cambio' => $c->id]) }}"
+                                class="btn btn-sm btn-outline-secondary"
+                                target="_blank"
+                                rel="noopener noreferrer">
+                                Acta firmada
+                            </a>
+                            @endif
 
-                        @if($puedeAprobarCambios && $c->puedeAutorizar())
-                        <button wire:click="autorizar({{ $c->id }})"
-                            type="button"
-                            class="btn btn-sm btn-outline-info">
-                            Autorizar
-                        </button>
-                        @elseif($puedeAprobarCambios && $c->estado === 'borrador')
-                        <button type="button"
-                            class="btn btn-sm btn-outline-info"
-                            disabled
-                            title="Cargá detalles y finalizá el acta para autorizar">
-                            Autorizar
-                        </button>
-                        @endif
+                            @if($puedeAprobarCambios && $c->puedeAutorizar())
+                            <button wire:click="autorizar({{ $c->id }})"
+                                type="button"
+                                class="btn btn-sm btn-outline-info">
+                                Autorizar
+                            </button>
+                            @elseif($puedeAprobarCambios && $c->estado === 'borrador')
+                            <button type="button"
+                                class="btn btn-sm btn-outline-info"
+                                disabled
+                                title="Cargá detalles y finalizá el acta para autorizar">
+                                Autorizar
+                            </button>
+                            @endif
 
-                        @if($puedeEfectivizarCambios && $c->estado === 'firmado')
-                        <button wire:click="activar({{ $c->id }})"
-                            type="button"
-                            class="btn btn-sm btn-outline-success">
-                            Efectivizar cambio
-                        </button>
-                        @endif
+                            @if($puedeEfectivizarCambios && $c->estado === 'firmado')
+                            <button wire:click="activar({{ $c->id }})"
+                                type="button"
+                                class="btn btn-sm btn-outline-success">
+                                Efectivizar cambio
+                            </button>
+                            @endif
 
-                        @if($puedeEfectivizarCambios && $c->estado === 'activo')
-                        <button wire:click="finalizar({{ $c->id }})"
-                            type="button"
-                            class="btn btn-sm btn-outline-dark">
-                            Finalizar
-                        </button>
-                        @endif
+                            @if($puedeEfectivizarCambios && $c->estado === 'activo')
+                            <button wire:click="finalizar({{ $c->id }})"
+                                type="button"
+                                class="btn btn-sm btn-outline-dark">
+                                Finalizar
+                            </button>
+                            @endif
 
-                        @if($c->puedeAnular())
+                            @if($c->puedeAnular())
                             @can('schedule_changes.delete')
                             <button wire:click="anular({{ $c->id }})"
                                 wire:confirm="¿Confirmás que querés anular este cambio de horario?"
@@ -133,29 +134,30 @@
                                 Anular
                             </button>
                             @endcan
+                            @endif
+                        </div>
+
+                        @if($puedeFirmarCambios && $c->estado === 'autorizado')
+                        <div class="mt-2">
+                            <input type="file"
+                                wire:model="actasFirmadas.{{ $c->id }}"
+                                class="form-control form-control-sm"
+                                accept=".pdf,.jpg,.jpeg,.png">
+                            @error("actasFirmadas.$c->id") <div class="text-danger small">{{ $message }}</div> @enderror
+                            <button wire:click="firmar({{ $c->id }})"
+                                type="button"
+                                class="btn btn-sm btn-outline-warning mt-1">
+                                Subir y firmar
+                            </button>
+                        </div>
                         @endif
-                    </div>
 
-                    @if($puedeFirmarCambios && $c->estado === 'autorizado')
-                    <div class="mt-2">
-                        <input type="file"
-                            wire:model="actasFirmadas.{{ $c->id }}"
-                            class="form-control form-control-sm"
-                            accept=".pdf,.jpg,.jpeg,.png">
-                        @error("actasFirmadas.$c->id") <div class="text-danger small">{{ $message }}</div> @enderror
-                        <button wire:click="firmar({{ $c->id }})"
-                            type="button"
-                            class="btn btn-sm btn-outline-warning mt-1">
-                            Subir y firmar
-                        </button>
-                    </div>
-                    @endif
-
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 
     @endif
 
@@ -555,8 +557,8 @@
                                 $hbDocente = $hb?->docenteVigente?->nombre ?? '—';
                                 $hbDia = $this->diaSemanaTexto($hb?->dia_semana);
                                 $hbBloque = $hb?->bloque
-                                    ? trim($hb->bloque->nombre . ' (' . $hb->bloque->hora_inicio?->format('H:i') . ' - ' . $hb->bloque->hora_fin?->format('H:i') . ')')
-                                    : '—';
+                                ? trim($hb->bloque->nombre . ' (' . $hb->bloque->hora_inicio?->format('H:i') . ' - ' . $hb->bloque->hora_fin?->format('H:i') . ')')
+                                : '—';
                                 @endphp
                                 <tr>
                                     <td>
@@ -580,15 +582,15 @@
                     <h6 class="mb-2">Acta guardada generada</h6>
                     <div class="border rounded p-3 bg-light">
                         @if($cambio->acta)
-                            @include('livewire.partials.cambio-horario-acta', [
-                                'tipoCambio' => $cambio->tipo_cambio,
-                                'fechaActual' => $this->fechaActual,
-                                'cuerpoHtml' => $cambio->cuerpo_acta,
-                                'numeroActa' => $cambio->numero_acta,
-                                'anioActa' => $cambio->anio_acta,
-                            ])
+                        @include('livewire.partials.cambio-horario-acta', [
+                        'tipoCambio' => $cambio->tipo_cambio,
+                        'fechaActual' => $this->fechaActual,
+                        'cuerpoHtml' => $cambio->cuerpo_acta,
+                        'numeroActa' => $cambio->numero_acta,
+                        'anioActa' => $cambio->anio_acta,
+                        ])
                         @else
-                            <em>No hay acta guardada.</em>
+                        <em>No hay acta guardada.</em>
                         @endif
                     </div>
                 </div>
